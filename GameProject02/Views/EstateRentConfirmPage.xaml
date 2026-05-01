@@ -1,0 +1,131 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:local="clr-namespace:GameProject02.Views"
+             xmlns:controls="clr-namespace:GameProject02.Controls"
+             x:Class="GameProject02.Views.EstateRentConfirmPage"
+             NavigationPage.HasNavigationBar="False"
+             Title="تأكيد الإيجار"
+             FlowDirection="RightToLeft">
+    <Grid RowDefinitions="Auto,*,Auto" Padding="0">
+        <Image Source="background.png" Aspect="AspectFill" Opacity="1" Grid.RowSpan="3"/>
+        <local:GameHeader HeaderTitle="تأكيد الإيجار" Grid.Row="0"/>
+
+        <ScrollView Grid.Row="1" Margin="0,5,0,5">
+            <VerticalStackLayout Spacing="20" Padding="10">
+
+                <!-- بطاقة معلومات العقار -->
+                <Border Style="{StaticResource EstateSelectionCard}">
+                    <Grid>
+                        <Image Source="card_background.png" Aspect="Fill" Opacity="1"/>
+                        <Grid ColumnDefinitions="100,*" ColumnSpacing="20" Padding="20">
+                            <Border Grid.Column="0" Style="{StaticResource EstateImageFrame}" x:Name="EstateImageFrame">
+                                <Image x:Name="EstateImage" Source="dotnet_bot.png" Aspect="AspectFill"/>
+                            </Border>
+                            <StackLayout Grid.Column="1" Spacing="0" VerticalOptions="Center" HorizontalOptions="Start">
+                                <Grid ColumnDefinitions="80,*" ColumnSpacing="0">
+                                    <Label x:Name="OwnerLabelText" Text="المالك:" Style="{StaticResource EstateStatistic}"/>
+                                    <Label x:Name="OwnerLabel" Grid.Column="1" Text="" Style="{StaticResource CardDescription}"/>
+                                </Grid>
+                                <BoxView BackgroundColor="#0a0a0a" HeightRequest="1" Margin="0,3,0,3"/>
+                                <Grid ColumnDefinitions="80,*" ColumnSpacing="0">
+                                    <Label x:Name="PriceLabelText" Text="السعر:" Style="{StaticResource EstateStatistic}"/>
+                                    <Label x:Name="PricePerDayLabel" Grid.Column="1" Text="" Style="{StaticResource CardDescription}"/>
+                                </Grid>
+                                <BoxView BackgroundColor="#0a0a0a" HeightRequest="1" Margin="0,3,0,3"/>
+                                <Grid ColumnDefinitions="80,*" ColumnSpacing="0">
+                                    <Label x:Name="DurationLabelText" Text="المدة:" Style="{StaticResource EstateStatistic}"/>
+                                    <Label x:Name="MaxDurationLabel" Grid.Column="1" Text="" Style="{StaticResource CardDescription}"/>
+                                </Grid>
+                                <BoxView BackgroundColor="#0a0a0a" HeightRequest="1" Margin="0,3,0,3"/>
+                                <Grid ColumnDefinitions="80,*" ColumnSpacing="0">
+                                    <Label x:Name="HappinessLabelText" Text="السعادة:" Style="{StaticResource EstateStatistic}"/>
+                                    <Label x:Name="HappinessLabel" Grid.Column="1" Text="" Style="{StaticResource CardDescription}"/>
+                                </Grid>
+                            </StackLayout>
+                        </Grid>
+                    </Grid>
+                </Border>
+
+                <!-- بطاقة اختيار المدة -->
+                <Border Style="{StaticResource PriceInputCard}">
+                    <Grid>
+                        <Image Source="card_background_1.png" Aspect="Fill" Opacity="1"/>
+                        <StackLayout Spacing="10" Padding="20">
+                            <Label x:Name="SelectDurationTitle" Text="أختر مدة الإيجار" Style="{StaticResource CardTitle}" HorizontalOptions="Center"/>
+
+                            <!-- الإجمالي -->
+                            <Border Style="{StaticResource PriceInputField}" 
+                                    WidthRequest="250" HeightRequest="45"
+                                    HorizontalOptions="Center">
+                                <Grid>
+                                    <Image Source="card_background.png" Aspect="Fill" Opacity="1"/>
+                                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="0" Padding="20,0">
+                                        <Label Text="الإجمالي:" FontFamily="Cairo-Black" FontSize="13" TextColor="#0a0a0a" VerticalOptions="Center"/>
+                                        <Label x:Name="TotalPriceLabel" Text="" 
+                                               FontFamily="Cairo-Black" FontSize="13" TextColor="#0a0a0a"
+                                               VerticalOptions="Center" HorizontalOptions="Center" Grid.Column="1"/>
+                                    </Grid>
+                                </Grid>
+                            </Border>
+
+                            <!-- المدة -->
+                            <Border Style="{StaticResource PriceInputField}" 
+                                    WidthRequest="250" HeightRequest="45"
+                                    HorizontalOptions="Center">
+                                <Grid>
+                                    <Image Source="card_background.png" Aspect="Fill" Opacity="1"/>
+                                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="0" Padding="20,0">
+                                        <Label Text="المدة:" FontFamily="Cairo-Black" FontSize="13" TextColor="#0a0a0a" VerticalOptions="Center"/>
+                                        <Label x:Name="SelectedDurationLabel" Text="" 
+                                               FontFamily="Cairo-Black" FontSize="13" TextColor="#0a0a0a"
+                                               VerticalOptions="Center" HorizontalOptions="Center" Grid.Column="1"/>
+                                    </Grid>
+                                </Grid>
+                            </Border>
+
+                            <!-- عدد الأيام -->
+                            <Border Style="{StaticResource PriceInputField}" 
+                                    WidthRequest="150" HeightRequest="40"
+                                    HorizontalOptions="Center">
+                                <Grid>
+                                    <Image Source="input_field_bg.png" Aspect="Fill" Opacity="1"/>
+                                    <Entry x:Name="DaysEntry" 
+                                           Style="{StaticResource PriceEntry}" 
+                                           Placeholder="عدد الأيام" 
+                                           Keyboard="Numeric" 
+                                           MaxLength="2"
+                                           HeightRequest="50"
+                                           TextChanged="OnDaysChanged"
+                                           HorizontalTextAlignment="Center" 
+                                           VerticalTextAlignment="Center"/>
+                                </Grid>
+                            </Border>
+
+                            <!-- زر الإيجار -->
+                            <Grid ColumnDefinitions="*" Margin="0,20,0,0">
+                                <Border x:Name="RentBtnBorder" Style="{StaticResource TransactionButton}" 
+                                        WidthRequest="150" HeightRequest="45"
+                                        HorizontalOptions="Center">
+                                    <Grid>
+                                        <Image Source="button_background.png" Aspect="Fill" Opacity="1"/>
+                                        <Label x:Name="RentButtonLabel" Text="إيجار الآن" 
+                                               FontFamily="Cairo-Black" FontSize="14" TextColor="#0a0a0a"
+                                               HorizontalOptions="Center" VerticalOptions="Center"/>
+                                    </Grid>
+                                    <Border.GestureRecognizers>
+                                        <TapGestureRecognizer Tapped="OnRentClicked"/>
+                                    </Border.GestureRecognizers>
+                                </Border>
+                            </Grid>
+                        </StackLayout>
+                    </Grid>
+                </Border>
+
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <!-- الفوتر العام -->
+        <controls:FooterView x:Name="PageFooter" Grid.Row="2" />
+    </Grid>
+</ContentPage>

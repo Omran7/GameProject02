@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="GameProject02.Views.TopHeaderView"
+             BackgroundColor="#1a1a1a">
+
+	<Grid ColumnDefinitions="Auto, *, Auto" Padding="10,5" HeightRequest="100">
+		<!-- Background Gradient -->
+		<Grid.Background>
+			<LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+				<GradientStop Color="#2c3e50" Offset="0.0" />
+				<GradientStop Color="#000000" Offset="1.0" />
+			</LinearGradientBrush>
+		</Grid.Background>
+
+		<!-- Left Column: Avatar and Level -->
+		<HorizontalStackLayout Grid.Column="0" Spacing="10" VerticalOptions="Center">
+			<Frame CornerRadius="25" HeightRequest="50" WidthRequest="50" Padding="0" IsClippedToBounds="True" BorderColor="#45b7d1">
+				<Image x:Name="AvatarImage" Source="player_avatar.png" Aspect="AspectFill" />
+			</Frame>
+			<VerticalStackLayout VerticalOptions="Center">
+				<Label x:Name="PlayerNameLabel" Text="PLAYER" FontSize="12" FontAttributes="Bold" TextColor="White" />
+				<Label x:Name="LevelLabel" Text="LVL 1" FontSize="10" TextColor="#45b7d1" />
+			</VerticalStackLayout>
+		</HorizontalStackLayout>
+
+		<!-- Center Column: Status Bars (Now with 5 Bars) -->
+		<VerticalStackLayout Grid.Column="1" Spacing="2" VerticalOptions="Center" Margin="15,0">
+			<!-- Courage Bar -->
+			<Grid ColumnDefinitions="Auto, *">
+				<Label Text="🍷" FontSize="9" VerticalOptions="Center" Margin="0,0,5,0" />
+				<ProgressBar x:Name="CourageBar" Grid.Column="1" ProgressColor="DeepPink" HeightRequest="4" />
+			</Grid>
+			<!-- HP Bar -->
+			<Grid ColumnDefinitions="Auto, *">
+				<Label Text="❤️" FontSize="9" VerticalOptions="Center" Margin="0,0,5,0" />
+				<ProgressBar x:Name="HPBar" Grid.Column="1" ProgressColor="#ff6b6b" HeightRequest="4" />
+			</Grid>
+			<!-- Energy Bar -->
+			<Grid ColumnDefinitions="Auto, *">
+				<Label Text="⚡" FontSize="9" VerticalOptions="Center" Margin="0,0,5,0" />
+				<ProgressBar x:Name="EnergyBar" Grid.Column="1" ProgressColor="#f1c40f" HeightRequest="4" />
+			</Grid>
+			<!-- Nobility Bar (NEW) -->
+			<Grid ColumnDefinitions="Auto, *">
+				<Label Text="👑" FontSize="9" VerticalOptions="Center" Margin="0,0,5,0" />
+				<ProgressBar x:Name="NobilityBar" Grid.Column="1" ProgressColor="#9b59b6" HeightRequest="4" />
+			</Grid>
+			<!-- XP Bar -->
+			<Grid ColumnDefinitions="Auto, *">
+				<Label Text="⭐" FontSize="9" VerticalOptions="Center" Margin="0,0,5,0" />
+				<ProgressBar x:Name="XPBar" Grid.Column="1" ProgressColor="#2ecc71" HeightRequest="3" />
+			</Grid>
+		</VerticalStackLayout>
+
+		<!-- Right Column: Currencies -->
+		<HorizontalStackLayout Grid.Column="2" Spacing="12" VerticalOptions="Center">
+			<!-- Gold Only (Nobility moved to center) -->
+			<HorizontalStackLayout Spacing="4" VerticalOptions="Center">
+				<Label Text="💰" FontSize="14" />
+				<Label x:Name="GoldLabel" Text="0" FontSize="14" FontAttributes="Bold" TextColor="Gold" />
+			</HorizontalStackLayout>
+
+			<Button x:Name="DiamondButton"
+                    Text="💎 0"
+                    Padding="8,0"
+                    HeightRequest="30"
+                    FontSize="12"
+                    BackgroundColor="#3498db"
+                    TextColor="White"
+                    CornerRadius="15" />
+		</HorizontalStackLayout>
+
+		<!-- Bottom Border Accent -->
+		<BoxView Grid.ColumnSpan="3" HeightRequest="2" BackgroundColor="#45b7d1" VerticalOptions="End" Opacity="0.5" />
+	</Grid>
+</ContentView>

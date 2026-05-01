@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="GameProject02.Views.GangCreatePage"
+             BackgroundColor="#1a1a1a"
+             Title="🏴󠁥󠁮󠁧󠁢󠁳󠁣󠁿 إنشاء عصابة"
+             FlowDirection="RightToLeft"
+             Shell.NavBarIsVisible="False">
+
+    <Grid RowDefinitions="Auto,*,Auto">
+        <Border Grid.Row="0" BackgroundColor="#0a0a0a" Stroke="#e74c3c" StrokeThickness="2" Padding="10">
+            <Grid ColumnDefinitions="*,Auto">
+                <Label Text="🏴󠁥󠁮󠁧󠁢󠁳󠁣󠁿 إنشاء عصابة جديدة" TextColor="White" FontSize="18" FontAttributes="Bold" HorizontalOptions="Center"/>
+                <Button Grid.Column="1" Text="← رجوع" BackgroundColor="#95a5a6" TextColor="White" CornerRadius="8" WidthRequest="80" Clicked="OnBackClicked"/>
+            </Grid>
+        </Border>
+
+        <ScrollView Grid.Row="1">
+            <VerticalStackLayout Padding="20" Spacing="20">
+                <!-- Requirements Info -->
+                <Border BackgroundColor="#2c2c2c" Stroke="#f39c12" StrokeThickness="2" StrokeShape="RoundRectangle 12" Padding="15">
+                    <VerticalStackLayout Spacing="8">
+                        <Label Text="📋 متطلبات الإنشاء" TextColor="#f39c12" FontSize="16" FontAttributes="Bold"/>
+                        <Label Text="المستوى المطلوب: 10" TextColor="White" FontSize="14"/>
+                        <Label Text="تكلفة الإنشاء: 1000 ذهب" TextColor="White" FontSize="14"/>
+                        <Label Text="اسم العصابة: 4-15 حرف" TextColor="White" FontSize="14"/>
+                        <Label Text="رمز العصابة: 3 أحرف بالضبط" TextColor="White" FontSize="14"/>
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- Input Fields -->
+                <Border BackgroundColor="#2c2c2c" Stroke="#3498db" StrokeThickness="1" StrokeShape="RoundRectangle 10" Padding="15">
+                    <VerticalStackLayout Spacing="12">
+                        <Label Text="اسم العصابة" TextColor="White" FontSize="14" FontAttributes="Bold"/>
+                        <Entry x:Name="NameEntry" Placeholder="أدخل اسم العصابة (4-15 حرف)" TextColor="White" PlaceholderColor="#888" MaxLength="15" BackgroundColor="#333"/>
+
+                        <Label Text="رمز العصابة" TextColor="White" FontSize="14" FontAttributes="Bold"/>
+                        <Entry x:Name="TagEntry" Placeholder="XXX (3 أحرف)" TextColor="White" PlaceholderColor="#888" MaxLength="3" BackgroundColor="#333" Keyboard="Text" TextChanged="OnTagTextChanged"/>
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- Status Message -->
+                <Label x:Name="StatusLabel" Text="" TextColor="#bdc3c7" FontSize="13" HorizontalOptions="Center"/>
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <!-- Bottom Action -->
+        <Border Grid.Row="2" BackgroundColor="#0a0a0a" Stroke="#e74c3c" StrokeThickness="2" StrokeShape="RoundRectangle 15,15,0,0" Margin="10,5,10,10" Padding="10">
+            <Button x:Name="CreateButton" Text="🏴󠁥󠁮󠁧󠁢󠁳󠁣󠁿 إنشاء العصابة" BackgroundColor="#e74c3c" TextColor="White" CornerRadius="12" FontAttributes="Bold" FontSize="16" Clicked="OnCreateClicked"/>
+        </Border>
+    </Grid>
+</ContentPage>

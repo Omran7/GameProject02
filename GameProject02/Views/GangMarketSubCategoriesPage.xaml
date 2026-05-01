@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="GameProject02.Views.GangMarketSubCategoriesPage"
+             BackgroundColor="#1a1a1a"
+             Title="سوق العصابات"
+             FlowDirection="RightToLeft"
+             Shell.NavBarIsVisible="False">
+
+    <Grid RowDefinitions="Auto,*,Auto">
+        <Image Grid.RowSpan="3" Source="market_bg.jpg" Aspect="AspectFill" Opacity="1"/>
+        <Border Grid.Row="0" BackgroundColor="Transparent" Stroke="#1a1a1a" StrokeShape="RoundRectangle 0,0,20,20" Padding="0">
+            <Grid HeightRequest="30">
+                <Image Source="market_header_bg.jpg" Aspect="Fill" Opacity="1"/>
+                <Label Text="اختر نوع السلاح" TextColor="#C3C9BD" FontFamily="MCS-ALMAALIM" HorizontalOptions="Center" VerticalOptions="Center" FontSize="16"/>
+            </Grid>
+        </Border>
+
+        <ScrollView Grid.Row="1" VerticalScrollBarVisibility="Never">
+            <Grid x:Name="SubCategoriesGrid" ColumnSpacing="10" RowSpacing="10" Padding="25">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+            </Grid>
+        </ScrollView>
+
+        <Border Grid.Row="2" BackgroundColor="#2c3e50" Stroke="Transparent" Padding="10">
+            <Button Text="← رجوع" BackgroundColor="#e74c3c" TextColor="White" CornerRadius="8" Clicked="OnBackClicked"/>
+        </Border>
+    </Grid>
+</ContentPage>

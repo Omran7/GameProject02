@@ -1,0 +1,287 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ResourceDictionary xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+                    xmlns:helpers="clr-namespace:GameProject02.Helpers"
+                    xmlns:controls="clr-namespace:GameProject02.Controls">
+
+    <!-- ========================================== -->
+    <!-- الألوان الأساسية -->
+    <!-- ========================================== -->
+    <Color x:Key="StockTextGold">#f39c12</Color>
+    <Color x:Key="StockTextWhite">WhiteSmoke</Color>
+    <Color x:Key="StockTextDark">#000000</Color>
+    <Color x:Key="StockTextRed">#c0392b</Color>
+    <Color x:Key="StockTextGreen">#27ae60</Color>
+    <Color x:Key="StockBackgroundDark">#1a1a1a</Color>
+    <Color x:Key="StockBorderGold">#f39c12</Color>
+    <Color x:Key="StockBorderBlue">#3498db</Color>
+    <Color x:Key="StockBorderOrange">#e67e22</Color>
+
+    <!-- ========================================== -->
+    <!-- حاوية النافذة المنبثقة -->
+    <!-- ========================================== -->
+    <Style TargetType="Border" x:Key="StockPopupContainer">
+        <Setter Property="Stroke" Value="{StaticResource StockBorderGold}"/>
+        <Setter Property="StrokeThickness" Value="0"/>
+        <Setter Property="BackgroundColor" Value="Transparent"/>
+        <Setter Property="Padding" Value="0"/>
+        <Setter Property="HorizontalOptions" Value="Center"/>
+        <Setter Property="VerticalOptions" Value="Center"/>
+        <Setter Property="StrokeShape" Value="RoundRectangle 0"/>
+    </Style>
+
+    <!-- ========================================== -->
+    <!-- عنوان النافذة -->
+    <!-- ========================================== -->
+    <Style TargetType="Label" x:Key="StockPopupTitle">
+        <Setter Property="FontFamily" Value="Cairo-Black"/>
+        <Setter Property="FontSize" Value="{helpers:Static StockUIConstants.FontSizexLarge}"/>
+        <Setter Property="TextColor" Value="{StaticResource StockTextDark}"/>
+        <Setter Property="HorizontalOptions" Value="Center"/>
+        <Setter Property="VerticalOptions" Value="Center"/>
+        <Setter Property="Margin" Value="0,-5,0,0"/>
+        <Setter Property="Shadow">
+            <Setter.Value>
+                <Shadow Brush="Black" Offset="0,1" Radius="5" Opacity="1"/>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- ========================================== -->
+    <!-- نص المحتوى في النافذة -->
+    <!-- ========================================== -->
+    <Style TargetType="Label" x:Key="StockPopupMessage">
+        <Setter Property="FontFamily" Value="Cairo-Black"/>
+        <Setter Property="FontSize" Value="{helpers:Static StockUIConstants.FontSizeMedium}"/>
+        <Setter Property="TextColor" Value="{StaticResource StockTextWhite}"/>
+        <Setter Property="HorizontalOptions" Value="Center"/>
+        <Setter Property="HorizontalTextAlignment" Value="Center"/>
+        <Setter Property="Shadow">
+            <Setter.Value>
+                <Shadow Brush="Black" Offset="0.5,2.9" Radius="1" Opacity="1"/>
+            </Setter.Value>
+        </Setter>
+
+    </Style>
+
+    <!-- ========================================== -->
+    <!-- أزرار النافذة (موحدة) -->
+    <!-- ========================================== -->
+    <Style TargetType="Border" x:Key="StockPopupButton">
+        <Setter Property="Stroke" Value="Transparent"/>
+        <Setter Property="StrokeThickness" Value="0"/>
+        <Setter Property="BackgroundColor" Value="Transparent"/>
+        <Setter Property="WidthRequest" Value="{helpers:Static StockUIConstants.PopupButtonWidth}"/>
+        <Setter Property="HeightRequest" Value="{helpers:Static StockUIConstants.PopupButtonHeight}"/>
+        <Setter Property="HorizontalOptions" Value="Center"/>
+        <Setter Property="VerticalOptions" Value="Center"/>
+        <Setter Property="Padding" Value="0"/>
+    </Style>
+
+    <Style TargetType="Label" x:Key="StockPopupButtonText">
+        <Setter Property="FontFamily" Value="Cairo-Black"/>
+        <Setter Property="FontSize" Value="{helpers:Static StockUIConstants.FontSizeLarge}"/>
+        <Setter Property="TextColor" Value="{StaticResource StockTextDark}"/>
+        <Setter Property="FontAttributes" Value="Bold"/>
+        <Setter Property="HorizontalOptions" Value="Center"/>
+        <Setter Property="VerticalOptions" Value="Center"/>
+        <Setter Property="TranslationY" Value="0"/>
+        <Setter Property="Shadow">
+            <Setter.Value>
+                <Shadow Brush="Black" Offset="0,1" Radius="1" Opacity="0.5"/>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- ========================================== -->
+    <!-- حقل الإدخال -->
+    <!-- ========================================== -->
+    <Style TargetType="Entry" x:Key="StockPopupEntry">
+        <Setter Property="Keyboard" Value="Numeric"/>
+        <Setter Property="TextColor" Value="{StaticResource StockTextDark}"/>
+        <Setter Property="BackgroundColor" Value="Transparent"/>
+        <Setter Property="HorizontalTextAlignment" Value="Center"/>
+        <Setter Property="VerticalTextAlignment" Value="Center"/>
+        <Setter Property="FontSize" Value="{helpers:Static StockUIConstants.FontSizeMedium}"/>
+        <Setter Property="FontFamily" Value="Cairo-Black"/>
+        <Setter Property="Margin" Value="-9"/>
+    </Style>
+    <!-- ========================================== -->
+    <!-- ✅ شريط التمرير المخصص (CustomSlider) -->
+    <!-- ========================================== -->
+    <Style TargetType="controls:CustomSlider" x:Key="StockPopupSlider">
+        <!-- الصور المخصصة -->
+        <Setter Property="MinimumTrackImage" Value="slider_track_filled.png"/>
+        <Setter Property="MaximumTrackImage" Value="slider_track_empty.png"/>
+        <Setter Property="ThumbImageSource" Value="slider_thumb.png"/>
+
+        <!-- الألوان شفافة لأن الصور تغطيها -->
+        <Setter Property="MinimumTrackColor" Value="Transparent"/>
+        <Setter Property="MaximumTrackColor" Value="Transparent"/>
+        <Setter Property="ThumbColor" Value="Transparent"/>
+
+        <!-- ✅ أحجام ديناميكية من الثوابت -->
+        <Setter Property="WidthRequest" Value="{helpers:Static StockUIConstants.SliderWidth}"/>
+        <Setter Property="HeightRequest" Value="{helpers:Static StockUIConstants.SliderHeight}"/>
+        <Setter Property="ThumbSize" Value="{helpers:Static StockUIConstants.ThumbSize}"/>
+        <Setter Property="Margin" Value="0"/>
+    </Style>
+
+    <!-- ========================================== -->
+    <!-- إطار الصورة داخل النافذة -->
+    <!-- ========================================== -->
+    <Style TargetType="Border" x:Key="StockPopupImageFrame">
+        <Setter Property="Stroke" Value="{StaticResource StockBorderGold}"/>
+        <Setter Property="StrokeThickness" Value="0"/>
+        <Setter Property="StrokeShape" Value="RoundRectangle 0"/>
+        <Setter Property="BackgroundColor" Value="Transparent"/>
+        <Setter Property="Padding" Value="0"/>
+        <Setter Property="HorizontalOptions" Value="Center"/>
+        <Setter Property="VerticalOptions" Value="Center"/>
+        
+        
+    </Style>
+
+    <!-- ========================================== -->
+    <!-- بطاقة العنصر (لصفحة المخزن) -->
+    <!-- ========================================== -->
+    <Style TargetType="Border" x:Key="StockCard">
+        <Setter Property="Stroke" Value="Transparent"/>
+        <Setter Property="StrokeThickness" Value="0"/>
+        <Setter Property="BackgroundColor" Value="Transparent"/>
+        <Setter Property="Padding" Value="0"/>
+        <Setter Property="Margin" Value="{helpers:Static StockUIConstants.CardMargin}"/>
+        <Setter Property="MinimumHeightRequest" Value="{helpers:Static StockUIConstants.CardMinHeight}"/>
+    </Style>
+
+    <!-- ========================================== -->
+    <!-- اسم العنصر في البطاقة -->
+    <!-- ========================================== -->
+    <Style TargetType="Label" x:Key="StockCardTitle">
+        <Setter Property="TextColor" Value="{StaticResource StockTextGold}"/>
+        <Setter Property="FontFamily" Value="Cairo-Black"/>
+        <Setter Property="FontSize" Value="{helpers:Static StockUIConstants.FontSizeMedium}"/>
+        <Setter Property="FontAttributes" Value="Bold"/>
+        <Setter Property="HorizontalOptions" Value="Start"/>
+        <Setter Property="VerticalOptions" Value="Center"/>
+        <Setter Property="Shadow">
+            <Setter.Value>
+                <Shadow Brush="Black" Offset="0.5,2.9" Radius="1" Opacity="1"/>
+            </Setter.Value>
+        </Setter>
+
+    </Style>
+
+    <!-- ========================================== -->
+    <!-- السعر والكمية في البطاقة -->
+    <!-- ========================================== -->
+    <Style TargetType="Label" x:Key="StockCardInfo">
+        <Setter Property="TextColor" Value="{StaticResource StockTextGold}"/>
+        <Setter Property="FontFamily" Value="Cairo-Black"/>
+        <Setter Property="FontSize" Value="{helpers:Static StockUIConstants.FontSizeSmall}"/>
+        <Setter Property="FontAttributes" Value="Bold"/>
+        <Setter Property="HorizontalOptions" Value="Start"/>
+        <Setter Property="VerticalOptions" Value="Center"/>
+        <Setter Property="Shadow">
+            <Setter.Value>
+                <Shadow Brush="Black" Offset="0.5,2.9" Radius="1" Opacity="1"/>
+            </Setter.Value>
+        </Setter>
+
+    </Style>
+
+    <Style TargetType="Label" x:Key="StockCardCount">
+        <Setter Property="TextColor" Value="{StaticResource StockTextWhite}"/>
+        <Setter Property="FontFamily" Value="Cairo-Black"/>
+        <Setter Property="FontSize" Value="{helpers:Static StockUIConstants.FontSizeSmall}"/>
+        <Setter Property="FontAttributes" Value="Bold"/>
+        <Setter Property="HorizontalOptions" Value="Start"/>
+        <Setter Property="VerticalOptions" Value="Center"/>
+        <Setter Property="Shadow">
+            <Setter.Value>
+                <Shadow Brush="Black" Offset="0,2" Radius="1" Opacity="1"/>
+            </Setter.Value>
+        </Setter>
+
+    </Style>
+
+    <!-- ========================================== -->
+    <!-- أزرار البطاقة (استخدام، بيع، إضافة) -->
+    <!-- ========================================== -->
+    <Style TargetType="Border" x:Key="StockCardButton">
+        <Setter Property="Stroke" Value="Transparent"/>
+        <Setter Property="StrokeThickness" Value="0"/>
+        <Setter Property="BackgroundColor" Value="Transparent"/>
+        <Setter Property="HeightRequest" Value="{helpers:Static StockUIConstants.ButtonHeight}"/>
+        <Setter Property="HorizontalOptions" Value="Fill"/>
+        <Setter Property="VerticalOptions" Value="Center"/>
+        
+    </Style>
+
+    <Style TargetType="Label" x:Key="StockCardButtonText">
+        <Setter Property="TextColor" Value="{StaticResource StockTextDark}"/>
+        <Setter Property="FontFamily" Value="Cairo-Black"/>
+        <Setter Property="FontSize" Value="{helpers:Static StockUIConstants.FontSizeButton}"/>
+        <Setter Property="FontAttributes" Value="Bold"/>
+        <Setter Property="HorizontalOptions" Value="Center"/>
+        <Setter Property="VerticalOptions" Value="Center"/>
+        <Setter Property="TranslationY" Value="-1"/>
+        <Setter Property="Shadow">
+            <Setter.Value>
+                <Shadow Brush="Black" Offset="0,1" Radius="1" Opacity="0.5"/>
+            </Setter.Value>
+        </Setter>
+
+    </Style>
+
+    <!-- ========================================== -->
+    <!-- أزرار التبويبات العلوية -->
+    <!-- ========================================== -->
+    <Style TargetType="Border" x:Key="TabButton">
+        <Setter Property="Stroke" Value="Transparent"/>
+        <Setter Property="StrokeThickness" Value="0"/>
+        <Setter Property="BackgroundColor" Value="Transparent"/>
+        <Setter Property="HeightRequest" Value="{helpers:Static StockUIConstants.TabButtonHeight}"/>
+        <Setter Property="HorizontalOptions" Value="Fill"/>
+        <Setter Property="VerticalOptions" Value="Center"/>
+        
+    </Style>
+
+    <Style TargetType="Label" x:Key="TabButtonText">
+        <Setter Property="TextColor" Value="{StaticResource StockTextDark}"/>
+        <Setter Property="FontFamily" Value="Cairo-Black"/>
+        <Setter Property="FontSize" Value="{helpers:Static StockUIConstants.FontSizeMedium}"/>
+        <Setter Property="FontAttributes" Value="Bold"/>
+        <Setter Property="HorizontalOptions" Value="Center"/>
+        <Setter Property="VerticalOptions" Value="Center"/>
+        <Setter Property="Shadow">
+            <Setter.Value>
+                <Shadow Brush="Black" Offset="0,1" Radius="1" Opacity="0.5"/>
+            </Setter.Value>
+        </Setter>
+
+    </Style>
+
+    <!-- ========================================== -->
+    <!-- أزرار الفوتر (HOME، قفل، تصفية) -->
+    <!-- ========================================== -->
+    <Style TargetType="Border" x:Key="FooterButton">
+        <Setter Property="Stroke" Value="Transparent"/>
+        <Setter Property="StrokeThickness" Value="0"/>
+        <Setter Property="BackgroundColor" Value="Transparent"/>
+        <Setter Property="WidthRequest" Value="{helpers:Static StockUIConstants.FooterButtonWidth}"/>
+        <Setter Property="HeightRequest" Value="{helpers:Static StockUIConstants.FooterButtonHeight}"/>
+        <Setter Property="HorizontalOptions" Value="Fill"/>
+        <Setter Property="VerticalOptions" Value="Center"/>
+    </Style>
+
+    <Style TargetType="Label" x:Key="FooterButtonText">
+        <Setter Property="TextColor" Value="{StaticResource StockTextDark}"/>
+        <Setter Property="FontFamily" Value="Cairo-Black"/>
+        <Setter Property="FontSize" Value="{helpers:Static StockUIConstants.FontSizeButton}"/>
+        <Setter Property="FontAttributes" Value="Bold"/>
+        <Setter Property="HorizontalOptions" Value="Center"/>
+        <Setter Property="VerticalOptions" Value="Center"/>
+    </Style>
+
+</ResourceDictionary>

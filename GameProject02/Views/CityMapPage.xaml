@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:views="clr-namespace:GameProject02.Views"
+             ControlTemplate="{StaticResource StickyHeaderTemplate}"
+             x:Class="GameProject02.Views.CityMapPage"
+             Title="Crime City Map">
+
+    <Grid>
+        <views:MapView x:Name="CityMapView" HorizontalOptions="Fill" VerticalOptions="Fill" />
+    </Grid>
+</ContentPage>

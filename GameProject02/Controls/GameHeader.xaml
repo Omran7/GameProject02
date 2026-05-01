@@ -1,0 +1,43 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="GameProject02.Views.GameHeader">
+
+    <Border BackgroundColor="Transparent"
+            Stroke="Transparent"
+            StrokeThickness="0"
+            Padding="0"
+            HorizontalOptions="Fill">
+
+        <!-- توسيط المحتوى كله أفقياً -->
+        <HorizontalStackLayout HorizontalOptions="Center"
+                               VerticalOptions="Center"
+                               Spacing="10">
+
+            <!-- صورة اليمين (تبدأ قبل النص في RTL) -->
+            <Image Source="{Binding RightImage}"
+                   Aspect="Fill"
+                   VerticalOptions="Center"
+                   WidthRequest="100"
+                   HeightRequest="15"/>
+
+            <!-- النص في المنتصف -->
+            <Label x:Name="TitleLabel"
+                   Text="{Binding HeaderTitle}"
+                   TextColor="#C3C9BD"
+                   FontFamily="Cairo-Black"
+                   FontSize="12"
+                   FontAttributes="Bold"
+                   VerticalOptions="Center"/>
+
+            <!-- صورة اليسار (تأتي بعد النص) -->
+            <Image Source="{Binding LeftImage}"
+                   Aspect="Fill"
+                   VerticalOptions="Center"
+                   WidthRequest="100"
+                   HeightRequest="15"/>
+
+        </HorizontalStackLayout>
+
+    </Border>
+</ContentView>

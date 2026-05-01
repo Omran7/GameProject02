@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="GameProject02.Views.ArmingStockSelectionPage"
+             BackgroundColor="#1a1a1a"
+             Title="اختيار التجهيز"
+             FlowDirection="RightToLeft"
+             Shell.NavBarIsVisible="False">
+
+    <Grid RowDefinitions="Auto,*,Auto">
+        <Image Grid.RowSpan="3" Source="market_bg.jpg" Aspect="AspectFill" Opacity="0.9"/>
+
+        <!-- Header -->
+        <Border Grid.Row="0" BackgroundColor="#0a0a0a" Stroke="#f39c12" StrokeThickness="2" Padding="5">
+            <Grid ColumnDefinitions="Auto,*,Auto">
+                <Button Text="← رجوع" BackgroundColor="#95a5a6" TextColor="White" CornerRadius="5" 
+                        WidthRequest="80" Clicked="OnBackClicked"/>
+                <Label x:Name="TitleLabel" Grid.Column="1" Text="اختيار سلاح" TextColor="White" FontSize="16" 
+                       FontAttributes="Bold" HorizontalOptions="Center" VerticalOptions="Center"/>
+            </Grid>
+        </Border>
+
+        <!-- Stock Items Grid -->
+        <ScrollView Grid.Row="1" Margin="10,5,10,5">
+            <VerticalStackLayout x:Name="ItemsContainer" Spacing="10" Padding="5">
+                <!-- Items will be added dynamically -->
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <!-- Empty State -->
+        <Label x:Name="EmptyState" Grid.Row="1" Text="لا توجد عناصر متاحة في المخزن" 
+               TextColor="#bdc3c7" FontSize="16" HorizontalOptions="Center" VerticalOptions="Center"
+               IsVisible="False"/>
+    </Grid>
+</ContentPage>

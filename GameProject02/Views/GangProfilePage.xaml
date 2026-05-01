@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="GameProject02.Views.GangProfilePage"
+             BackgroundColor="#1a1a1a"
+             Title="🏴󠁥󠁮󠁧󠁢󠁳󠁣󠁿 ملف العصابة"
+             FlowDirection="RightToLeft"
+             Shell.NavBarIsVisible="False">
+
+    <Grid RowDefinitions="Auto,*,Auto">
+        <!-- Header -->
+        <Border Grid.Row="0" BackgroundColor="#0a0a0a" Stroke="#e74c3c" StrokeThickness="2" Padding="10">
+            <Grid ColumnDefinitions="Auto,*,Auto">
+                <Button Text="← رجوع" BackgroundColor="#95a5a6" TextColor="White" CornerRadius="8" WidthRequest="80" Clicked="OnBackClicked"/>
+                <Label Grid.Column="1" Text="🏴󠁥󠁮󠁧󠁢󠁳󠁣󠁿 ملف العصابة" TextColor="White" FontSize="18" FontAttributes="Bold" HorizontalOptions="Center"/>
+                <Button x:Name="SettingsButton" Grid.Column="2" Text="⚙️" BackgroundColor="Transparent" Padding="0" TextColor="#f39c12" FontSize="20" WidthRequest="40" Clicked="OnSettingsClicked"/>
+            </Grid>
+        </Border>
+
+        <!-- Main Content -->
+        <ScrollView Grid.Row="1">
+            <VerticalStackLayout Padding="15" Spacing="15">
+
+                <!-- Gang Banner -->
+                <Border BackgroundColor="#2c2c2c" Stroke="#e74c3c" StrokeThickness="2" StrokeShape="RoundRectangle 12" Padding="15">
+                    <Grid ColumnDefinitions="Auto,*,Auto" RowSpacing="10">
+                        <Border Grid.RowSpan="3" Stroke="#e74c3c" StrokeThickness="2" StrokeShape="RoundRectangle 8" WidthRequest="70" HeightRequest="70">
+                            <Image Source="{Binding ImageUrl, FallbackValue='gang_default'}" Aspect="AspectFill"/>
+                        </Border>
+
+                        <Label Grid.Column="1" Text="{Binding Name}" Padding="10,0,0,0" TextColor="White" FontSize="18" FontAttributes="Bold"/>
+                        <Label Grid.Column="1" Grid.Row="1" Padding="10,40,0,0" Text="{Binding Tag, StringFormat='[{0}]'}" TextColor="#f39c12" FontSize="14" FontAttributes="Bold"/>
+
+                        <VerticalStackLayout Grid.Column="2" Spacing="5" HorizontalOptions="End">
+                            <Label Text="{Binding Level, StringFormat='المستوى: {0}'}" TextColor="#3498db" FontSize="12"/>
+                            <Label Text="{Binding MembersCount, StringFormat='الأعضاء: {0}/50'}" TextColor="#2ecc71" FontSize="12"/>
+                        </VerticalStackLayout>
+                    </Grid>
+                </Border>
+
+                <!-- Stats Grid -->
+                <Grid ColumnDefinitions="*,*,*" ColumnSpacing="5">
+                    <Border BackgroundColor="#2c2c2c" Stroke="#3498db" StrokeThickness="1" StrokeShape="RoundRectangle 8" Padding="10">
+                        <VerticalStackLayout HorizontalOptions="Center">
+                            <Label Text="الاحترام" TextColor="#bdc3c7" FontSize="11"/>
+                            <Label Text="{Binding AvailableRespect, StringFormat='{0:N0}'}" TextColor="#3498db" FontSize="16" FontAttributes="Bold"/>
+                        </VerticalStackLayout>
+                    </Border>
+                    <Border Grid.Column="1" BackgroundColor="#2c2c2c" Stroke="#e74c3c" StrokeThickness="1" StrokeShape="RoundRectangle 8" Padding="10">
+                        <VerticalStackLayout HorizontalOptions="Center">
+                            <Label Text="الولاء" TextColor="#bdc3c7" FontSize="11"/>
+                            <Label Text="{Binding Loyalty, StringFormat='{0:N0}'}" TextColor="#e74c3c" FontSize="16" FontAttributes="Bold"/>
+                        </VerticalStackLayout>
+                    </Border>
+                    <Border Grid.Column="2" BackgroundColor="#2c2c2c" Stroke="#2ecc71" StrokeThickness="1" StrokeShape="RoundRectangle 8" Padding="10">
+                        <VerticalStackLayout HorizontalOptions="Center">
+                            <Label Text="نقد العصابة" TextColor="#bdc3c7" FontSize="11"/>
+                            <Label Text="{Binding GangCash, StringFormat='{0:N0}'}" TextColor="#2ecc71" FontSize="16" FontAttributes="Bold"/>
+                        </VerticalStackLayout>
+                    </Border>
+                </Grid>
+
+                <!-- Action Buttons -->
+                <!-- Action Buttons -->
+                <Grid ColumnDefinitions="*,*,*,*,*" ColumnSpacing="5">
+                    <Button Text="🛡️ الميليشيا" BackgroundColor="#9b59b6" TextColor="White" CornerRadius="8" Clicked="OnOpenMilitiaPageClicked"/>
+                    <Button Text="🏪 سوق العصابة" BackgroundColor="#e67e22" TextColor="White" CornerRadius="8" Grid.Column="1" Clicked="OnGangMarketClicked"/>
+                    <Button Text="⚡ المهارات" BackgroundColor="#3498db" TextColor="White" CornerRadius="8" Grid.Column="2" Clicked="OnSkillsClicked"/>
+                    <Button Text="⭐ ترقية" BackgroundColor="#e67e22" TextColor="White" CornerRadius="8" Grid.Column="3" Clicked="OnLevelUpgradeClicked"/>
+                    <Button Text="💰 تبرع" BackgroundColor="#2ecc71" TextColor="White" CornerRadius="8" Grid.Column="4" Clicked="OnDonateClicked"/>
+                </Grid>
+
+                <!-- Members List Header -->
+                <Label Text="أعضاء العصابة" TextColor="White" FontSize="16" FontAttributes="Bold" Margin="0,10,0,5"/>
+
+                <!-- Members CollectionView -->
+                <CollectionView x:Name="MembersList" HeightRequest="300">
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate>
+                            <Border BackgroundColor="#2c2c2c" Stroke="#444" StrokeThickness="1" Margin="0,0,0,5" Padding="10" StrokeShape="RoundRectangle 8">
+                                <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="10">
+                                    <Border Stroke="#555" StrokeThickness="1" StrokeShape="RoundRectangle 20" WidthRequest="40" HeightRequest="40">
+                                        <Image Source="{Binding ProfilePicUrl}" Aspect="AspectFill"/>
+                                    </Border>
+
+                                    <VerticalStackLayout Grid.Column="1" VerticalOptions="Center">
+                                        <Label Text="{Binding Username}" TextColor="White" FontSize="14" FontAttributes="Bold"/>
+                                        <Label Text="{Binding Position, StringFormat='المنصب: {0}'}" TextColor="#bdc3c7" FontSize="11"/>
+                                    </VerticalStackLayout>
+
+                                    <Label Grid.Column="2" Text="{Binding PersonalLoyalty, StringFormat='{ولاء: {0'}" TextColor="#e74c3c" FontSize="11" VerticalOptions="Center"/>
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <!-- Bottom Bar -->
+        <Border Grid.Row="2" BackgroundColor="#0a0a0a" Stroke="#e74c3c" StrokeThickness="2" StrokeShape="RoundRectangle 15,15,0,0" Margin="10,5,10,10" Padding="10">
+            <Button Text="🏠 الرئيسية" BackgroundColor="#3498db" TextColor="White" CornerRadius="12" FontAttributes="Bold" Clicked="OnHomeClicked"/>
+        </Border>
+    </Grid>
+</ContentPage>

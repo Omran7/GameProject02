@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="GameProject02.Views.GangMarketCategoriesPage"
+             BackgroundColor="#1a1a1a"
+             Title="سوق العصابات"
+             FlowDirection="RightToLeft"
+             Shell.NavBarIsVisible="False">
+
+	<Grid RowDefinitions="Auto,*,Auto">
+
+		<!-- Background -->
+		<Image Grid.RowSpan="3"
+               Source="market_bg.jpg"
+               Aspect="AspectFill"
+               Opacity="1"/>
+
+		<!-- Header -->
+		<Border Grid.Row="0"
+                BackgroundColor="Transparent"
+                Stroke="#1a1a1a"
+                StrokeShape="RoundRectangle 0,0,20,20"
+                Padding="0">
+
+			<Grid HeightRequest="30">
+				<Image Source="market_header_bg.jpg"
+                       Aspect="Fill"
+                       Opacity="1"/>
+				<Label Text="سوق العصابات"
+                       TextColor="#C3C9BD"
+                       FontFamily="MCS-ALMAALIM"
+                       HorizontalOptions="Center"
+                       VerticalOptions="Center"
+                       FontSize="16"/>
+			</Grid>
+		</Border>
+
+		<!-- Categories Grid -->
+		<Grid Grid.Row="1">
+			<ScrollView VerticalScrollBarVisibility="Never">
+				<Grid x:Name="CategoryCardsGrid"
+                      ColumnSpacing="10"
+                      RowSpacing="10"
+                      Padding="25">
+					<Grid.ColumnDefinitions>
+						<ColumnDefinition Width="*" />
+						<ColumnDefinition Width="*" />
+					</Grid.ColumnDefinitions>
+				</Grid>
+			</ScrollView>
+		</Grid>
+
+		<!-- Bottom Bar -->
+		<Border Grid.Row="2"
+                BackgroundColor="#2c3e50"
+                Stroke="Transparent"
+                Padding="10">
+
+			<Grid ColumnDefinitions="*,*" ColumnSpacing="10">
+				<Button Text="← رجوع"
+                        BackgroundColor="#e74c3c"
+                        TextColor="White"
+                        CornerRadius="8"
+                        Clicked="OnBackClicked"/>
+
+				<Button Text="🔄 تحديث"
+                        BackgroundColor="#3498db"
+                        TextColor="White"
+                        CornerRadius="8"
+                        Clicked="OnRefreshClicked"/>
+			</Grid>
+		</Border>
+
+		<!-- Popup for weapon subcategories -->
+		<Grid x:Name="PopupOverlay"
+              IsVisible="False"
+              BackgroundColor="Transparent"
+              HorizontalOptions="Fill"
+              VerticalOptions="Fill"
+              InputTransparent="True">
+
+			<Grid.GestureRecognizers>
+				<TapGestureRecognizer Tapped="OnOverlayClicked"/>
+			</Grid.GestureRecognizers>
+
+			<Border BackgroundColor="#1a1a1a"
+                    Stroke="#f39c12"
+                    StrokeThickness="2"
+                    StrokeShape="RoundRectangle 20,20,20,20"
+                    HorizontalOptions="Center"
+                    VerticalOptions="Center"
+                    WidthRequest="280"
+                    HeightRequest="400"
+                    Padding="0"
+                    x:Name="PopupContent">
+
+				<Grid RowDefinitions="Auto,*">
+
+					<Grid Grid.Row="0"
+                          Padding="15,12,15,12"
+                          ColumnDefinitions="*,Auto"
+                          BackgroundColor="#0a0a0a">
+
+						<Label x:Name="PopupTitle"
+                               Text="اختر نوع السلاح"
+                               FontFamily="MCS-ALMAALIM"
+                               TextColor="#f39c12"
+                               HorizontalOptions="Center"
+                               VerticalOptions="Center"
+                               FontSize="18"/>
+
+						<ImageButton Grid.Column="1"
+                                     BackgroundColor="Transparent"
+                                     WidthRequest="28"
+                                     HeightRequest="28"
+                                     Clicked="OnClosePopupClicked">
+							<ImageButton.Source>
+								<FontImageSource Glyph="✕"
+                                                 Size="18"
+                                                 Color="#f39c12"/>
+							</ImageButton.Source>
+						</ImageButton>
+					</Grid>
+
+					<ScrollView Grid.Row="1" VerticalScrollBarVisibility="Never">
+						<VerticalStackLayout x:Name="SubCategoriesList"
+                                             Spacing="8"
+                                             Padding="12"/>
+					</ScrollView>
+				</Grid>
+			</Border>
+		</Grid>
+	</Grid>
+</ContentPage>

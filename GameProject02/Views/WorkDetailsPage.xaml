@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:local="clr-namespace:GameProject02.Views"
+             xmlns:controls="clr-namespace:GameProject02.Controls"
+             x:Class="GameProject02.Views.WorkDetailsPage"
+             Title="تفاصيل الوظيفة"
+             FlowDirection="RightToLeft"
+             NavigationPage.HasNavigationBar="False">
+
+    <Grid RowDefinitions="Auto,*,Auto" Padding="0">
+        <Image Source="background.png" Aspect="AspectFill" Opacity="1" Grid.RowSpan="3"/>
+        <local:GameHeader HeaderTitle="تفاصيل الوظيفة" Grid.Row="0"/>
+
+        <ScrollView Grid.Row="1" VerticalScrollBarVisibility="Never">
+            <VerticalStackLayout Padding="5" Spacing="5">
+                <!-- البطاقة الرئيسية (العمل الحالي) -->
+                <Border x:Name="MainCard"
+                        Stroke="Transparent"
+                        StrokeThickness="0"
+                        StrokeShape="RoundRectangle 12"
+                        BackgroundColor="Transparent"
+                        Padding="0">
+                    <Grid>
+                        <Image Source="card_background.png" Aspect="Fill" Opacity="1"/>
+                    </Grid>
+                </Border>
+
+                <!-- بطاقة الوظيفة التالية (تظهر فقط عند بدء العمل) -->
+                <Border x:Name="NextJobCard"
+                        Stroke="Transparent"
+                        StrokeThickness="0"
+                        StrokeShape="RoundRectangle 12"
+                        BackgroundColor="Transparent"
+                        Padding="0"
+                        IsVisible="False">
+                    <Grid>
+                        <Image Source="card_background.png" Aspect="Fill" Opacity="1"/>
+                    </Grid>
+                </Border>
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <controls:FooterView x:Name="PageFooter" Grid.Row="2" />
+    </Grid>
+</ContentPage>

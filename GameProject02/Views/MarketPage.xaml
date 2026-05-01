@@ -1,0 +1,30 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:local="clr-namespace:GameProject02.Views"
+             xmlns:controls="clr-namespace:GameProject02.Controls"
+             x:Class="GameProject02.Views.MarketPage"
+             Title="المتجر"
+             FlowDirection="RightToLeft"
+             Shell.NavBarIsVisible="False">
+
+    <Grid RowDefinitions="Auto,*,Auto" Padding="0">
+        <!-- خلفية موحدة -->
+        <Image Source="background.png" Aspect="AspectFill" Opacity="1" Grid.RowSpan="3"/>
+
+        <!-- هيدر موحد -->
+        <local:GameHeader x:Name="PageHeader" HeaderTitle="المتجر" Grid.Row="0"/>
+
+        <!-- المحتوى الرئيسي -->
+        <ScrollView Grid.Row="1" VerticalScrollBarVisibility="Never">
+            <VerticalStackLayout x:Name="ItemsContainer" 
+                                 Spacing="0"
+                                 Padding="0,0,0,0">
+                <!-- سيتم إضافة البطاقات هنا برمجياً -->
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <!-- فوتر موحد -->
+        <controls:FooterView x:Name="PageFooter" Grid.Row="2" />
+    </Grid>
+</ContentPage>

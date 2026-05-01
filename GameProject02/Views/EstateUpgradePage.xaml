@@ -1,0 +1,37 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:local="clr-namespace:GameProject02.Views"
+             xmlns:controls="clr-namespace:GameProject02.Controls"
+             x:Class="GameProject02.Views.EstateUpgradePage"
+             NavigationPage.HasNavigationBar="False"
+             FlowDirection="RightToLeft"
+             Title="تحديثات العقار">
+
+    <Grid RowDefinitions="Auto,Auto,*,Auto" Padding="0">
+        <Image Source="background.png" Aspect="AspectFill" Opacity="1" Grid.RowSpan="4"/>
+        <local:GameHeader HeaderTitle="مكتب التطوير العقاري" Grid.Row="0"/>
+        <Border Grid.Row="1" x:Name="ImageChangeContainer" IsVisible="False" Stroke="Transparent" StrokeThickness="0" StrokeShape="RoundRectangle 12,12,12,12" Padding="0" Margin="0,5,0,0">
+            <Grid>
+                <Image Source="header_background.jpg" Aspect="Fill" Opacity="1"/>
+                <Grid RowDefinitions="Auto,Auto" ColumnDefinitions="*,Auto,*" Padding="0">
+                    <Border Grid.Column="1" x:Name="ImageChangeBtnBorder" Stroke="Transparent" StrokeThickness="0" StrokeShape="RoundRectangle 0,0,0,0" Padding="0" HeightRequest="50" BackgroundColor="Transparent">
+                        <Grid>
+                            <Image Source="card_background.png" Aspect="Fill"/>
+                            <Label x:Name="ImageChangeLabel" Text="اضغط لتغيير الصورة" Style="{StaticResource Upgrade_ActionButton}" TextColor="Goldenrod"/>
+                        </Grid>
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="OnImageChangeClicked"/>
+                        </Border.GestureRecognizers>
+                    </Border>
+                </Grid>
+            </Grid>
+        </Border>
+        <ScrollView Grid.Row="2" Margin="0,0,0,5" VerticalScrollBarVisibility="Never" HorizontalScrollBarVisibility="Never">
+            <VerticalStackLayout x:Name="UpgradesContainer" Spacing="5" Padding="10"/>
+        </ScrollView>
+
+        <!-- الفوتر العام -->
+        <controls:FooterView x:Name="PageFooter" Grid.Row="3" />
+    </Grid>
+</ContentPage>

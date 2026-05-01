@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="GameProject02.Views.FightPage"
+             BackgroundColor="#1a1a1a"
+             Title="⚔️ المعركة"
+             FlowDirection="RightToLeft"
+             Shell.NavBarIsVisible="False">
+
+    <Grid RowDefinitions="Auto,*,Auto">
+
+        <Image Grid.RowSpan="3"
+               Source="market_bg.jpg"
+               Aspect="AspectFill"
+               Opacity="0.9"/>
+
+        <!-- Header -->
+        <Border Grid.Row="0"
+                BackgroundColor="#0a0a0a"
+                Stroke="#f39c12"
+                StrokeThickness="2"
+                Padding="5">
+            <Grid ColumnDefinitions="*,Auto,*">
+                <Button Text="← رجوع"
+                        BackgroundColor="#95a5a6"
+                        TextColor="White"
+                        CornerRadius="5"
+                        WidthRequest="80"
+                        Clicked="OnBackClicked"/>
+
+                <Label Grid.Column="1"
+                       Text="⚔️ المعركة"
+                       TextColor="White"
+                       FontSize="16"
+                       FontAttributes="Bold"
+                       HorizontalOptions="Center"
+                       VerticalOptions="Center"/>
+            </Grid>
+        </Border>
+
+        <!-- Fight Arena -->
+        <Grid Grid.Row="1" RowDefinitions="Auto, *, Auto">
+
+            <Image Grid.Row="0"
+                   Source="fight_background.jpg"
+                   Aspect="AspectFill" />
+
+            <Grid Grid.Row="0" ColumnDefinitions="42*, 16*, 42*">
+
+                <Grid Grid.Column="1" VerticalOptions="Center">
+                    <Image Source="fight_vs_background.png"
+                           Aspect="AspectFit"
+                           ZIndex="1" />
+
+                    <Label x:Name="TurnLabel"
+                           Text="جارٍ القتال..."
+                           TextColor="Yellow"
+                           FontSize="10"
+                           FontAttributes="Bold"
+                           HorizontalOptions="Center"
+                           VerticalOptions="End"
+                           Margin="0,0,0,-15"/>
+                </Grid>
+
+                <!-- Player (You) -->
+                <Border Grid.Column="0"
+                        StrokeThickness="0"
+                        Margin="0,10,0,10">
+                    <Grid RowDefinitions="Auto, Auto, Auto, Auto, Auto, Auto" Padding="8">
+                        <!-- ✅ FIXED: 6 rows -->
+                        <Border Stroke="Gray" StrokeThickness="1" BackgroundColor="Black" Padding="2"
+                                HeightRequest="54" WidthRequest="54" HorizontalOptions="Start">
+                            <Image Source="{Binding YourImage}" Aspect="AspectFill" />
+                        </Border>
+
+                        <Label Grid.Row="1" Text="{Binding YourName}" TextColor="White" FontSize="14" FontAttributes="Bold" />
+                        <Label Grid.Row="2" Text="{Binding YourLevel, StringFormat='المستوى {0}'}" TextColor="#f1c40f" FontSize="12" />
+
+                        <Grid Grid.Row="3" Margin="0,10,0,0">
+                            <Image Source="fight_health_empty_bar.png" Aspect="Fill" HeightRequest="12" />
+                            <ProgressBar Progress="{Binding YourHealthPercent}" ProgressColor="#2ecc71" HeightRequest="12" BackgroundColor="Transparent" />
+                            <Label Text="{Binding YourHealth, StringFormat='{0}'}" TextColor="White" FontSize="10" HorizontalOptions="Center" VerticalOptions="Center" />
+                        </Grid>
+
+                        <!-- ✅ ARMING DISPLAY: WEAPON (GOLD TEXT) -->
+                        <Label Grid.Row="4" 
+                               x:Name="YourWeaponLabel" 
+                               Text="غير مجهز" 
+                               TextColor="#f39c12" 
+                               FontSize="10" 
+                               FontAttributes="Bold"
+                               HorizontalOptions="Center"
+                               VerticalOptions="Center"
+                               Margin="0,4,0,2"/>
+
+                        <!-- ✅ ARMING DISPLAY: ARMOR (BLUE TEXT) -->
+                        <Label Grid.Row="5" 
+                               x:Name="YourArmorLabel" 
+                               Text="غير مجهز" 
+                               TextColor="#3498db" 
+                               FontSize="10" 
+                               FontAttributes="Bold"
+                               HorizontalOptions="Center"
+                               VerticalOptions="Center"
+                               Margin="0,2,0,4"/>
+                    </Grid>
+                </Border>
+
+                <!-- Opponent -->
+                <Border Grid.Column="2"
+                        StrokeThickness="0"
+                        Margin="0,10,0,10">
+                    <Grid RowDefinitions="Auto, Auto, Auto, Auto, Auto, Auto" Padding="8">
+                        <!-- ✅ FIXED: 6 rows -->
+                        <Border Stroke="Gray" StrokeThickness="1" BackgroundColor="Black" Padding="2"
+                                HeightRequest="54" WidthRequest="54" HorizontalOptions="End">
+                            <Image Source="{Binding OpponentImage}" Aspect="AspectFill" />
+                        </Border>
+
+                        <Label Grid.Row="1" Text="{Binding OpponentName}" TextColor="White" FontSize="14" FontAttributes="Bold" HorizontalOptions="End" />
+                        <Label Grid.Row="2" Text="{Binding OpponentLevel, StringFormat='المستوى {0}'}" TextColor="#f1c40f" FontSize="12" HorizontalOptions="End" />
+
+                        <Grid Grid.Row="3" Margin="0,10,0,0">
+                            <Image Source="fight_health_empty_bar.png" Aspect="Fill" HeightRequest="12" />
+                            <ProgressBar Progress="{Binding OpponentHealthPercent}" ProgressColor="#2ecc71" HeightRequest="12" BackgroundColor="Transparent" />
+                            <Label Text="{Binding OpponentHealth, StringFormat='{0}'}" TextColor="White" FontSize="10" HorizontalOptions="Center" VerticalOptions="Center" />
+                        </Grid>
+
+                        <!-- ✅ ARMING DISPLAY: WEAPON (GOLD TEXT) -->
+                        <Label Grid.Row="4" 
+                               x:Name="OpponentWeaponLabel" 
+                               Text="غير مجهز" 
+                               TextColor="#f39c12" 
+                               FontSize="10" 
+                               FontAttributes="Bold"
+                               HorizontalOptions="Center"
+                               VerticalOptions="Center"
+                               Margin="0,4,0,2"/>
+
+                        <!-- ✅ ARMING DISPLAY: ARMOR (BLUE TEXT) -->
+                        <Label Grid.Row="5" 
+                               x:Name="OpponentArmorLabel" 
+                               Text="غير مجهز" 
+                               TextColor="#3498db" 
+                               FontSize="10" 
+                               FontAttributes="Bold"
+                               HorizontalOptions="Center"
+                               VerticalOptions="Center"
+                               Margin="0,2,0,4"/>
+                    </Grid>
+                </Border>
+            </Grid>
+
+            <!-- Fight Log -->
+            <Grid Grid.Row="1" Margin="12,8,12,2">
+                <Image Source="dialog_bio.png" Aspect="Fill" />
+                <ScrollView Padding="10">
+                    <VerticalStackLayout x:Name="FightLogContainer" Spacing="4"/>
+                </ScrollView>
+            </Grid>
+
+            <!-- Action Buttons: Leave, Steal, Disability -->
+            <Grid Grid.Row="2" ColumnDefinitions="*, *, *" Margin="0,0,0,10" Padding="5">
+                <Image Grid.ColumnSpan="3" Source="bottom_bar_background.png" Aspect="Fill" />
+
+                <Button Grid.Column="0" Text="هروب" BackgroundColor="Transparent" TextColor="White" FontAttributes="Bold" Clicked="OnLeaveClicked"/>
+                <Button x:Name="StealButton" Grid.Column="1" Text="سرقة" BackgroundColor="Transparent" TextColor="White" FontAttributes="Bold" IsEnabled="False" Clicked="OnStealClicked"/>
+                <Button x:Name="DisabilityButton" Grid.Column="2" Text="إعاقة" BackgroundColor="Transparent" TextColor="White" FontAttributes="Bold" IsEnabled="False" Clicked="OnDisabilityClicked"/>
+            </Grid>
+        </Grid>
+
+        <!-- Bottom Bar (optional) -->
+        <Border Grid.Row="2"
+                BackgroundColor="#0a0a0a"
+                Stroke="#f39c12"
+                StrokeThickness="2"
+                StrokeShape="RoundRectangle 15,15,0,0"
+                Margin="10,5,10,10"
+                Padding="10">
+            <Grid ColumnDefinitions="*,*">
+                <Button Text="🏠 الرئيسية"
+                        BackgroundColor="#3498db"
+                        TextColor="White"
+                        CornerRadius="12"
+                        FontAttributes="Bold"
+                        Clicked="OnHomeClicked"/>
+
+                <Button Text="🔄 تحديث"
+                        BackgroundColor="#e67e22"
+                        TextColor="White"
+                        CornerRadius="12"
+                        FontAttributes="Bold"
+                        Clicked="OnRefreshClicked"/>
+            </Grid>
+        </Border>
+    </Grid>
+</ContentPage>
