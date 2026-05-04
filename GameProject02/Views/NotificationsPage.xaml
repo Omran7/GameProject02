@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:models="clr-namespace:GameProject02.Models"
+             xmlns:converters="clr-namespace:GameProject02.Converters"
+             x:Class="GameProject02.Views.NotificationsPage"
+             Title="Digital Pager"
+             BackgroundColor="#080808">
+
+	<ContentPage.Resources>
+		<ResourceDictionary>
+			<converters:ReadToColorConverter x:Key="ReadToColorConverter" />
+		</ResourceDictionary>
+	</ContentPage.Resources>
+
+	<Grid RowDefinitions="Auto, *">
+		<!-- Header -->
+		<Border Grid.Row="0" BackgroundColor="#111" HeightRequest="60" StrokeThickness="0">
+			<Label Text="PAGER LOG"
+                   TextColor="#45b7d1"
+                   FontSize="18"
+                   FontAttributes="Bold"
+                   HorizontalOptions="Center"
+                   VerticalOptions="Center"
+                   CharacterSpacing="2" />
+		</Border>
+
+		<!-- Notification List -->
+		<CollectionView Grid.Row="1" x:Name="NotificationList" SelectionMode="None">
+			<CollectionView.ItemsLayout>
+				<LinearItemsLayout Orientation="Vertical" ItemSpacing="2" />
+			</CollectionView.ItemsLayout>
+			<CollectionView.ItemTemplate>
+				<DataTemplate x:DataType="models:NotificationItem">
+					<Grid Padding="10,2">
+						<Border BackgroundColor="{Binding IsRead, Converter={StaticResource ReadToColorConverter}}"
+                                Stroke="#222" StrokeThickness="0.5" Padding="15">
+							<Border.StrokeShape>
+								<RoundRectangle CornerRadius="0" />
+							</Border.StrokeShape>
+
+							<Grid ColumnDefinitions="40, *" ColumnSpacing="15">
+								<Label Grid.Column="0" Text="{Binding Icon}" FontSize="24" VerticalOptions="Center" HorizontalOptions="Center" />
+
+								<VerticalStackLayout Grid.Column="1" Spacing="2">
+									<HorizontalStackLayout Spacing="10">
+										<Label Text="{Binding Title}" TextColor="White" FontSize="14" FontAttributes="Bold" />
+										<Label Text="{Binding Timestamp, StringFormat='{0:HH:mm}'}" TextColor="#45b7d1" FontSize="10" VerticalOptions="Center" />
+									</HorizontalStackLayout>
+									<Label Text="{Binding Message}" TextColor="#888" FontSize="12" LineBreakMode="WordWrap" />
+								</VerticalStackLayout>
+							</Grid>
+						</Border>
+					</Grid>
+				</DataTemplate>
+			</CollectionView.ItemTemplate>
+			<CollectionView.EmptyView>
+				<VerticalStackLayout Padding="50" HorizontalOptions="Center" VerticalOptions="Center">
+					<Label Text="📟" FontSize="48" HorizontalOptions="Center" />
+					<Label Text="Pager is silent..." TextColor="#444" HorizontalOptions="Center" Margin="0,10,0,0" />
+				</VerticalStackLayout>
+			</CollectionView.EmptyView>
+		</CollectionView>
+	</Grid>
+</ContentPage>

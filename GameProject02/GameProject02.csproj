@@ -672,6 +672,12 @@
 	  <MauiXaml Update="Views\MuseumPage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
+	  <MauiXaml Update="Views\NewsPage.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Views\NotificationsPage.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
 	  <MauiXaml Update="Views\PrisonPage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
