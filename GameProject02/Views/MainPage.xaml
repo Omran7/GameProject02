@@ -16,7 +16,7 @@
                 <Label Text="CRIME CITY HUD" FontSize="20" TextColor="#45b7d1" HorizontalOptions="Center" FontAttributes="Bold" Margin="0,10" />
 
                 <!-- Action Buttons -->
-                <Grid ColumnDefinitions="*, *" RowDefinitions="Auto, Auto, Auto, Auto, Auto, Auto, Auto" ColumnSpacing="15" RowSpacing="15">
+                <Grid ColumnDefinitions="*, *" RowDefinitions="Auto, Auto, Auto, Auto, Auto, Auto, Auto, Auto" ColumnSpacing="15" RowSpacing="15">
 
                     <Button Grid.Row="0" Grid.Column="0" x:Name="GymButton" Text="💪 GYM" 
                             BackgroundColor="#ff6b6b" TextColor="White" HeightRequest="60" CornerRadius="12" Clicked="OnGymClicked"/>
@@ -53,6 +53,9 @@
 
                     <Button Grid.Row="5" Grid.Column="1" Text="🏙️ CITY MAP" 
                             BackgroundColor="#2ecc71" TextColor="White" HeightRequest="60" CornerRadius="12" FontAttributes="Bold" Clicked="OnCityMapClicked"/>
+                    
+                    <Button Grid.Row="6" Grid.Column="1" Text="🏙️ Crime" 
+                            BackgroundColor="#2ecc71" TextColor="White" HeightRequest="60" CornerRadius="12" FontAttributes="Bold" Clicked="OnCrimeClicked"/>
 
                     <Grid Grid.Row="6" Grid.Column="0">
                         <Button Text="📰 NEWS" 
@@ -70,7 +73,7 @@
                         </Border>
                     </Grid>
 
-                    <Grid Grid.Row="6" Grid.Column="1">
+                    <Grid Grid.Row="7" Grid.Column="1">
                         <Button Text="📟 PAGER" 
                                 BackgroundColor="#e67e22" TextColor="White" HeightRequest="60" CornerRadius="12" Clicked="OnPagerClicked"/>
                         <!-- Notification Dot -->

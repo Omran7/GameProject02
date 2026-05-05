@@ -104,7 +104,6 @@ public partial class App : Application
             if (player != null)
             {
                 player.Gold = 999999999;
-                player.Level = 10;
                 
                 AddTestEstates(player);
                 AccountService.Login("omran", "omran");
