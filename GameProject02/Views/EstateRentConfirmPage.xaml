@@ -4,6 +4,7 @@
              xmlns:local="clr-namespace:GameProject02.Views"
              xmlns:controls="clr-namespace:GameProject02.Controls"
              x:Class="GameProject02.Views.EstateRentConfirmPage"
+             ControlTemplate="{StaticResource StickyHeaderTemplate}"
              NavigationPage.HasNavigationBar="False"
              Title="تأكيد الإيجار"
              FlowDirection="RightToLeft">

@@ -3,7 +3,9 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:views="clr-namespace:GameProject02.Views"
              x:Class="GameProject02.MainPage"
-             BackgroundColor="Black">
+             BackgroundColor="Black"
+             FlowDirection="RightToLeft"
+             NavigationPage.HasNavigationBar="False">
 
     <Grid RowDefinitions="Auto, *">
         <!-- Sticky Top Bar -->
@@ -16,104 +18,61 @@
                 <Label Text="CRIME CITY HUD" FontSize="20" TextColor="#45b7d1" HorizontalOptions="Center" FontAttributes="Bold" Margin="0,10" />
 
                 <!-- Action Buttons -->
-                <Grid ColumnDefinitions="*, *" RowDefinitions="Auto, Auto, Auto, Auto, Auto, Auto, Auto, Auto" ColumnSpacing="15" RowSpacing="15">
+                <Grid ColumnDefinitions="*, *" RowDefinitions="Auto, Auto, Auto, Auto, Auto, Auto,Auto" ColumnSpacing="15" RowSpacing="15">
 
-                    <Button Grid.Row="0" Grid.Column="0" x:Name="GymButton" Text="💪 GYM" 
+                    <Button Grid.Row="0" Grid.Column="0" x:Name="GymButton" Text="💪 النادي" 
                             BackgroundColor="#ff6b6b" TextColor="White" HeightRequest="60" CornerRadius="12" Clicked="OnGymClicked"/>
 
-                    <Button Grid.Row="0" Grid.Column="1" x:Name="SchoolButton" Text="🎓 SCHOOL" 
+                    <Button Grid.Row="0" Grid.Column="1" x:Name="SchoolButton" Text="🎓 المدرسة" 
                             BackgroundColor="#45b7d1" TextColor="White" HeightRequest="60" CornerRadius="12" Clicked="OnSchoolClicked"/>
 
-                    <Button Grid.Row="1" Grid.Column="0" x:Name="StockButton" Text="📦 STOCK" 
+                    <Button Grid.Row="1" Grid.Column="0" x:Name="StockButton" Text="📦 المخزن" 
                             BackgroundColor="#9b59b6" TextColor="White" HeightRequest="60" CornerRadius="12" Clicked="OnStockClicked"/>
 
-                    <Button Grid.Row="1" Grid.Column="1" Text="🏪 MARKET" 
+                    <Button Grid.Row="1" Grid.Column="1" Text="🏪 سوق المدينة" 
                             BackgroundColor="#8e44ad" TextColor="White" HeightRequest="60" CornerRadius="12" Clicked="OnMarketClicked"/>
 
-                    <Button Grid.Row="2" Grid.Column="0" Text="🏴‍☠️ GANG MARKET"
+                    <Button Grid.Row="2" Grid.Column="0" Text="🏴‍☠️ متجر العصابات"
                             BackgroundColor="#9b59b6" TextColor="White" HeightRequest="60" CornerRadius="12" Clicked="OnGangMarketClicked"/>
 
-                    <Button Grid.Row="2" Grid.Column="1" Text="🕵️ BLACK MARKET"
+                    <Button Grid.Row="2" Grid.Column="1" Text="🕵️ السوق السوداء"
                             BackgroundColor="#2c3e50" TextColor="White" HeightRequest="60" CornerRadius="12" Clicked="OnBlackMarketClicked"/>
 
-                    <Button Grid.Row="3" Grid.Column="0" Text="🏘️ ESTATE" 
+                    <Button Grid.Row="3" Grid.Column="0" Text="🏘️ العقارات" 
                             BackgroundColor="#f39c12" TextColor="White" HeightRequest="60" CornerRadius="12" Clicked="OnEstateClicked"/>
 
-                    <Button Grid.Row="3" Grid.Column="1" Text="💼 WORK OFFICE"
+                    <Button Grid.Row="3" Grid.Column="1" Text="💼 مكتب العمل"
                             BackgroundColor="#8e44ad" TextColor="White" HeightRequest="60" CornerRadius="12" Clicked="OnWorkOfficeClicked"/>
 
-                    <Button Grid.Row="4" Grid.Column="0" Text="⚔️ FIGHT CLUB"
+                    <Button Grid.Row="4" Grid.Column="0" Text="⚔️ نادي القتال"
                             BackgroundColor="#e74c3c" TextColor="White" HeightRequest="60" CornerRadius="12" Clicked="OnFightClubClicked"/>
 
-                    <Button Grid.Row="4" Grid.Column="1" Text="🏥 HOSPITAL" 
+                    <Button Grid.Row="4" Grid.Column="1" Text="🏥 المستشفى" 
                             BackgroundColor="#e74c3c" TextColor="White" HeightRequest="60" CornerRadius="12" Clicked="OnHospitalClicked"/>
 
-                    <Button Grid.Row="5" Grid.Column="0" Text="🔒 PRISON" 
+                    <Button Grid.Row="5" Grid.Column="0" Text="🔒 السجن" 
                             BackgroundColor="#e74c3c" TextColor="White" HeightRequest="60" CornerRadius="12" Clicked="OnPrisonClicked"/>
 
-                    <Button Grid.Row="5" Grid.Column="1" Text="🏙️ CITY MAP" 
+                    <Button Grid.Row="5" Grid.Column="1" Text="🏙️ الخريطة" 
                             BackgroundColor="#2ecc71" TextColor="White" HeightRequest="60" CornerRadius="12" FontAttributes="Bold" Clicked="OnCityMapClicked"/>
                     
-                    <Button Grid.Row="6" Grid.Column="1" Text="🏙️ Crime" 
-                            BackgroundColor="#2ecc71" TextColor="White" HeightRequest="60" CornerRadius="12" FontAttributes="Bold" Clicked="OnCrimeClicked"/>
-
-                    <Grid Grid.Row="6" Grid.Column="0">
-                        <Button Text="📰 NEWS" 
-                                BackgroundColor="#3498db" TextColor="White" HeightRequest="60" CornerRadius="12" Clicked="OnNewsClicked"/>
-                        <!-- Notification Dot -->
-                        <Border x:Name="NewsNotificationDot"
-                                BackgroundColor="Red" 
-                                WidthRequest="12" HeightRequest="12" 
-                                HorizontalOptions="End" VerticalOptions="Start"
-                                TranslationX="-10" TranslationY="10"
-                                IsVisible="False">
-                            <Border.StrokeShape>
-                                <RoundRectangle CornerRadius="6" />
-                            </Border.StrokeShape>
-                        </Border>
-                    </Grid>
-
-                    <Grid Grid.Row="7" Grid.Column="1">
-                        <Button Text="📟 PAGER" 
-                                BackgroundColor="#e67e22" TextColor="White" HeightRequest="60" CornerRadius="12" Clicked="OnPagerClicked"/>
-                        <!-- Notification Dot -->
-                        <Border x:Name="PagerNotificationDot"
-                                BackgroundColor="Red" 
-                                WidthRequest="12" HeightRequest="12" 
-                                HorizontalOptions="End" VerticalOptions="Start"
-                                TranslationX="-10" TranslationY="10"
-                                IsVisible="False">
-                            <Border.StrokeShape>
-                                <RoundRectangle CornerRadius="6" />
-                            </Border.StrokeShape>
-                        </Border>
-                    </Grid>
+                    <Button Grid.Row="6" Grid.Column="1" Text="🏙️ مدينة إدلب" 
+                            BackgroundColor="#2ecc71" TextColor="White" HeightRequest="60" CornerRadius="12" FontAttributes="Bold" Clicked="OnIdlibCityMapClicked"/>
                 </Grid>
 
-                <Grid Margin="0,20,0,0">
-                    <Button x:Name="ProfileButton" Text="👤 PROFILE" 
-                            BackgroundColor="#45b7d1" TextColor="White" HeightRequest="50" CornerRadius="25" Clicked="OnProfileClicked"/>
-                    <!-- Notification Dot -->
-                    <Border x:Name="ProfileNotificationDot"
-                            BackgroundColor="Red" 
-                            WidthRequest="12" HeightRequest="12" 
-                            HorizontalOptions="Center" VerticalOptions="Start"
-                            TranslationX="40" TranslationY="5"
-                            IsVisible="False">
-                        <Border.StrokeShape>
-                            <RoundRectangle CornerRadius="6" />
-                        </Border.StrokeShape>
-                    </Border>
-                </Grid>
+                <Button Text="👤 الملف الشخصي" 
+                        BackgroundColor="#45b7d1" TextColor="White" HeightRequest="50" CornerRadius="25" Clicked="OnProfileClicked" Margin="0,20,0,0"/>
 
-                <Button Text="🏪 GANG BASE"
+                <Button Text="🏪 مقر العصابة"
                         BackgroundColor="#9b59b6" TextColor="White" HeightRequest="50" CornerRadius="25" Clicked="OnGangClicked"/>
+                <Button Text="🏪 الجريمة"
+                        BackgroundColor="#9b59b6" TextColor="White" HeightRequest="50" CornerRadius="25" Clicked="OnCrimeClicked"/>
 
                 <!-- Language switcher button -->
-                <Button Text="🌐 SWITCH LANGUAGE" 
+                <Button Text="🌐 تغيير اللغة" 
                         BackgroundColor="#2c3e50" TextColor="White" HeightRequest="50" CornerRadius="12" Clicked="OnSwitchLanguageClicked"/>
 
-                <Button Text="🚪 SIGN OUT" 
+                <Button Text="🚪 تسجيل الخروج" 
                         BackgroundColor="#c0392b" TextColor="White" HeightRequest="50" CornerRadius="12" Clicked="OnSignOutClicked"/>
 
             </VerticalStackLayout>

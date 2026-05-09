@@ -5,6 +5,7 @@
              x:Class="GameProject02.Views.BagPage"
              x:Name="BagPageRoot"
              xmlns:controls="clr-namespace:GameProject02.Controls"
+             ControlTemplate="{StaticResource StickyHeaderTemplate}"
              BackgroundColor="#1a1a1a"
              Title="الحقيبة"
              Shell.NavBarIsVisible="False"

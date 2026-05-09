@@ -2,10 +2,11 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="GameProject02.Views.GangCreatePage"
+             ControlTemplate="{StaticResource StickyHeaderTemplate}"
              BackgroundColor="#1a1a1a"
              Title="🏴󠁥󠁮󠁧󠁢󠁳󠁣󠁿 إنشاء عصابة"
              FlowDirection="RightToLeft"
-             Shell.NavBarIsVisible="False">
+             NavigationPage.HasNavigationBar="False">
 
     <Grid RowDefinitions="Auto,*,Auto">
         <Border Grid.Row="0" BackgroundColor="#0a0a0a" Stroke="#e74c3c" StrokeThickness="2" Padding="10">

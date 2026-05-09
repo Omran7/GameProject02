@@ -4,9 +4,10 @@
              xmlns:local="clr-namespace:GameProject02.Views"
              xmlns:controls="clr-namespace:GameProject02.Controls"
              x:Class="GameProject02.Views.MarketCategoriesPage"
+             ControlTemplate="{StaticResource StickyHeaderTemplate}"
              Title="السوق"
              FlowDirection="RightToLeft"
-             Shell.NavBarIsVisible="False">
+             NavigationPage.HasNavigationBar="False">
 
     <Grid RowDefinitions="Auto,*,Auto" Padding="0">
         <!-- خلفية موحدة -->

@@ -4,6 +4,7 @@
              xmlns:local="clr-namespace:GameProject02.Views"
              xmlns:controls="clr-namespace:GameProject02.Controls"
              x:Class="GameProject02.Views.EstateUpgradePage"
+             ControlTemplate="{StaticResource StickyHeaderTemplate}"
              NavigationPage.HasNavigationBar="False"
              FlowDirection="RightToLeft"
              Title="تحديثات العقار">

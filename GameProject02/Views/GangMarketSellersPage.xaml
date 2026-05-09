@@ -2,8 +2,9 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="GameProject02.Views.GangMarketSellersPage"
+             ControlTemplate="{StaticResource StickyHeaderTemplate}"
              BackgroundColor="#1a1a1a"
-             Shell.NavBarIsVisible="False"
+             NavigationPage.HasNavigationBar="False"
              FlowDirection="RightToLeft">
 
     <Grid RowDefinitions="Auto,*,Auto">

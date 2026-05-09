@@ -6,7 +6,7 @@
     <Border BackgroundColor="Transparent"
             Stroke="Transparent"
             StrokeThickness="0"
-            Padding="0"
+            Padding="5"
             HorizontalOptions="Fill">
 
         <!-- توسيط المحتوى كله أفقياً -->

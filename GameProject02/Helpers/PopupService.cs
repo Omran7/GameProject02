@@ -6,14 +6,14 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 namespace GameProject02.Helpers;
-
+using Path = System.IO.Path;
 public enum PopupOperationType { Confirm, Sell, Move, Remove, Rent, Upgrade, Alert }
 
 public static class PopupService
 {
     // نخزن النوافذ المفتوحة في Stack للتعامل مع التداخل
     private static Stack<PopupContext> _popupStack = new();
-
+    public enum AvatarPopupResult { Change, Remove, Cancel }
     private class PopupContext
     {
         public View Overlay { get; set; } = null!;
@@ -604,6 +604,247 @@ public static class PopupService
                 }
             }
             catch { }
+        }
+    }
+    // =====================================================================
+    // نافذة تغيير صورة اللاعب
+    // =====================================================================
+    public static async Task<AvatarPopupResult> ShowAvatarPopupAsync(string currentAvatarPath)
+    {
+        var tcs = new TaskCompletionSource<AvatarPopupResult>();
+        var activePage = GetActivePage();
+        if (activePage == null)
+        {
+            tcs.TrySetResult(AvatarPopupResult.Cancel);
+            return AvatarPopupResult.Cancel;
+        }
+
+        Grid? rootGrid = activePage.Content as Grid;
+        View? originalContent = null;
+        if (rootGrid == null)
+        {
+            originalContent = activePage.Content;
+            rootGrid = new Grid { BackgroundColor = Colors.Transparent };
+            rootGrid.Add(originalContent);
+            activePage.Content = rootGrid;
+        }
+
+        try
+        {
+            double screenWidth = DeviceDisplay.MainDisplayInfo.Width / DeviceDisplay.MainDisplayInfo.Density;
+            double popupWidth = Math.Min(screenWidth * 0.85, 375);
+            double topHeight = Math.Max(40, popupWidth * 0.12);
+            double bottomHeight = Math.Max(35, popupWidth * 0.10);
+
+            // الخلفية المعتمة
+            var overlay = new Grid
+            {
+                BackgroundColor = Color.FromArgb("#80000000"),
+                IsVisible = false,
+                Opacity = 0,
+                HorizontalOptions = LayoutOptions.Fill,
+                VerticalOptions = LayoutOptions.Fill
+            };
+            overlay.GestureRecognizers.Add(
+                new TapGestureRecognizer { Command = new Command(() => { }) });
+
+            // حاوية البوب
+            var popupContainer = new Grid
+            {
+                WidthRequest = popupWidth,
+                HorizontalOptions = LayoutOptions.Center,
+                VerticalOptions = LayoutOptions.Center,
+                BackgroundColor = Colors.Transparent,
+                RowDefinitions = new RowDefinitionCollection
+                {
+                    new RowDefinition { Height = topHeight },
+                    new RowDefinition { Height = GridLength.Auto },
+                    new RowDefinition { Height = bottomHeight }
+                }
+            };
+
+            // خلفيات البوب
+            var topImg = new Image { Source = "popup_top", Aspect = Aspect.Fill };
+            var middleImg = new Image { Source = "popup_middle", Aspect = Aspect.Fill };
+            var bottomImg = new Image { Source = "popup_bottom", Aspect = Aspect.Fill };
+            Grid.SetRow(topImg, 0); popupContainer.Add(topImg);
+            Grid.SetRow(middleImg, 1); popupContainer.Add(middleImg);
+            Grid.SetRow(bottomImg, 2); popupContainer.Add(bottomImg);
+
+            // طبقة المحتوى
+            var contentGrid = new Grid { RowDefinitions = popupContainer.RowDefinitions };
+
+            // العنوان
+            var titleLabel = new Label
+            {
+                Text = "تغيير الصورة",
+                Style = (Style)Application.Current.Resources["PopupTitle"]
+            };
+            Grid.SetRow(titleLabel, 0);
+            contentGrid.Add(titleLabel);
+
+            // الجزء الأوسط
+            var middleStack = new VerticalStackLayout
+            {
+                Spacing = 20,
+                HorizontalOptions = LayoutOptions.Center,
+                Padding = new Thickness(20, 15, 20, 10)
+            };
+
+            // صورة اللاعب داخل الكنار
+            double avatarContainerSz = popupWidth * 0.30;
+            double avatarInnerSz = avatarContainerSz * 0.85;
+
+            var avatarGrid = new Grid
+            {
+                WidthRequest = avatarContainerSz,
+                HeightRequest = avatarContainerSz,
+                HorizontalOptions = LayoutOptions.Center
+            };
+
+            avatarGrid.Add(new Image
+            {
+                Source = "avatar_frame.png",
+                Aspect = Aspect.Fill,
+                WidthRequest = avatarContainerSz,
+                HeightRequest = avatarContainerSz,
+                HorizontalOptions = LayoutOptions.Center,
+                VerticalOptions = LayoutOptions.Center
+            });
+
+            ImageSource avatarSource;
+            if (!string.IsNullOrEmpty(currentAvatarPath)
+                && Path.IsPathRooted(currentAvatarPath)
+                && File.Exists(currentAvatarPath))
+                avatarSource = ImageSource.FromFile(currentAvatarPath);
+            else
+                avatarSource = "avatar_player.png";
+
+            avatarGrid.Add(new Frame
+            {
+                WidthRequest = avatarInnerSz,
+                HeightRequest = avatarInnerSz,
+                CornerRadius = 0,
+                Padding = 0,
+                HasShadow = false,
+                IsClippedToBounds = true,
+                BackgroundColor = Colors.Transparent,
+                BorderColor = Colors.Transparent,
+                HorizontalOptions = LayoutOptions.Center,
+                VerticalOptions = LayoutOptions.Center,
+                Content = new Image
+                {
+                    Source = avatarSource,
+                    Aspect = Aspect.AspectFill,
+                    WidthRequest = avatarInnerSz,
+                    HeightRequest = avatarInnerSz
+                }
+            });
+
+            middleStack.Children.Add(avatarGrid);
+
+            // الأزرار الثلاثة
+            double btnWidth = popupWidth * 0.26;
+
+            var buttonsRow = new HorizontalStackLayout
+            {
+                Spacing = 12,
+                HorizontalOptions = LayoutOptions.Center
+            };
+
+            var removeBtn = CreateButton("ازالة", Color.FromArgb("#cc0000"), "button_background_no.png", btnWidth);
+            var cancelBtn = CreateButton("الغاء", Color.FromArgb("#888888"), "button_background_no.png", btnWidth);
+            var changeBtn = CreateButton("تغيير", Color.FromArgb("#000000"), "button_background.png", btnWidth);
+
+            removeBtn.GestureRecognizers.Add(new TapGestureRecognizer
+            {
+                Command = new Command(async () =>
+                {
+                    await AnimateButton(removeBtn);
+                    await CloseAvatarPopup(overlay, popupContainer, rootGrid);
+                    tcs.TrySetResult(AvatarPopupResult.Remove);
+                })
+            });
+
+            cancelBtn.GestureRecognizers.Add(new TapGestureRecognizer
+            {
+                Command = new Command(async () =>
+                {
+                    await AnimateButton(cancelBtn);
+                    await CloseAvatarPopup(overlay, popupContainer, rootGrid);
+                    tcs.TrySetResult(AvatarPopupResult.Cancel);
+                })
+            });
+
+            changeBtn.GestureRecognizers.Add(new TapGestureRecognizer
+            {
+                Command = new Command(async () =>
+                {
+                    await AnimateButton(changeBtn);
+                    await CloseAvatarPopup(overlay, popupContainer, rootGrid);
+                    tcs.TrySetResult(AvatarPopupResult.Change);
+                })
+            });
+
+            buttonsRow.Children.Add(removeBtn);
+            buttonsRow.Children.Add(cancelBtn);
+            buttonsRow.Children.Add(changeBtn);
+            middleStack.Children.Add(buttonsRow);
+
+            Grid.SetRow(middleStack, 1);
+            contentGrid.Add(middleStack);
+
+            popupContainer.Add(contentGrid);
+            Grid.SetRowSpan(contentGrid, 3);
+
+            overlay.Add(popupContainer);
+            Grid.SetRowSpan(overlay,
+                rootGrid.RowDefinitions.Count > 0 ? rootGrid.RowDefinitions.Count : 1);
+            Grid.SetColumnSpan(overlay,
+                rootGrid.ColumnDefinitions.Count > 0 ? rootGrid.ColumnDefinitions.Count : 1);
+            rootGrid.Add(overlay);
+
+            popupContainer.Scale = 0.95;
+            popupContainer.Opacity = 0;
+            overlay.IsVisible = true;
+
+            await Task.WhenAll(
+                overlay.FadeTo(1, 150, Easing.Linear),
+                popupContainer.FadeTo(1, 200, Easing.SinOut),
+                popupContainer.ScaleTo(1, 200, Easing.SinOut)
+            );
+
+            return await tcs.Task;
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"[AvatarPopup Error] {ex.Message}");
+            tcs.TrySetResult(AvatarPopupResult.Cancel);
+            return AvatarPopupResult.Cancel;
+        }
+        finally
+        {
+            if (originalContent != null
+                && activePage.Content is Grid tempGrid
+                && tempGrid.Children.Contains(originalContent))
+                activePage.Content = originalContent;
+        }
+    }
+
+    private static async Task CloseAvatarPopup(View overlay, View popupContainer, Grid rootGrid)
+    {
+        try
+        {
+            await Task.WhenAll(
+                overlay.FadeTo(0, 150, Easing.Linear),
+                popupContainer.FadeTo(0, 200, Easing.SinIn),
+                popupContainer.ScaleTo(0.95, 200, Easing.SinIn)
+            );
+        }
+        catch { }
+        finally
+        {
+            SafeClose(overlay, rootGrid);
         }
     }
 }

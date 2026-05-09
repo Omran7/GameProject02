@@ -3,15 +3,6 @@
 	<PropertyGroup>
 		<TargetFrameworks>net9.0-android;net9.0-ios;net9.0-maccatalyst</TargetFrameworks>
 		<TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('windows'))">$(TargetFrameworks);net9.0-windows10.0.19041.0</TargetFrameworks>
-		<!-- Uncomment to also build the tizen app. You will need to install tizen by following this: https://github.com/Samsung/Tizen.NET -->
-		<!-- <TargetFrameworks>$(TargetFrameworks);net9.0-tizen</TargetFrameworks> -->
-
-		<!-- Note for MacCatalyst:
-		The default runtime is maccatalyst-x64, except in Release config, in which case the default is maccatalyst-x64;maccatalyst-arm64.
-		When specifying both architectures, use the plural <RuntimeIdentifiers> instead of the singular <RuntimeIdentifier>.
-		The Mac App Store will NOT accept apps with ONLY maccatalyst-arm64 indicated;
-		either BOTH runtimes must be indicated or ONLY macatalyst-x64. -->
-		<!-- For example: <RuntimeIdentifiers>maccatalyst-x64;maccatalyst-arm64</RuntimeIdentifiers> -->
 
 		<OutputType>Exe</OutputType>
 		<RootNamespace>GameProject02</RootNamespace>
@@ -20,17 +11,10 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 
-		<!-- Display name -->
 		<ApplicationTitle>GameProject02</ApplicationTitle>
-
-		<!-- App Identifier -->
 		<ApplicationId>com.companyname.gameproject02</ApplicationId>
-
-		<!-- Versions -->
 		<ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>
 		<ApplicationVersion>1</ApplicationVersion>
-
-		<!-- To develop, package, and publish an app to the Microsoft Store, see: https://aka.ms/MauiTemplateUnpackaged -->
 		<WindowsPackageType>None</WindowsPackageType>
 
 		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">15.0</SupportedOSPlatformVersion>
@@ -51,249 +35,125 @@
 		<!-- Splash Screen -->
 		<MauiSplashScreen Include="Resources\Splash\splash.svg" Color="#512BD4" BaseSize="128,128" />
 
-		<!-- Images -->
+		<!-- ════════════════════════════════════════════════════════════════
+		     صور الواجهة — تُستخدم في XAML كـ  <Image Source="name.png">
+		     يجب أن تبقى MauiImage دائماً
+		     ════════════════════════════════════════════════════════════════ -->
 		<MauiImage Include="Resources\Images\*" />
 
-		<!-- Custom Fonts -->
+		<!-- Fonts -->
 		<MauiFont Include="Resources\Fonts\*" />
 
-		<!-- Raw Assets (also remove the "Resources\Raw" prefix) -->
+		<!-- Raw Assets (Resources\Raw) -->
 		<MauiAsset Include="Resources\Raw\**" LogicalName="%(RecursiveDir)%(Filename)%(Extension)" />
 	</ItemGroup>
 
+	<!-- ════════════════════════════════════════════════════════════════════
+	     صور الخريطة — تُحمَّل بالكود عبر FileSystem.OpenAppPackageFileAsync
+	     يجب أن تبقى MauiAsset دائماً
+	     ════════════════════════════════════════════════════════════════════ -->
 	<ItemGroup>
-		<None Remove="Assets\images\%40banner_airport.png" />
-		<None Remove="Assets\images\%40banner_bank.png" />
-		<None Remove="Assets\images\%40banner_black_market.png" />
-		<None Remove="Assets\images\%40banner_casino.png" />
-		<None Remove="Assets\images\%40banner_cenima.png" />
-		<None Remove="Assets\images\%40banner_city_market.png" />
-		<None Remove="Assets\images\%40banner_estate_office.png" />
-		<None Remove="Assets\images\%40banner_fight_club.png" />
-		<None Remove="Assets\images\%40banner_gang_center.png" />
-		<None Remove="Assets\images\%40banner_gang_market.png" />
-		<None Remove="Assets\images\%40banner_gym.png" />
-		<None Remove="Assets\images\%40banner_hanager.png" />
-		<None Remove="Assets\images\%40banner_hospital.png" />
-		<None Remove="Assets\images\%40banner_lucky_wheel.png" />
-		<None Remove="Assets\images\%40banner_mercenary_base.png" />
-		<None Remove="Assets\images\%40banner_palace.png" />
-		<None Remove="Assets\images\%40banner_prison.png" />
-		<None Remove="Assets\images\%40banner_school.png" />
-		<None Remove="Assets\images\%40banner_settings.png" />
-		<None Remove="Assets\images\%40banner_skyscraper.png" />
-		<None Remove="Assets\images\%40banner_upgrade_lab.png" />
-		<None Remove="Assets\images\%40banner_wedding_hall.png" />
-		<None Remove="Assets\images\%40banner_work_office.png" />
-		<None Remove="Assets\images\%40building_airport.png" />
-		<None Remove="Assets\images\%40building_bank.png" />
-		<None Remove="Assets\images\%40building_bank_flip_x.png" />
-		<None Remove="Assets\images\%40building_black market.png" />
-		<None Remove="Assets\images\%40building_casino.png" />
-		<None Remove="Assets\images\%40building_cinema.png" />
-		<None Remove="Assets\images\%40building_city_database.png" />
-		<None Remove="Assets\images\%40building_city_market.png" />
-		<None Remove="Assets\images\%40building_city_market_flip_x.png" />
-		<None Remove="Assets\images\%40building_estate.png" />
-		<None Remove="Assets\images\%40building_fake11.png" />
-		<None Remove="Assets\images\%40building_fake4.png" />
-		<None Remove="Assets\images\%40building_fake5.png" />
-		<None Remove="Assets\images\%40building_fake8.png" />
-		<None Remove="Assets\images\%40building_fake9.png" />
-		<None Remove="Assets\images\%40building_fight_club.png" />
-		<None Remove="Assets\images\%40building_fire_frame_five.png" />
-		<None Remove="Assets\images\%40building_fire_frame_four.png" />
-		<None Remove="Assets\images\%40building_fire_frame_one.png" />
-		<None Remove="Assets\images\%40building_fire_frame_six.png" />
-		<None Remove="Assets\images\%40building_fire_frame_three.png" />
-		<None Remove="Assets\images\%40building_fire_frame_two.png" />
-		<None Remove="Assets\images\%40building_gang_base.png" />
-		<None Remove="Assets\images\%40building_gang_base_flip_x.png" />
-		<None Remove="Assets\images\%40building_gang_market.png" />
-		<None Remove="Assets\images\%40building_gym.png" />
-		<None Remove="Assets\images\%40building_hangar.png" />
-		<None Remove="Assets\images\%40building_hospital.png" />
-		<None Remove="Assets\images\%40building_hospital_flip_x.png" />
-		<None Remove="Assets\images\%40building_lucky_wheel.png" />
-		<None Remove="Assets\images\%40building_mercenary_base.png" />
-		<None Remove="Assets\images\%40building_mountains.png" />
-		<None Remove="Assets\images\%40building_mountains2.png" />
-		<None Remove="Assets\images\%40building_mountains3.png" />
-		<None Remove="Assets\images\%40building_mountains4.png" />
-		<None Remove="Assets\images\%40building_mountains5.png" />
-		<None Remove="Assets\images\%40building_mummy_tomb.png" />
-		<None Remove="Assets\images\%40building_prison.png" />
-		<None Remove="Assets\images\%40building_prison_flip_x.png" />
-		<None Remove="Assets\images\%40building_school.png" />
-		<None Remove="Assets\images\%40building_secret_lab.png" />
-		<None Remove="Assets\images\%40building_settings.png" />
-		<None Remove="Assets\images\%40building_skyscraper.png" />
-		<None Remove="Assets\images\%40building_upgrade_lab.png" />
-		<None Remove="Assets\images\%40building_war_banner.png" />
-		<None Remove="Assets\images\%40building_war_banner_gang_frame.png" />
-		<None Remove="Assets\images\%40building_war_banner_gang_image.png" />
-		<None Remove="Assets\images\%40building_work_office.png" />
-		<None Remove="Assets\images\%40floor_interlock.png" />
-		<None Remove="Assets\images\%40floor_interlock5.png" />
-		<None Remove="Assets\images\%40floor_interlock6.png" />
-		<None Remove="Assets\images\%40floor_rocks_cracks.png" />
-		<None Remove="Assets\images\%40floor_rocks_cracks2.png" />
-		<None Remove="Assets\images\%40floor_sand2.png" />
-		<None Remove="Assets\images\%40floor_solid.png" />
-		<None Remove="Assets\images\%40floor_water.png" />
-		<None Remove="Assets\images\%40floor_water_sand2.png" />
-		<None Remove="Assets\images\%40grass_decorate.png" />
-		<None Remove="Assets\images\%40others_chair.png" />
-		<None Remove="Assets\images\%40others_fire.png" />
-		<None Remove="Assets\images\%40others_postal.png" />
-		<None Remove="Assets\images\%40others_stack.png" />
-		<None Remove="Assets\images\%40others_stack2.png" />
-		<None Remove="Assets\images\%40others_traffic_light.png" />
-		<None Remove="Assets\images\%40others_traffic_light4.png" />
-		<None Remove="Assets\images\%40others_trash2.png" />
-		<None Remove="Assets\images\%40others_trash5.png" />
-		<None Remove="Assets\images\%40road_big.png" />
-		<None Remove="Assets\images\%40road_big_cross.png" />
-		<None Remove="Assets\images\%40road_big_cross2.png" />
-		<None Remove="Assets\images\%40road_big_cross3.png" />
-		<None Remove="Assets\images\%40road_big_curve_left.png" />
-		<None Remove="Assets\images\%40road_big_curve_right.png" />
-		<None Remove="Assets\images\%40road_big_small_cross.png" />
-		<None Remove="Assets\images\%40road_big_small_cross2.png" />
-		<None Remove="Assets\images\%40road_big_small_cross3.png" />
-		<None Remove="Assets\images\%40road_block2.png" />
-		<None Remove="Assets\images\%40road_dash.png" />
-		<None Remove="Assets\images\%40road_small.png" />
-		<None Remove="Assets\images\%40road_small_block2.png" />
-		<None Remove="Assets\images\%40road_small_cross.png" />
-		<None Remove="Assets\images\%40tree.png" />
-		<None Remove="Assets\images\%40tree11.png" />
-		<None Remove="Assets\images\%40tree13.png" />
-		<None Remove="Assets\images\%40tree14.png" />
-		<None Remove="Assets\images\%40tree16.png" />
-		<None Remove="Assets\images\%40tree2.png" />
-		<None Remove="Assets\images\%40tree3.png" />
-		<None Remove="Assets\images\%40tree4.png" />
-		<None Remove="Assets\images\%40tree6.png" />
+		<MauiAsset Include="Assets\images\maincity\%40banner_airport.png" />
+		<MauiAsset Include="Assets\images\maincity\%40banner_bank.png" />
+		<MauiAsset Include="Assets\images\maincity\%40banner_black_market.png" />
+		<MauiAsset Include="Assets\images\maincity\%40banner_casino.png" />
+		<MauiAsset Include="Assets\images\maincity\%40banner_cenima.png" />
+		<MauiAsset Include="Assets\images\maincity\%40banner_city_market.png" />
+		<MauiAsset Include="Assets\images\maincity\%40banner_estate_office.png" />
+		<MauiAsset Include="Assets\images\maincity\%40banner_fight_club.png" />
+		<MauiAsset Include="Assets\images\maincity\%40banner_gang_center.png" />
+		<MauiAsset Include="Assets\images\maincity\%40banner_gang_market.png" />
+		<MauiAsset Include="Assets\images\maincity\%40banner_gym.png" />
+		<MauiAsset Include="Assets\images\maincity\%40banner_hanager.png" />
+		<MauiAsset Include="Assets\images\maincity\%40banner_hospital.png" />
+		<MauiAsset Include="Assets\images\maincity\%40banner_lucky_wheel.png" />
+		<MauiAsset Include="Assets\images\maincity\%40banner_mercenary_base.png" />
+		<MauiAsset Include="Assets\images\maincity\%40banner_palace.png" />
+		<MauiAsset Include="Assets\images\maincity\%40banner_prison.png" />
+		<MauiAsset Include="Assets\images\maincity\%40banner_school.png" />
+		<MauiAsset Include="Assets\images\maincity\%40banner_settings.png" />
+		<MauiAsset Include="Assets\images\maincity\%40banner_skyscraper.png" />
+		<MauiAsset Include="Assets\images\maincity\%40banner_upgrade_lab.png" />
+		<MauiAsset Include="Assets\images\maincity\%40banner_wedding_hall.png" />
+		<MauiAsset Include="Assets\images\maincity\%40banner_work_office.png" />
+		<MauiAsset Include="Assets\images\maincity\%40building_airport.png" />
+		<MauiAsset Include="Assets\images\maincity\%40building_bank.png" />
+		<MauiAsset Include="Assets\images\maincity\%40building_bank_flip_x.png" />
+		<MauiAsset Include="Assets\images\maincity\%40building_black market.png" />
+		<MauiAsset Include="Assets\images\maincity\%40building_casino.png" />
+		<MauiAsset Include="Assets\images\maincity\%40building_cinema.png" />
+		<MauiAsset Include="Assets\images\maincity\%40building_city_database.png" />
+		<MauiAsset Include="Assets\images\maincity\%40building_city_market.png" />
+		<MauiAsset Include="Assets\images\maincity\%40building_city_market_flip_x.png" />
+		<MauiAsset Include="Assets\images\maincity\%40building_estate.png" />
+		<MauiAsset Include="Assets\images\maincity\%40building_fake11.png" />
+		<MauiAsset Include="Assets\images\maincity\%40building_fake4.png" />
+		<MauiAsset Include="Assets\images\maincity\%40building_fake5.png" />
+		<MauiAsset Include="Assets\images\maincity\%40building_fake8.png" />
+		<MauiAsset Include="Assets\images\maincity\%40building_fake9.png" />
+		<MauiAsset Include="Assets\images\maincity\%40building_fight_club.png" />
+		<MauiAsset Include="Assets\images\maincity\%40building_fire_frame_five.png" />
+		<MauiAsset Include="Assets\images\maincity\%40building_fire_frame_four.png" />
+		<MauiAsset Include="Assets\images\maincity\%40building_fire_frame_one.png" />
+		<MauiAsset Include="Assets\images\maincity\%40building_fire_frame_six.png" />
+		<MauiAsset Include="Assets\images\maincity\%40building_fire_frame_three.png" />
+		<MauiAsset Include="Assets\images\maincity\%40building_fire_frame_two.png" />
+		<MauiAsset Include="Assets\images\maincity\%40building_gang_base.png" />
+		<MauiAsset Include="Assets\images\maincity\%40building_gang_market.png" />
+		<MauiAsset Include="Assets\images\maincity\%40building_gym.png" />
+		<MauiAsset Include="Assets\images\maincity\%40building_hospital.png" />
+		<MauiAsset Include="Assets\images\maincity\%40building_lucky_wheel.png" />
+		<MauiAsset Include="Assets\images\maincity\%40building_mercenary_base.png" />
+		<MauiAsset Include="Assets\images\maincity\%40building_prison.png" />
+		<MauiAsset Include="Assets\images\maincity\%40building_school.png" />
+		<MauiAsset Include="Assets\images\maincity\%40building_skyscraper.png" />
+		<MauiAsset Include="Assets\images\maincity\%40building_upgrade_lab.png" />
+		<MauiAsset Include="Assets\images\maincity\%40building_war_banner.png" />
+		<MauiAsset Include="Assets\images\maincity\%40building_war_banner_gang_frame.png" />
+		<MauiAsset Include="Assets\images\maincity\%40building_war_banner_gang_image.png" />
+		<MauiAsset Include="Assets\images\maincity\%40building_work_office.png" />
+		<MauiAsset Include="Assets\images\maincity\%40floor_interlock.png" />
+		<MauiAsset Include="Assets\images\maincity\%40floor_interlock5.png" />
+		<MauiAsset Include="Assets\images\maincity\%40floor_interlock6.png" />
+		<MauiAsset Include="Assets\images\maincity\%40floor_rocks_cracks.png" />
+		<MauiAsset Include="Assets\images\maincity\%40floor_rocks_cracks2.png" />
+		<MauiAsset Include="Assets\images\maincity\%40floor_sand2.png" />
+		<MauiAsset Include="Assets\images\maincity\%40floor_solid.png" />
+		<MauiAsset Include="Assets\images\maincity\%40floor_water.png" />
+		<MauiAsset Include="Assets\images\maincity\%40floor_water_sand2.png" />
+		<MauiAsset Include="Assets\images\maincity\%40grass_decorate.png" />
+		<MauiAsset Include="Assets\images\maincity\%40others_chair.png" />
+		<MauiAsset Include="Assets\images\maincity\%40others_fire.png" />
+		<MauiAsset Include="Assets\images\maincity\%40others_postal.png" />
+		<MauiAsset Include="Assets\images\maincity\%40others_stack.png" />
+		<MauiAsset Include="Assets\images\maincity\%40others_stack2.png" />
+		<MauiAsset Include="Assets\images\maincity\%40others_traffic_light.png" />
+		<MauiAsset Include="Assets\images\maincity\%40others_traffic_light4.png" />
+		<MauiAsset Include="Assets\images\maincity\%40others_trash2.png" />
+		<MauiAsset Include="Assets\images\maincity\%40others_trash5.png" />
+		<MauiAsset Include="Assets\images\maincity\%40road_big.png" />
+		<MauiAsset Include="Assets\images\maincity\%40road_big_cross.png" />
+		<MauiAsset Include="Assets\images\maincity\%40road_big_cross2.png" />
+		<MauiAsset Include="Assets\images\maincity\%40road_big_cross3.png" />
+		<MauiAsset Include="Assets\images\maincity\%40road_big_curve_left.png" />
+		<MauiAsset Include="Assets\images\maincity\%40road_big_curve_right.png" />
+		<MauiAsset Include="Assets\images\maincity\%40road_big_small_cross.png" />
+		<MauiAsset Include="Assets\images\maincity\%40road_big_small_cross2.png" />
+		<MauiAsset Include="Assets\images\maincity\%40road_big_small_cross3.png" />
+		<MauiAsset Include="Assets\images\maincity\%40road_block2.png" />
+		<MauiAsset Include="Assets\images\maincity\%40road_dash.png" />
+		<MauiAsset Include="Assets\images\maincity\%40road_small.png" />
+		<MauiAsset Include="Assets\images\maincity\%40road_small_block2.png" />
+		<MauiAsset Include="Assets\images\maincity\%40road_small_cross.png" />
+		<MauiAsset Include="Assets\images\maincity\%40tree.png" />
+		<MauiAsset Include="Assets\images\maincity\%40tree11.png" />
+		<MauiAsset Include="Assets\images\maincity\%40tree13.png" />
+		<MauiAsset Include="Assets\images\maincity\%40tree14.png" />
 	</ItemGroup>
 
 	<ItemGroup>
-		<MauiAsset Include="Assets\images\@banner_airport.png" />
-		<MauiAsset Include="Assets\images\@banner_bank.png" />
-		<MauiAsset Include="Assets\images\@banner_black_market.png" />
-		<MauiAsset Include="Assets\images\@banner_casino.png" />
-		<MauiAsset Include="Assets\images\@banner_cenima.png" />
-		<MauiAsset Include="Assets\images\@banner_city_market.png" />
-		<MauiAsset Include="Assets\images\@banner_estate_office.png" />
-		<MauiAsset Include="Assets\images\@banner_fight_club.png" />
-		<MauiAsset Include="Assets\images\@banner_gang_center.png" />
-		<MauiAsset Include="Assets\images\@banner_gang_market.png" />
-		<MauiAsset Include="Assets\images\@banner_gym.png" />
-		<MauiAsset Include="Assets\images\@banner_hanager.png" />
-		<MauiAsset Include="Assets\images\@banner_hospital.png" />
-		<MauiAsset Include="Assets\images\@banner_lucky_wheel.png" />
-		<MauiAsset Include="Assets\images\@banner_mercenary_base.png" />
-		<MauiAsset Include="Assets\images\@banner_palace.png" />
-		<MauiAsset Include="Assets\images\@banner_prison.png" />
-		<MauiAsset Include="Assets\images\@banner_school.png" />
-		<MauiAsset Include="Assets\images\@banner_settings.png" />
-		<MauiAsset Include="Assets\images\@banner_skyscraper.png" />
-		<MauiAsset Include="Assets\images\@banner_upgrade_lab.png" />
-		<MauiAsset Include="Assets\images\@banner_wedding_hall.png" />
-		<MauiAsset Include="Assets\images\@banner_work_office.png" />
-		<MauiAsset Include="Assets\images\@building_airport.png" />
-		<MauiAsset Include="Assets\images\@building_bank.png" />
-		<MauiAsset Include="Assets\images\@building_bank_flip_x.png" />
-		<MauiAsset Include="Assets\images\@building_black market.png" />
-		<MauiAsset Include="Assets\images\@building_casino.png" />
-		<MauiAsset Include="Assets\images\@building_cinema.png" />
-		<MauiAsset Include="Assets\images\@building_city_database.png" />
-		<MauiAsset Include="Assets\images\@building_city_market.png" />
-		<MauiAsset Include="Assets\images\@building_city_market_flip_x.png" />
-		<MauiAsset Include="Assets\images\@building_estate.png" />
-		<MauiAsset Include="Assets\images\@building_fake11.png" />
-		<MauiAsset Include="Assets\images\@building_fake4.png" />
-		<MauiAsset Include="Assets\images\@building_fake5.png" />
-		<MauiAsset Include="Assets\images\@building_fake8.png" />
-		<MauiAsset Include="Assets\images\@building_fake9.png" />
-		<MauiAsset Include="Assets\images\@building_fight_club.png" />
-		<MauiAsset Include="Assets\images\@building_fire_frame_five.png" />
-		<MauiAsset Include="Assets\images\@building_fire_frame_four.png" />
-		<MauiAsset Include="Assets\images\@building_fire_frame_one.png" />
-		<MauiAsset Include="Assets\images\@building_fire_frame_six.png" />
-		<MauiAsset Include="Assets\images\@building_fire_frame_three.png" />
-		<MauiAsset Include="Assets\images\@building_fire_frame_two.png" />
-		<MauiAsset Include="Assets\images\@building_gang_base.png" />
-		<MauiAsset Include="Assets\images\@building_gang_base_flip_x.png" />
-		<MauiAsset Include="Assets\images\@building_gang_market.png" />
-		<MauiAsset Include="Assets\images\@building_gym.png" />
-		<MauiAsset Include="Assets\images\@building_hangar.png" />
-		<MauiAsset Include="Assets\images\@building_hospital.png" />
-		<MauiAsset Include="Assets\images\@building_hospital_flip_x.png" />
-		<MauiAsset Include="Assets\images\@building_lucky_wheel.png" />
-		<MauiAsset Include="Assets\images\@building_mercenary_base.png" />
-		<MauiAsset Include="Assets\images\@building_mountains.png" />
-		<MauiAsset Include="Assets\images\@building_mountains2.png" />
-		<MauiAsset Include="Assets\images\@building_mountains3.png" />
-		<MauiAsset Include="Assets\images\@building_mountains4.png" />
-		<MauiAsset Include="Assets\images\@building_mountains5.png" />
-		<MauiAsset Include="Assets\images\@building_mummy_tomb.png" />
-		<MauiAsset Include="Assets\images\@building_prison.png" />
-		<MauiAsset Include="Assets\images\@building_prison_flip_x.png" />
-		<MauiAsset Include="Assets\images\@building_school.png" />
-		<MauiAsset Include="Assets\images\@building_secret_lab.png" />
-		<MauiAsset Include="Assets\images\@building_settings.png" />
-		<MauiAsset Include="Assets\images\@building_skyscraper.png" />
-		<MauiAsset Include="Assets\images\@building_upgrade_lab.png" />
-		<MauiAsset Include="Assets\images\@building_war_banner.png" />
-		<MauiAsset Include="Assets\images\@building_war_banner_gang_frame.png" />
-		<MauiAsset Include="Assets\images\@building_war_banner_gang_image.png" />
-		<MauiAsset Include="Assets\images\@building_work_office.png" />
-		<MauiAsset Include="Assets\images\@floor_interlock.png" />
-		<MauiAsset Include="Assets\images\@floor_interlock5.png" />
-		<MauiAsset Include="Assets\images\@floor_interlock6.png" />
-		<MauiAsset Include="Assets\images\@floor_rocks_cracks.png" />
-		<MauiAsset Include="Assets\images\@floor_rocks_cracks2.png" />
-		<MauiAsset Include="Assets\images\@floor_sand2.png" />
-		<MauiAsset Include="Assets\images\@floor_solid.png" />
-		<MauiAsset Include="Assets\images\@floor_water.png" />
-		<MauiAsset Include="Assets\images\@floor_water_sand2.png" />
-		<MauiAsset Include="Assets\images\@grass_decorate.png" />
-		<MauiAsset Include="Assets\images\@others_chair.png" />
-		<MauiAsset Include="Assets\images\@others_fire.png" />
-		<MauiAsset Include="Assets\images\@others_postal.png" />
-		<MauiAsset Include="Assets\images\@others_stack.png" />
-		<MauiAsset Include="Assets\images\@others_stack2.png" />
-		<MauiAsset Include="Assets\images\@others_traffic_light.png" />
-		<MauiAsset Include="Assets\images\@others_traffic_light4.png" />
-		<MauiAsset Include="Assets\images\@others_trash2.png" />
-		<MauiAsset Include="Assets\images\@others_trash5.png" />
-		<MauiAsset Include="Assets\images\@road_big.png" />
-		<MauiAsset Include="Assets\images\@road_big_cross.png" />
-		<MauiAsset Include="Assets\images\@road_big_cross2.png" />
-		<MauiAsset Include="Assets\images\@road_big_cross3.png" />
-		<MauiAsset Include="Assets\images\@road_big_curve_left.png" />
-		<MauiAsset Include="Assets\images\@road_big_curve_right.png" />
-		<MauiAsset Include="Assets\images\@road_big_small_cross.png" />
-		<MauiAsset Include="Assets\images\@road_big_small_cross2.png" />
-		<MauiAsset Include="Assets\images\@road_big_small_cross3.png" />
-		<MauiAsset Include="Assets\images\@road_block2.png" />
-		<MauiAsset Include="Assets\images\@road_dash.png" />
-		<MauiAsset Include="Assets\images\@road_small.png" />
-		<MauiAsset Include="Assets\images\@road_small_block2.png" />
-		<MauiAsset Include="Assets\images\@road_small_cross.png" />
-		<MauiAsset Include="Assets\images\@tree.png" />
-		<MauiAsset Include="Assets\images\@tree11.png" />
-		<MauiAsset Include="Assets\images\@tree13.png" />
-		<MauiAsset Include="Assets\images\@tree14.png" />
-		<MauiAsset Include="Assets\images\@tree16.png" />
-		<MauiAsset Include="Assets\images\@tree2.png" />
-		<MauiAsset Include="Assets\images\@tree3.png" />
-		<MauiAsset Include="Assets\images\@tree4.png" />
-		<MauiAsset Include="Assets\images\@tree6.png" />
-	</ItemGroup>
-
-	<ItemGroup>
+		<PackageReference Include="FirebaseAuthentication.net" Version="4.1.0" />
+		<PackageReference Include="FirebaseDatabase.net" Version="5.0.0" />
 		<PackageReference Include="Microsoft.Maui.Controls" Version="$(MauiVersion)" />
 		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="9.0.9" />
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
@@ -322,10 +182,6 @@
 		<MauiFont Update="Resources\Fonts\Cairo-Regular.ttf">
 			<CopyToOutputDirectory>Never</CopyToOutputDirectory>
 		</MauiFont>
-	</ItemGroup>
-
-	<ItemGroup>
-	  <MauiImage Update="Resources\Images\dotnet_bot.png" Resize="True" BaseSize="300,185" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -386,6 +242,9 @@
 		<MauiXaml Update="Views\HospitalPage.xaml">
 			<Generator>MSBuild:Compile</Generator>
 		</MauiXaml>
+		<MauiXaml Update="Views\IdlibCityMapPage.xaml">
+		  <Generator>MSBuild:Compile</Generator>
+		</MauiXaml>
 		<MauiXaml Update="Views\LessonPage.xaml">
 			<Generator>MSBuild:Compile</Generator>
 		</MauiXaml>
@@ -422,6 +281,10 @@
 		<MauiXaml Update="Views\UsedEstateSellPage.xaml">
 			<Generator>MSBuild:Compile</Generator>
 		</MauiXaml>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Folder Include="Assets\images\IdlibCity\" />
 	</ItemGroup>
 
 </Project>

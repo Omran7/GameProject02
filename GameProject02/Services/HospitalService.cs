@@ -7,50 +7,45 @@ namespace GameProject02.Services;
 
 public static class HospitalService
 {
-    // ✅ أقسام العمل في المستشفى (من اللعبة القديمة)
     private static readonly List<HospitalWorkDefinition> _hospitalWorks = new()
     {
         new HospitalWorkDefinition
         {
-            WorkLevel = 3,
-            Name = "تنظيف الغرف",
-            Description = "ساعد في تنظيف غرف المرضى واستلم راتباً بسيطاً",
-            RequiredCash = 100000,
-            RequiredCourage = 10,
-            HealthRestored = 75,
-            ExperienceReward = 75,
+            WorkLevel          = 3,
+            Name               = "تنظيف الغرف",
+            Description        = "ساعد في تنظيف غرف المرضى واستلم راتباً بسيطاً",
+            RequiredCash       = 100000,
+            RequiredCourage    = 10,
+            HealthRestored     = 75,
+            ExperienceReward   = 75,
             RequiredPlayerLevel = 0
         },
         new HospitalWorkDefinition
         {
-            WorkLevel = 4,
-            Name = "الصيدلية",
-            Description = "ساعد في توزيع الأدوية واحصل على راتب أفضل",
-            RequiredCash = 300000,
-            RequiredCourage = 15,
-            HealthRestored = 250,
-            ExperienceReward = 250,
+            WorkLevel          = 4,
+            Name               = "الصيدلية",
+            Description        = "ساعد في توزيع الأدوية واحصل على راتب أفضل",
+            RequiredCash       = 300000,
+            RequiredCourage    = 15,
+            HealthRestored     = 250,
+            ExperienceReward   = 250,
             RequiredPlayerLevel = 103
         },
         new HospitalWorkDefinition
         {
-            WorkLevel = 5,
-            Name = "المختبر الطبي",
-            Description = "ساعد في تحليل العينات واحصل على راتب ممتاز",
-            RequiredCash = 400000,
-            RequiredCourage = 20,
-            HealthRestored = 500,
-            ExperienceReward = 500,
+            WorkLevel          = 5,
+            Name               = "المختبر الطبي",
+            Description        = "ساعد في تحليل العينات واحصل على راتب ممتاز",
+            RequiredCash       = 400000,
+            RequiredCourage    = 20,
+            HealthRestored     = 500,
+            ExperienceReward   = 500,
             RequiredPlayerLevel = 119
         }
     };
 
     public static List<HospitalWorkDefinition> GetAvailableWorks(PlayerAccount player)
-    {
-        return _hospitalWorks
-            .Where(work => player.Level >= work.RequiredPlayerLevel)
-            .ToList();
-    }
+        => _hospitalWorks.Where(w => player.Level >= w.RequiredPlayerLevel).ToList();
 
     public static (bool success, string message) PerformWork(PlayerAccount player, int workLevel)
     {
@@ -67,42 +62,40 @@ public static class HospitalService
         if (player.Gold < work.RequiredCash)
             return (false, $"ليس لديك ما يكفي من المال!\nتحتاج {work.RequiredCash:N0} ذهب.");
 
-        if (player.CrimeObject.Courage < work.RequiredCourage)
+        // ✅ player.Courage بدلاً من player.CrimeObject.Courage
+        if (player.Courage < work.RequiredCourage)
             return (false, $"ليس لديك ما يكفي من الشجاعة!\nتحتاج {work.RequiredCourage} نقطة.");
 
-        // خصم التكاليف
+        // ✅ خصم التكاليف من player.Courage
         player.Gold -= work.RequiredCash;
-        player.CrimeObject.Courage -= work.RequiredCourage;
+        player.Courage -= work.RequiredCourage;
 
         // استعادة الصحة
         int healthBefore = player.CrimeObject.HealthCurrent;
         player.CrimeObject.HealthCurrent = Math.Min(
             player.CrimeObject.HealthMax,
-            player.CrimeObject.HealthCurrent + work.HealthRestored
-        );
+            player.CrimeObject.HealthCurrent + work.HealthRestored);
         int healthGained = player.CrimeObject.HealthCurrent - healthBefore;
 
         // منح الخبرة
         player.CurrentXP += work.ExperienceReward;
 
-        // تقليل وقت المستشفى (25% لكل عمل)
+        // تقليل وقت المستشفى 25%
         if (player.CrimeObject.HospitalReleaseTime > 0)
         {
             var now = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
             long remainingTime = player.CrimeObject.HospitalReleaseTime - now;
-            long timeReduction = (long)(remainingTime * 0.25);
+            long reduction = (long)(remainingTime * 0.25);
             player.CrimeObject.HospitalReleaseTime = Math.Max(
                 now,
-                player.CrimeObject.HospitalReleaseTime - timeReduction
-            );
+                player.CrimeObject.HospitalReleaseTime - reduction);
         }
 
-        string message = $"أكملت العمل بنجاح في المستشفى!\n" +
-                       $"الصحة المستعادة: +{healthGained}\n" +
-                       $"الخبرة: +{work.ExperienceReward}\n" +
-                       $"الوقت المتبقي: {GetRemainingTime(player.CrimeObject.HospitalReleaseTime)}";
-
-        return (true, message);
+        return (true,
+            $"أكملت العمل بنجاح!\n" +
+            $"الصحة المستعادة: +{healthGained}\n" +
+            $"الخبرة: +{work.ExperienceReward}\n" +
+            $"الوقت المتبقي: {GetRemainingTime(player.CrimeObject.HospitalReleaseTime)}");
     }
 
     public static (bool success, string message) UseHealthTank(PlayerAccount player)
@@ -113,14 +106,12 @@ public static class HospitalService
         const string healthTankId = "health_tank";
         if (!player.StockObject.ItemsInStock.TryGetValue(healthTankId, out var tankItem)
             || tankItem.Count < 1)
-            return (false, "ليس لديك خزان صحة كافي!\nاشترِ خزان صحة من الصيدلية.");
+            return (false, "ليس لديك خزان صحة!\nاشترِه من الصيدلية.");
 
-        // استهلاك الخزان
         tankItem.Count--;
         if (tankItem.Count <= 0)
             player.StockObject.ItemsInStock.Remove(healthTankId);
 
-        // خروج فوري واستعادة الصحة
         player.CrimeObject.IsInHospital = false;
         player.CrimeObject.HospitalReleaseTime = 0;
         player.CrimeObject.HealthCurrent = player.CrimeObject.HealthMax;
@@ -128,36 +119,27 @@ public static class HospitalService
         return (true, "✅ تم استخدام خزان الصحة!\nخرجت من المستشفى فوراً مع استعادة كامل صحتك.");
     }
 
-    // ✅ دالة لجلب جميع المرضى الحاليين (لحالة الزائر)
     public static List<PlayerAccount> GetPatients()
     {
         var allPlayers = AccountService.GetAllPlayers();
+        var now = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
 
-        // تصفية اللاعبين الموجودين حالياً في المستشفى ولم تنته مدتهم
-        var patients = allPlayers
+        return allPlayers
             .Where(p => p.CrimeObject.IsInHospital &&
-                       p.CrimeObject.HospitalReleaseTime > DateTimeOffset.UtcNow.ToUnixTimeMilliseconds())
+                        p.CrimeObject.HospitalReleaseTime > now)
             .ToList();
-
-        System.Diagnostics.Debug.WriteLine($"[HOSPITAL] Total players: {allPlayers.Count}");
-        System.Diagnostics.Debug.WriteLine($"[HOSPITAL] Patients: {patients.Count}");
-
-        return patients;
     }
 
     public static string GetRemainingTime(long releaseTime)
     {
         if (releaseTime <= 0) return "00:00:00";
-
         var now = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
         if (now >= releaseTime) return "00:00:00";
-
         var remaining = TimeSpan.FromMilliseconds(releaseTime - now);
         return $"{remaining.Hours:D2}:{remaining.Minutes:D2}:{remaining.Seconds:D2}";
     }
 }
 
-// تعريف فئة العمل (موجودة أصلاً في ملف منفصل، نضعها هنا للتكامل)
 public class HospitalWorkDefinition
 {
     public int WorkLevel { get; set; }

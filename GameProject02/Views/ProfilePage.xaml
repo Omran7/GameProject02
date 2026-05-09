@@ -4,7 +4,8 @@
              x:Class="GameProject02.Views.ProfilePage"
              ControlTemplate="{StaticResource StickyHeaderTemplate}"
              BackgroundColor="#000000"
-             Title="Profile">
+             Title="Profile"
+             NavigationPage.HasNavigationBar="False">
 
 	<Grid>
 		<!-- Background Gradient -->

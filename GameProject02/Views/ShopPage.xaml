@@ -5,6 +5,7 @@
              x:Class="GameProject02.Views.ShopPage"
              x:Name="ShopPageRoot"
              xmlns:controls="clr-namespace:GameProject02.Controls"
+             ControlTemplate="{StaticResource StickyHeaderTemplate}"
              BackgroundColor="#1a1a1a"
              Title="المتجر"
              Shell.NavBarIsVisible="False"

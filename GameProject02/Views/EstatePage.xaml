@@ -4,8 +4,9 @@
              xmlns:local="clr-namespace:GameProject02.Views"
              xmlns:controls="clr-namespace:GameProject02.Controls"
              x:Class="GameProject02.Views.EstatePage"
-             Title="العقارات"
+             ControlTemplate="{StaticResource StickyHeaderTemplate}"
              FlowDirection="RightToLeft"
+             Title="العقارات"
              NavigationPage.HasNavigationBar="False">
 
     <Grid RowDefinitions="Auto,*,Auto" Padding="0">

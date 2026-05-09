@@ -1,285 +1,97 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:controls="clr-namespace:GameProject02.Controls"
              xmlns:views="clr-namespace:GameProject02.Views"
              x:Class="GameProject02.Views.PrisonPage"
              BackgroundColor="#1a1a1a"
-             Title="🔒 السجن"
              FlowDirection="RightToLeft"
-             Shell.NavBarIsVisible="False">
+             NavigationPage.HasNavigationBar="False">
 
-    <Grid RowDefinitions="Auto,*,Auto">
+    <Grid RowDefinitions="Auto, Auto, *, Auto">
 
-        <!-- Top Navigation Bar -->
-        <Border Grid.Row="0" 
-                BackgroundColor="#8e44ad" 
-                Stroke="Transparent" 
-                StrokeShape="RoundRectangle 0,0,0,0" 
-                Padding="5">
-            <Grid ColumnDefinitions="Auto,*,Auto">
-                <!-- Back Button (Visitor Mode Only) -->
-                <Button x:Name="BackButton" 
-                        Text="← رجوع"
-                        BackgroundColor="#9b59b6" 
-                        TextColor="White" 
-                        CornerRadius="5" 
-                        FontAttributes="Bold"
-                        IsVisible="{Binding IsFreeMode}"
-                        Clicked="OnBackClicked"/>
+        <views:TopHeaderView Grid.Row="0"/>
 
-                <!-- Title & Time Display -->
-                <StackLayout Grid.Column="1" Spacing="2" VerticalOptions="Center">
-                    <Label Text="🔒 السجن" 
-                           TextColor="White" 
-                           FontSize="16" 
-                           FontAttributes="Bold" 
-                           HorizontalOptions="Center"/>
-                    <Label x:Name="BottomTimeLabel" 
-                           Text="00:00:00" 
-                           TextColor="#e74c3c" 
-                           FontSize="14" 
-                           FontAttributes="Bold" 
-                           HorizontalOptions="Center"/>
-                </StackLayout>
+        <!-- صورة خلفية الزائر -->
+        <Image Source="background.png"
+               Aspect="Fill"
+               HorizontalOptions="Fill"
+               VerticalOptions="Fill"
+               Grid.Row="1"
+               Grid.RowSpan="2"
+               IsVisible="{Binding IsFreeMode}"/>
 
-                <!-- Refresh Button (Visitor Mode Only) -->
-                <Button x:Name="RefreshButton" 
-                        Text="🔄 تحديث"
-                        BackgroundColor="#3498db" 
-                        TextColor="White" 
-                        CornerRadius="5" 
-                        FontAttributes="Bold"
-                        IsVisible="{Binding IsFreeMode}"
-                        Clicked="OnRefreshClicked"/>
+        <!-- صورة خلفية السجين -->
+        <Image Source="prison_inmate_bg.png"
+               Aspect="Fill"
+               HorizontalOptions="Fill"
+               VerticalOptions="Fill"
+               Grid.Row="1"
+               Grid.RowSpan="2"
+               IsVisible="{Binding IsInPrison}"/>
+
+        <!-- GameHeader يظهر للزائر فقط -->
+        <views:GameHeader Grid.Row="1"
+                          x:Name="PageHeader"
+                          HeaderTitle="السجن"/>
+
+        <Grid Grid.Row="2">
+
+            <!-- الوضع 1: السجين -->
+            <Grid x:Name="InmateModeLayout" IsVisible="{Binding IsInPrison}">
+                <ScrollView>
+                    <VerticalStackLayout Spacing="0" Padding="0">
+
+                        <Border x:Name="InmateInfoCard"
+                                Stroke="Transparent"
+                                StrokeThickness="2"
+                                StrokeShape="RoundRectangle 10,10,10,10"
+                                BackgroundColor="Transparent"
+                                Padding="5"
+                                HorizontalOptions="Center">
+                            <VerticalStackLayout Spacing="0">
+                                <Label Text="سبب السجن:"
+                                       TextColor="Black"
+                                       FontAttributes="Bold"/>
+                                <Label x:Name="ReasonLabel"
+                                       TextColor="Red"
+                                       LineBreakMode="WordWrap"/>
+                                <Label Text="الوقت المتبقي للخروج:"
+                                       TextColor="Black"
+                                       FontAttributes="Bold"/>
+                                <Label x:Name="TimeRemainingLabel"
+                                       Text="00:00:00"
+                                       TextColor="Red"
+                                       FontAttributes="Bold"/>
+                                <Label Text="مبلغ الكفالة:"
+                                       TextColor="Black"
+                                       FontAttributes="Bold"/>
+                                <Label x:Name="BailAmountLabel"
+                                       Text="0 ذهب"
+                                       TextColor="Red"/>
+                                <Label x:Name="VisitCountLabel"
+                                       Text="مرات السجن: 0"
+                                       TextColor="Black"
+                                       FontAttributes="Bold"/>
+                            </VerticalStackLayout>
+                        </Border>
+
+                    </VerticalStackLayout>
+                </ScrollView>
             </Grid>
-        </Border>
 
-        <!-- Main Content Area -->
-        <Grid Grid.Row="1" Margin="10,5,10,5">
-
-            <!-- MODE 1: INMATE MODE (Player is in prison) -->
-            <ScrollView x:Name="InmateModeLayout" IsVisible="{Binding IsInPrison}">
-                <VerticalStackLayout Spacing="15">
-
-                    <!-- Prison Information Card -->
-                    <Border Stroke="Transparent" 
-                            StrokeShape="RoundRectangle 10,10,10,10"
-                            BackgroundColor="#2c2c2c"
-                            Padding="15" 
-                            Margin="0,0,0,10">
-                        <VerticalStackLayout Spacing="8">
-                            <Label Text="سبب السجن" 
-                                   TextColor="#f1c40f" 
-                                   FontSize="14" 
-                                   FontAttributes="Bold"/>
-                            <Label x:Name="ReasonLabel" 
-                                   Text="جرمت وتم القبض عليك" 
-                                   TextColor="White" 
-                                   FontSize="16" 
-                                   LineBreakMode="WordWrap"/>
-
-                            <Label Text="الوقت المتبقي" 
-                                   TextColor="#f1c40f" 
-                                   FontSize="14" 
-                                   FontAttributes="Bold"/>
-                            <Label x:Name="TimeRemainingLabel" 
-                                   Text="02:30:45" 
-                                   TextColor="#e74c3c" 
-                                   FontSize="18" 
-                                   FontAttributes="Bold"/>
-
-                            <Label Text="مبلغ الكفالة" 
-                                   TextColor="#f1c40f" 
-                                   FontSize="14" 
-                                   FontAttributes="Bold"/>
-                            <Label x:Name="BailAmountLabel" 
-                                   Text="10,000 ذهب" 
-                                   TextColor="White" 
-                                   FontSize="16"/>
-
-                            <Label x:Name="VisitCountLabel" 
-                                   Text="مرات السجن: 3" 
-                                   TextColor="#bdc3c7" 
-                                   FontSize="12"/>
-                        </VerticalStackLayout>
-                    </Border>
-
-                    <!-- Action Buttons Grid (3 rows x 2 columns) -->
-                    <Grid ColumnDefinitions="*,*" 
-                          RowDefinitions="Auto,Auto,Auto" 
-                          ColumnSpacing="10" 
-                          RowSpacing="10">
-                        <!-- Row 1: Phone + Chat (DISABLED PLACEHOLDERS) -->
-                        <Button Text="📞 اتصال" 
-                                Grid.Column="0" Grid.Row="0" 
-                                BackgroundColor="#7f8c8d" 
-                                TextColor="#bdc3c7" 
-                                CornerRadius="8" 
-                                Clicked="OnPhoneClicked" 
-                                IsEnabled="False"/>
-                        <Button Text="💬 دردشة" 
-                                Grid.Column="1" Grid.Row="0" 
-                                BackgroundColor="#7f8c8d" 
-                                TextColor="#bdc3c7" 
-                                CornerRadius="8" 
-                                Clicked="OnChatClicked" 
-                                IsEnabled="False"/>
-
-                        <!-- Row 2: News + Stock -->
-                        <Button Text="📰 أخبار" 
-                                Grid.Column="0" Grid.Row="1" 
-                                BackgroundColor="#7f8c8d" 
-                                TextColor="#bdc3c7" 
-                                CornerRadius="8" 
-                                Clicked="OnNewsClicked" 
-                                IsEnabled="False"/>
-                        <Button Text="📦 المخزن" 
-                                Grid.Column="1" Grid.Row="1" 
-                                BackgroundColor="#27ae60" 
-                                TextColor="White" 
-                                CornerRadius="8" 
-                                Clicked="OnStockClicked"/>
-
-                        <!-- Row 3: Escape + Bail -->
-                        <Button Text="🏃 هروب" 
-                                Grid.Column="0" Grid.Row="2" 
-                                BackgroundColor="#e74c3c" 
-                                TextColor="White" 
-                                CornerRadius="8" 
-                                Clicked="OnJailbreakClicked"/>
-                        <!--<Button Text="💰 كفالة" 
-                                Grid.Column="1" Grid.Row="2" 
-                                BackgroundColor="#f39c12" 
-                                TextColor="White" 
-                                CornerRadius="8" 
-                                Clicked="OnPayBailClicked"/>-->
-                    </Grid>
-
-                    <!-- Market Button (FULL WIDTH) -->
-                    <Button Text="🛒 السوق" 
-                            BackgroundColor="#16a085" 
-                            TextColor="White" 
-                            CornerRadius="8" 
-                            FontSize="16" 
-                            Clicked="OnMarketClicked" 
-                            HorizontalOptions="Fill"/>
-                    <!-- Sign-out button in visitor mode bottom bar -->
-                    <Button Text="تسجيل الخروج" 
-                            BackgroundColor="#e74c3c" 
-                            TextColor="White" 
-                            CornerRadius="8" 
-                            FontSize="16" 
-                            Clicked="OnSignOutClicked"
-                            HorizontalOptions="Fill"/>
-                </VerticalStackLayout>
-            </ScrollView>
-
-            <!-- MODE 2: VISITOR MODE (Player is FREE - shows list of prisoners) -->
-            <ScrollView x:Name="VisitorModeLayout" IsVisible="{Binding IsFreeMode}">
-                <VerticalStackLayout Spacing="10">
-
-                    <Label Text="قائمة السجناء" 
-                           TextColor="#f1c40f" 
-                           FontSize="18" 
-                           FontAttributes="Bold" 
-                           HorizontalOptions="Center" 
-                           Margin="0,0,0,10"/>
-
-                    <CollectionView x:Name="PrisonersListView" 
-                                    ItemsSource="{Binding Prisoners}"
-                                    EmptyView="لا يوجد سجناء حالياً">
-                        <CollectionView.ItemTemplate>
-                            <DataTemplate>
-                                <Border Stroke="#8e44ad" 
-                                        StrokeThickness="2" 
-                                        StrokeShape="RoundRectangle 10,10,10,10" 
-                                        BackgroundColor="#2c2c2c" 
-                                        Padding="12" 
-                                        Margin="0,0,0,8">
-                                    <Grid ColumnDefinitions="Auto,*,Auto,Auto" ColumnSpacing="10">
-                                        <!-- Avatar -->
-                                        <Frame CornerRadius="30" 
-                                               IsClippedToBounds="True" 
-                                               HeightRequest="60" 
-                                               WidthRequest="60" 
-                                               Padding="0"
-                                               BackgroundColor="#34495e">
-                                            <Image Source="{Binding ImageResource}" 
-                                                   Aspect="AspectFill"/>
-                                        </Frame>
-
-                                        <!-- Player Info -->
-                                        <VerticalStackLayout Grid.Column="1" VerticalOptions="Center">
-                                            <Label Text="{Binding Username}" 
-                                                   TextColor="White" 
-                                                   FontSize="16" 
-                                                   FontAttributes="Bold"/>
-                                            <Label Text="{Binding CrimeObject.PrisonReason}" 
-                                                   TextColor="#bdc3c7" 
-                                                   FontSize="12" 
-                                                   LineBreakMode="TailTruncation"/>
-                                            <Label Text="{Binding CrimeObject.PrisonRemainingTime, StringFormat='الوقت: {0}'}" 
-                                                   TextColor="#e74c3c" 
-                                                   FontSize="13" 
-                                                   FontAttributes="Bold"/>
-                                            <Label Text="{Binding CrimeObject.PrisonBailAmount, StringFormat='الكفالة: {0:N0} ذهب'}" 
-                                                   TextColor="#f39c12" 
-                                                   FontSize="12"/>
-                                        </VerticalStackLayout>
-
-                                        <!-- Smuggle Button -->
-                                        <Button Text="تهريب" 
-                                                Grid.Column="2" 
-                                                BackgroundColor="#e74c3c" 
-                                                TextColor="White" 
-                                                CornerRadius="6" 
-                                                FontSize="11" 
-                                                WidthRequest="70"
-                                                Command="{Binding Source={RelativeSource AncestorType={x:Type views:PrisonPage}}, Path=BindingContext.SmugglePlayerCommand}"
-                                                CommandParameter="{Binding .}"/>
-
-                                        <!-- Bail Button -->
-                                        <Button Text="كفالة" 
-                                                Grid.Column="3" 
-                                                BackgroundColor="#f39c12" 
-                                                TextColor="White" 
-                                                CornerRadius="6" 
-                                                FontSize="11" 
-                                                WidthRequest="70"
-                                                Command="{Binding Source={RelativeSource AncestorType={x:Type views:PrisonPage}}, Path=BindingContext.PayBailForPlayerCommand}"
-                                                CommandParameter="{Binding .}"/>
-                                    </Grid>
-                                </Border>
-                            </DataTemplate>
-                        </CollectionView.ItemTemplate>
-                    </CollectionView>
-                </VerticalStackLayout>
-            </ScrollView>
+            <!-- الوضع 2: الزائر -->
+            <Grid x:Name="VisitorModeLayout" IsVisible="{Binding IsFreeMode}">
+                <ScrollView VerticalOptions="Fill">
+                    <VerticalStackLayout x:Name="PrisonersContainer"
+                                         Spacing="0"
+                                         Padding="10,5"
+                                         VerticalOptions="Fill"/>
+                </ScrollView>
+            </Grid>
         </Grid>
 
-        <!-- Bottom Bar (Visitor Mode Only) -->
-        <Border Grid.Row="2" 
-                BackgroundColor="#8e44ad" 
-                Stroke="Transparent" 
-                StrokeShape="RoundRectangle 0,0,0,0" 
-                Padding="5"
-                IsVisible="{Binding IsFreeMode}">
-            <Grid ColumnDefinitions="*,Auto,*">
-                <Button Text="🏠 رجوع" 
-                        Grid.Column="0" 
-                        BackgroundColor="#9b59b6" 
-                        TextColor="White" 
-                        CornerRadius="12" 
-                        Clicked="OnBackClicked"/>
-
-                <Button Text="🔄 تحديث" 
-                        Grid.Column="1" 
-                        BackgroundColor="#3498db" 
-                        TextColor="White" 
-                        CornerRadius="8" 
-                        WidthRequest="100" 
-                        Clicked="OnRefreshClicked"/>
-            </Grid>
-        </Border>
+        <controls:FooterView Grid.Row="3"
+                             x:Name="PageFooter"/>
     </Grid>
 </ContentPage>

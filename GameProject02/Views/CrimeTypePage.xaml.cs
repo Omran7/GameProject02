@@ -15,7 +15,7 @@ public partial class CrimeTypePage : ContentPage
     private static double ScreenWidth => DeviceDisplay.Current.MainDisplayInfo.Width / DeviceDisplay.Current.MainDisplayInfo.Density;
     private static double ScreenHeight => DeviceDisplay.Current.MainDisplayInfo.Height / DeviceDisplay.Current.MainDisplayInfo.Density;
 
-    private double CardHeight => ScreenHeight * 0.20;
+    private double CardHeight => ScreenHeight * 0.18;
     private double CrimeImageSize => CardHeight * 0.45;
     private double ToolImageSize => CardHeight * 0.45;
     private double TrafficLightSize => CardHeight * 0.14;
@@ -23,7 +23,7 @@ public partial class CrimeTypePage : ContentPage
     private double ButtonHeight => CardHeight * 0.20;
     private double ButtonWidth => CardHeight * 0.60;
     private double InfoBoxHeight => CardHeight * 0.16;
-    private double FontTitle => CardHeight * 0.10;
+    private double FontTitle => CardHeight * 0.09;
     private double FontLabel => CardHeight * 0.07;
     private double FontValue => CardHeight * 0.08;
     private double FontButton => CardHeight * 0.09;
@@ -95,7 +95,6 @@ public partial class CrimeTypePage : ContentPage
     {
         if (_player == null) return;
 
-        _player.CrimeObject.RegenerateCourage();
         PageHeader.HeaderTitle = GetCrimeTypeName(_crimeType);
 
         CrimesContainer.Children.Clear();
@@ -154,12 +153,14 @@ public partial class CrimeTypePage : ContentPage
         string toolImage = "item_default";
         int ownedToolCount = 0;
         int requiredToolCount = 0;
+        string toolName = string.Empty;
 
         if (crime.ToolRequirements?.Count > 0)
         {
             var toolReq = crime.ToolRequirements[0];
             toolImage = toolReq.ToolItemId;
             requiredToolCount = toolReq.RequiredCount;
+            toolName = toolReq.ToolName;
             if (_player.StockObject.ItemsInStock.TryGetValue(toolReq.ToolItemId, out var toolItem))
                 ownedToolCount = toolItem.Count;
         }
@@ -265,7 +266,9 @@ public partial class CrimeTypePage : ContentPage
             WidthRequest = ButtonWidth,
             HorizontalOptions = LayoutOptions.Center,
             Padding = 0,
-            BackgroundColor = Colors.Transparent
+            BackgroundColor = Colors.Transparent,
+            Margin = new Thickness(0, CardHeight * 0.07, 0, 0)  
+
         };
         var btnGrid = new Grid();
         btnGrid.Add(new Image
@@ -288,14 +291,32 @@ public partial class CrimeTypePage : ContentPage
 
         if (isExecutable)
         {
+            // نحفظ القيم لاستخدامها داخل الـ lambda
+            int capturedOwned = ownedToolCount;
+            int capturedRequired = requiredToolCount;
+            string capturedName = toolName;
+            bool hasToolReq = crime.ToolRequirements?.Count > 0;
+
             var tap = new TapGestureRecognizer();
             tap.Tapped += async (s, e) =>
             {
                 await AnimateBorder(buttonBorder);
+
+                // ── التحقق من الأدوات ──
+                if (hasToolReq && capturedOwned < capturedRequired)
+                {
+                    await ToastService.Show(
+                        $"تحتاج {capturedRequired} {capturedName}",
+                        ToastType.Error
+                    );
+                    return;
+                }
+
                 await ExecuteCrime(crime);
             };
             buttonBorder.GestureRecognizers.Add(tap);
         }
+
         middleStack.Children.Add(buttonBorder);
         mainContentGrid.Add(middleStack, 1);
 
@@ -317,7 +338,6 @@ public partial class CrimeTypePage : ContentPage
         if (crime.ToolRequirements?.Count > 0)
         {
             bool hasEnough = ownedToolCount >= requiredToolCount;
-            string toolName = crime.ToolRequirements[0].ToolName;
             toolStack.Children.Add(new Label
             {
                 Text = toolName,
@@ -353,7 +373,9 @@ public partial class CrimeTypePage : ContentPage
             HorizontalOptions = LayoutOptions.Center
         };
         infoGrid.Add(MakeInfoBox($"{crime.CourageCost}", "icon_courage"), 0);
-        infoGrid.Add(MakeInfoBox($"{NumberFormatter.FormatNumber(crime.Reward.CashRewardMin)}-{NumberFormatter.FormatNumber(crime.Reward.CashRewardMax)}", "icon_cash"), 1);
+        infoGrid.Add(MakeInfoBox(
+            $"{NumberFormatter.FormatNumber(crime.Reward.CashRewardMin)}-{NumberFormatter.FormatNumber(crime.Reward.CashRewardMax)}",
+            "icon_cash"), 1);
         infoGrid.Add(MakeInfoBox($"{crime.Reward.ExperienceReward}", "icon_exp"), 2);
 
         contentStack.Children.Add(infoGrid);
@@ -434,8 +456,6 @@ public partial class CrimeTypePage : ContentPage
             if (executeAgain)
                 await ExecuteCrime(crime);
         }
-        // عند الفشل: CrimeService يفتح السجن/المستشفى تلقائياً
-        // والرسالة ستظهر هناك
     }
 
     private async void OnBackClicked(object sender, EventArgs e)

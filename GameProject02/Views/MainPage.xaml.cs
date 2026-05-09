@@ -121,23 +121,6 @@ public partial class MainPage : ContentPage, INotifyPropertyChanged
         });
     }
 
-    private void UpdateNotificationDots()
-    {
-        var state = NotificationService.GetState();
-        NewsNotificationDot.IsVisible = state.HasUnreadNews;
-        ProfileNotificationDot.IsVisible = state.HasUnseenProfileUpdate;
-        PagerNotificationDot.IsVisible = state.HasUnreadNews; // Using unread news as a proxy for pager unreads
-    }
-
-    private async void OnPagerClicked(object sender, EventArgs e)
-    {
-        // NotificationService.MarkAllAsRead() is called inside NotificationsPage, 
-        // so we just navigate and refresh UI on return would be ideal, 
-        // but for now we refresh when we click.
-        await Navigation.PushAsync(new NotificationsPage());
-        UpdateNotificationDots();
-    }
-
     private async void OnSignOutClicked(object sender, EventArgs e)
     {
         bool confirmed = await DisplayAlert("تسجيل الخروج", "هل أنت متأكد من تسجيل الخروج؟", "نعم", "لا");
@@ -211,9 +194,8 @@ public partial class MainPage : ContentPage, INotifyPropertyChanged
     {
         await Navigation.PushAsync(new CityMapPage());
     }
-
-    private async void OnNewsClicked(object sender, EventArgs e)
+    private async void OnIdlibCityMapClicked(object sender, EventArgs e)
     {
-        await Navigation.PushAsync(new NewsPage());
+        await Navigation.PushAsync(new CityMapPage());
     }
 }

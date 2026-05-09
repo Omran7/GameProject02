@@ -2,65 +2,59 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="GameProject02.Views.RegisterPage"
-             BackgroundColor="#1a1a1a"
-             Title="Register">
+             BackgroundColor="#2c3e50">
 
     <ScrollView>
-        <VerticalStackLayout Padding="20" Spacing="25" VerticalOptions="Center">
+        <VerticalStackLayout Padding="30" Spacing="15" VerticalOptions="Center">
 
-            <Label Text="CREATE ACCOUNT" FontSize="32" FontAttributes="Bold" TextColor="White" 
-                   HorizontalOptions="Center"/>
+            <Label Text="إنشاء حساب"
+                   FontSize="32"
+                   FontAttributes="Bold"
+                   HorizontalOptions="Center"
+                   TextColor="White" />
 
-            <Frame BackgroundColor="#2d2d2d" BorderColor="#404040" CornerRadius="15" Padding="25">
-                <VerticalStackLayout Spacing="20">
+            <Entry x:Name="UsernameEntry"
+                   Placeholder="اسم المستخدم (3-15 حرف)"
+                   BackgroundColor="#34495e"
+                   TextColor="White"
+                   PlaceholderColor="#bdc3c7" />
 
-                    <VerticalStackLayout Spacing="5">
-                        <Label Text="CHOOSE NICKNAME" FontSize="12" TextColor="#aaaaaa"/>
-                        <Entry x:Name="UsernameEntry" Placeholder="Your in-game name (3-15 chars)" 
-                               TextColor="White" PlaceholderColor="#888888"
-                               BackgroundColor="#3a3a3a" HeightRequest="45"
-                               Keyboard="Text" MaxLength="15"/>
-                        <Label Text="Letters, numbers, underscores only" FontSize="10" TextColor="#888888"/>
-                    </VerticalStackLayout>
+            <Entry x:Name="PasswordEntry"
+                   Placeholder="كلمة المرور (4-20 حرف)"
+                   IsPassword="True"
+                   BackgroundColor="#34495e"
+                   TextColor="White"
+                   PlaceholderColor="#bdc3c7" />
 
-                    <VerticalStackLayout Spacing="5">
-                        <Label Text="CREATE PASSWORD" FontSize="12" TextColor="#aaaaaa"/>
-                        <Entry x:Name="PasswordEntry" Placeholder="At least 4 characters" IsPassword="True"
-                               TextColor="White" PlaceholderColor="#888888"
-                               BackgroundColor="#3a3a3a" HeightRequest="45"
-                               Keyboard="Default" MaxLength="20"/>
-                    </VerticalStackLayout>
+            <Entry x:Name="ConfirmPasswordEntry"
+                   Placeholder="تأكيد كلمة المرور"
+                   IsPassword="True"
+                   BackgroundColor="#34495e"
+                   TextColor="White"
+                   PlaceholderColor="#bdc3c7" />
 
-                    <VerticalStackLayout Spacing="5">
-                        <Label Text="CONFIRM PASSWORD" FontSize="12" TextColor="#aaaaaa"/>
-                        <Entry x:Name="ConfirmPasswordEntry" Placeholder="Type password again" IsPassword="True"
-                               TextColor="White" PlaceholderColor="#888888"
-                               BackgroundColor="#3a3a3a" HeightRequest="45"
-                               Keyboard="Default" MaxLength="20"/>
-                    </VerticalStackLayout>
+            <Button x:Name="RegisterButton"
+                    Text="إنشاء الحساب"
+                    BackgroundColor="#27ae60"
+                    TextColor="White"
+                    Clicked="OnRegisterClicked" />
 
-                    <Button Text="CREATE ACCOUNT" 
-                            BackgroundColor="#45b7d1" 
-                            TextColor="White" 
-                            CornerRadius="12"
-                            HeightRequest="50"
-                            Clicked="OnRegisterClicked"/>
+            <ActivityIndicator x:Name="LoadingIndicator"
+                               IsRunning="False"
+                               IsVisible="False"
+                               Color="White"
+                               HorizontalOptions="Center" />
 
-                    <Button Text="ALREADY HAVE ACCOUNT? LOGIN" 
-                            BackgroundColor="#2e2e2e" 
-                            TextColor="#45b7d1" 
-                            BorderColor="#45b7d1" 
-                            BorderWidth="1"
-                            CornerRadius="12"
-                            HeightRequest="45"
-                            Clicked="OnLoginClicked"/>
-                </VerticalStackLayout>
-            </Frame>
+            <Label x:Name="ErrorMessage"
+                   Text=""
+                   TextColor="#e74c3c"
+                   HorizontalOptions="Center"
+                   IsVisible="False" />
 
-            <Label x:Name="ErrorMessage" TextColor="#ff6b6b" HorizontalOptions="Center" 
-                   FontAttributes="Italic" IsVisible="False"/>
-
+            <Button Text="لديك حساب بالفعل؟ سجّل الدخول"
+                    BackgroundColor="Transparent"
+                    TextColor="#3498db"
+                    Clicked="OnLoginClicked" />
         </VerticalStackLayout>
     </ScrollView>
-
 </ContentPage>

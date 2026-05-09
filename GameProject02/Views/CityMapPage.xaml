@@ -4,7 +4,8 @@
              xmlns:views="clr-namespace:GameProject02.Views"
              ControlTemplate="{StaticResource StickyHeaderTemplate}"
              x:Class="GameProject02.Views.CityMapPage"
-             Title="Crime City Map">
+             Title="Crime City Map"
+             NavigationPage.HasNavigationBar="False">
 
     <Grid>
         <views:MapView x:Name="CityMapView" HorizontalOptions="Fill" VerticalOptions="Fill" />

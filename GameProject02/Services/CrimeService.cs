@@ -18,9 +18,10 @@ public static class CrimeService
         return prevProgress >= prevCrime.RequiredSuccesses;
     }
 
-    public static (bool success, string message) AttemptCrime(PlayerAccount player, int crimeTypeId, int crimeItemId)
+    public static (bool success, string message) AttemptCrime(
+        PlayerAccount player, int crimeTypeId, int crimeItemId)
     {
-        player.CrimeObject.RegenerateCourage();
+        // ── تحقق من وضع السجن/المستشفى ────────────────────────────────────────
         player.CrimeObject.CheckConfinementStatus();
 
         var crime = CrimeDatabase.GetCrimeItem(crimeTypeId, crimeItemId);
@@ -35,14 +36,15 @@ public static class CrimeService
         if (player.CrimeObject.IsInPrison)
         {
             var p = Microsoft.Maui.Controls.Application.Current.MainPage;
-            p?.Dispatcher.Dispatch(async () => await p.Navigation.PushModalAsync(new PrisonPage()));
+            p?.Dispatcher.Dispatch(async () =>
+                await p.Navigation.PushModalAsync(new PrisonPage()));
             return (false, "أنت في السجن حالياً!");
         }
 
         if (player.CrimeObject.IsInHospital)
             return (false, "أنت في المستشفى حالياً!");
 
-        // ── الأدوات ───────────────────────────────────
+        // ── الأدوات ────────────────────────────────────────────────────────────
         var consumedTools = new List<string>();
         bool toolsLost = false;
 
@@ -50,7 +52,8 @@ public static class CrimeService
         {
             if (!player.StockObject.ItemsInStock.TryGetValue(toolReq.ToolItemId, out var toolItem) ||
                 toolItem.Count < toolReq.RequiredCount)
-                return (false, $"لا تملك أدوات كافية!\nتحتاج {toolReq.RequiredCount} × {toolReq.ToolName}.");
+                return (false,
+                    $"لا تملك أدوات كافية!\nتحتاج {toolReq.RequiredCount} × {toolReq.ToolName}.");
         }
 
         var random = new Random();
@@ -67,18 +70,21 @@ public static class CrimeService
             }
         }
 
-        // ── الشجاعة ───────────────────────────────────
-        if (player.CrimeObject.Courage < crime.CourageCost)
-            return (false, $"ليس لديك ما يكفي من الشجاعة!\nتحتاج {crime.CourageCost} نقطة.");
+        // ── الشجاعة ────────────────────────────────────────────────────────────
+        // ✅ نستخدم player.Courage (المصدر الموحد) وليس CrimeObject.Courage
+        if (player.Courage < crime.CourageCost)
+            return (false,
+                $"ليس لديك ما يكفي من الشجاعة!\nتحتاج {crime.CourageCost} / لديك {player.Courage}.");
 
-        player.CrimeObject.Courage -= crime.CourageCost;
+        // ✅ استهلاك الشجاعة من PlayerAccount مباشرة
+        player.Courage -= crime.CourageCost;
         player.CrimeObject.TotalCrimesAttempted++;
 
-        // ── نسبة النجاح ───────────────────────────────
+        // ── نسبة النجاح ────────────────────────────────────────────────────────
         int currentProgress = player.CrimeObject.TaskProgress.GetValueOrDefault(linearIndex, 0);
         double percent = crime.RequiredSuccesses > 0
-                            ? Math.Clamp((double)currentProgress / crime.RequiredSuccesses, 0, 1)
-                            : 1.0;
+                              ? Math.Clamp((double)currentProgress / crime.RequiredSuccesses, 0, 1)
+                              : 1.0;
 
         int colorBonus = percent >= 1.0 ? 0 : percent >= 0.50 ? -10 : -20;
         int baseChance = crime.BaseSuccessChance;
@@ -88,7 +94,7 @@ public static class CrimeService
 
         if (success)
         {
-            // ── مكافآت ───────────────────────────────
+            // ── مكافآت النجاح ──────────────────────────────────────────────────
             int cashReward = random.Next(crime.Reward.CashRewardMin, crime.Reward.CashRewardMax + 1);
             player.Gold += cashReward;
 
@@ -109,7 +115,7 @@ public static class CrimeService
                 }
             }
 
-            // ── تقدم السلسلة ──────────────────────────
+            // ── تقدم السلسلة ────────────────────────────────────────────────────
             int ownProgress = player.CrimeObject.TaskProgress.GetValueOrDefault(linearIndex, 0);
             player.CrimeObject.TaskProgress[linearIndex] = ownProgress + 1;
 
@@ -130,7 +136,8 @@ public static class CrimeService
             MissionService.OnCrimeDone(player, crimeTypeId, true);
 
             string message = $"نجحت في {crime.Name}!\nحصلت على {cashReward:N0} ذهب و {xpReward} خبرة.";
-            if (leveledUp) message += $"\n\n🎉 تمت ترقيتك إلى المستوى {player.Level}!";
+            if (leveledUp)
+                message += $"\n\n🎉 تمت ترقيتك إلى المستوى {player.Level}!";
             if (toolsLost && consumedTools.Count > 0)
                 message += $"\n\nضاعت منك الأدوات:\n{string.Join("\n", consumedTools)}";
             else if (!toolsLost && crime.ToolRequirements.Count > 0)
@@ -147,7 +154,7 @@ public static class CrimeService
 
             if (random.Next(100) < 30)
             {
-                // ── مستشفى ───────────────────────────
+                // ── مستشفى ─────────────────────────────────────────────────────
                 player.CrimeObject.IsInHospital = true;
                 player.CrimeObject.HospitalReason = $"فشلت في {crime.Name} وجرحت نفسك";
                 player.CrimeObject.TotalHospitalVisits++;
@@ -156,7 +163,8 @@ public static class CrimeService
                 player.CrimeObject.HospitalReleaseTime =
                     DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() +
                     (long)TimeSpan.FromMinutes(hospitalMinutes).TotalMilliseconds;
-                player.CrimeObject.HealthCurrent = Math.Max(1, player.CrimeObject.HealthCurrent - 50);
+                player.CrimeObject.HealthCurrent =
+                    Math.Max(1, player.CrimeObject.HealthCurrent - 50);
 
                 string message = $"فشلت في {crime.Name}!\nتم نقلك إلى المستشفى لمدة {hospitalMinutes} دقائق.";
                 if (toolsLost && consumedTools.Count > 0)
@@ -166,7 +174,6 @@ public static class CrimeService
 
                 MissionService.OnCrimeDone(player, crimeTypeId, false);
 
-                // ✅ حفظ الرسالة ثم فتح الصفحة
                 var currentPage = Microsoft.Maui.Controls.Application.Current.MainPage;
                 currentPage?.Dispatcher.Dispatch(async () =>
                     await currentPage.Navigation.PushModalAsync(new HospitalPage()));
@@ -175,13 +182,14 @@ public static class CrimeService
             }
             else
             {
-                // ── سجن ──────────────────────────────
+                // ── سجن ────────────────────────────────────────────────────────
                 player.CrimeObject.IsInPrison = true;
                 player.CrimeObject.PrisonReleaseTime =
                     DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() +
                     (long)TimeSpan.FromMinutes(confinementMinutes).TotalMilliseconds;
                 player.CrimeObject.TotalPrisonVisits++;
-                player.CrimeObject.PrisonBailAmount = (crimeTypeId + 1) * 1000 + (player.Level * 500);
+                player.CrimeObject.PrisonBailAmount =
+                    (crimeTypeId + 1) * 1000 + (player.Level * 500);
                 player.CrimeObject.PrisonReason = $"فشلت في {crime.Name}";
 
                 string message = $"فشلت في {crime.Name}!\nتم سجنك لمدة {confinementMinutes} دقائق.";
@@ -192,7 +200,6 @@ public static class CrimeService
 
                 MissionService.OnCrimeDone(player, crimeTypeId, false);
 
-                // ✅ حفظ الرسالة ثم فتح الصفحة
                 var currentPage = Microsoft.Maui.Controls.Application.Current.MainPage;
                 currentPage?.Dispatcher.Dispatch(async () =>
                     await currentPage.Navigation.PushModalAsync(new PrisonPage()));

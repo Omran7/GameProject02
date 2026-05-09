@@ -4,56 +4,68 @@ using SkiaSharp.Views.Maui.Controls;
 using GameProject02.Models;
 using Newtonsoft.Json;
 using System.Diagnostics;
+using System.Linq;
 
 namespace GameProject02.Views;
 
 // ═══════════════════════════════════════════════════════════════════════════
-//  ROOT CAUSE OF THE COORDINATE BUG (confirmed by reading MainScene.dt)
+//  COORDINATE SYSTEM (HyperLap2D / libGDX)
 // ═══════════════════════════════════════════════════════════════════════════
 //
-//  In HyperLap2D / libGDX:
-//    composite.x / composite.y  = BOTTOM-LEFT corner of the composite in world
-//    image.x     / image.y      = BOTTOM-LEFT corner of the image in composite-local space
-//    image.originX / originY    = rotation pivot measured FROM the image's bottom-left
-//                                 For ALL items in this scene: origin = exact centre
-//                                 i.e.  originX = width/2,  originY = height/2
+//  img.x / img.y    = BOTTOM-LEFT corner of the sprite in parent/world space
+//  img.originX/Y    = pivot measured FROM the sprite's bottom-left corner
+//                     (equals width/2 and height/2 when pivot is at centre)
 //
-//  WRONG (previous code):
-//    canvas.Translate(img.x, -img.y)          ← lands at image BOTTOM-LEFT
-//    dst = (-originX, -originY, originX, originY)  ← draws centred there
-//    → image centre ends up at the bottom-left instead of the true centre
-//    → every building is offset by (−originX, −originY) from its correct position
+//  Sprite world bounding box:
+//    left   = img.x
+//    right  = img.x + bmp.Width          ← actual PNG width
+//    bottom = img.y
+//    top    = img.y + bmp.Height         ← actual PNG height
 //
-//  RIGHT (this code):
-//    canvas.Translate(img.x + img.originX, -(img.y + img.originY))
-//                                             ← lands at image CENTRE (pivot)
-//    dst = (-originX, -originY, originX, originY)  ← draws centred there  ✓
-//    → image centre is at world (composite.x + img.x + originX,
-//                                composite.y + img.y + originY)             ✓
+//  In Skia (Y-down) after translating canvas to the pivot point:
+//    dst = SKRect( -originX,            ← left   (originX px left of pivot)
+//                  originY - bmpHeight, ← top    (bmpHeight-originY px above pivot)
+//                  bmpWidth - originX,  ← right  (bmpWidth-originX px right of pivot)
+//                  originY )            ← bottom (originY px below pivot)
 //
-//  Verified numbers (from the actual .dt file):
-//    Casino  composite BL=(122,−766)  origin=(130,112)
-//    WRONG centre → (122,−766)   CORRECT centre → (252,−654)
-//    Casino image covers world X[122,382] Y[−766,−542]  ✓
+//  Special case — pivot at exact centre (originX=W/2, originY=H/2):
+//    dst = SKRect(-W/2, -H/2, W/2, H/2)   ← same as old (-origin, +origin)
 // ═══════════════════════════════════════════════════════════════════════════
 
 public class MapView : ContentView
 {
-    private readonly SKCanvasView _canvasView;
+    // ── Bitmap cache: key = raw imageName from .dt  ──────────────────────────
     private readonly Dictionary<string, SKBitmap> _imageCache = new();
+    private readonly SKCanvasView _canvasView;
     private CompositeItemVO _sceneRoot;
     private bool _isMapLoaded = false;
 
     // ── Camera ───────────────────────────────────────────────────────────────
-    // Buildings span roughly  X: 95–2250,  Y: –1876 to –432
-    // Centre ≈ (1170, –1155) — good initial camera
     private float _camX = 1170f;
     private float _camY = -1155f;
-    private float _zoom = 1.5f;    // zoom level — increase to make map bigger, decrease to see more
+    private float _zoom = 2.5f;
     private float _startX, _startY;
-    private bool _wasPanning = false;   // suppress tap that fires at end of a pan
+    private bool _wasPanning = false;
+
+    // ── Inertia ───────────────────────────────────────────────────────────────
+    private float _velocityX, _velocityY;
+    private float _lastTotalX, _lastTotalY;
+    private System.Timers.Timer _inertiaTimer;
+
+    // ── Camera bounds ────────────────────────────────────────────────────────
+    private const float CAM_X_MIN = 0f;
+    private const float CAM_X_MAX = 2500f;
+    private const float CAM_Y_MIN = -1900f;
+    private const float CAM_Y_MAX = -265f;
+
+    // ── Visible world rect for culling (updated each frame) ──────────────────
+    private float _visMinX, _visMaxX, _visMinY, _visMaxY;
 
     public event EventHandler<string> BuildingTapped;
+
+    // ════════════════════════════════════════════════════════════════════════
+    //  CONSTRUCTOR
+    // ════════════════════════════════════════════════════════════════════════
 
     public MapView()
     {
@@ -61,31 +73,46 @@ public class MapView : ContentView
         _canvasView.PaintSurface += OnPaint;
         Content = _canvasView;
 
+        // ── Pan gesture ──────────────────────────────────────────────────────
         var pan = new PanGestureRecognizer();
         pan.PanUpdated += (s, e) =>
         {
             if (e.StatusType == GestureStatus.Started)
             {
-                _startX = _camX; _startY = _camY;
+                StopInertia();
+                _startX = _camX;
+                _startY = _camY;
                 _wasPanning = false;
+                _velocityX = _velocityY = 0f;
+                _lastTotalX = _lastTotalY = 0f;
             }
+
             if (e.StatusType == GestureStatus.Running)
             {
                 if (Math.Abs(e.TotalX) > 8 || Math.Abs(e.TotalY) > 8)
                     _wasPanning = true;
 
+                _velocityX = (float)(e.TotalX - _lastTotalX);
+                _velocityY = (float)(e.TotalY - _lastTotalY);
+                _lastTotalX = (float)e.TotalX;
+                _lastTotalY = (float)e.TotalY;
+
                 _camX = _startX - (float)e.TotalX / _zoom;
                 _camY = _startY + (float)e.TotalY / _zoom;
+                ClampCamera();
                 _canvasView.InvalidateSurface();
             }
+
             if (e.StatusType == GestureStatus.Completed ||
-                e.StatusType == GestureStatus.Canceled)   // ✅ fixed spelling
+                e.StatusType == GestureStatus.Canceled)
             {
+                StartInertia();
                 Task.Delay(200).ContinueWith(_ => _wasPanning = false);
             }
         };
         GestureRecognizers.Add(pan);
 
+        // ── Tap gesture ──────────────────────────────────────────────────────
         var tap = new TapGestureRecognizer();
         tap.Tapped += OnTap;
         GestureRecognizers.Add(tap);
@@ -94,95 +121,213 @@ public class MapView : ContentView
     }
 
     // ════════════════════════════════════════════════════════════════════════
+    //  CAMERA HELPERS
+    // ════════════════════════════════════════════════════════════════════════
+
+    private void ClampCamera()
+    {
+        float halfW = (_canvasView.CanvasSize.Width > 0
+            ? _canvasView.CanvasSize.Width : 1080f) / 2f / _zoom;
+        float halfH = (_canvasView.CanvasSize.Height > 0
+            ? _canvasView.CanvasSize.Height : 1920f) / 2f / _zoom;
+
+        _camX = Math.Clamp(_camX, CAM_X_MIN + halfW, CAM_X_MAX - halfW);
+        _camY = Math.Clamp(_camY, CAM_Y_MIN + halfH, CAM_Y_MAX - halfH);
+    }
+
+    private void StartInertia()
+    {
+        if (Math.Abs(_velocityX) < 1f && Math.Abs(_velocityY) < 1f) return;
+
+        const float friction = 0.99f;  // احتكاك — قلّله للتوقف أسرع
+        const float minSpeed = 0.08f;
+        const int intervalMs = 16;    // ~60 fps
+
+        _inertiaTimer = new System.Timers.Timer(intervalMs);
+        _inertiaTimer.Elapsed += (_, _) =>
+        {
+            _velocityX *= friction;
+            _velocityY *= friction;
+
+            if (Math.Abs(_velocityX) < minSpeed && Math.Abs(_velocityY) < minSpeed)
+            {
+                StopInertia();
+                return;
+            }
+
+            _camX -= _velocityX / _zoom;
+            _camY += _velocityY / _zoom;
+            ClampCamera();
+            MainThread.BeginInvokeOnMainThread(_canvasView.InvalidateSurface);
+        };
+        _inertiaTimer.AutoReset = true;
+        _inertiaTimer.Start();
+    }
+
+    private void StopInertia()
+    {
+        _inertiaTimer?.Stop();
+        _inertiaTimer?.Dispose();
+        _inertiaTimer = null;
+    }
+
+    // ════════════════════════════════════════════════════════════════════════
     //  TAP → HIT TEST
     // ════════════════════════════════════════════════════════════════════════
 
     private void OnTap(object sender, TappedEventArgs e)
     {
-        // Ignore the ghost tap that fires at the end of a pan gesture
-        if (_wasPanning) return;
-        if (!_isMapLoaded || _sceneRoot == null) return;
+        if (_wasPanning || !_isMapLoaded || _sceneRoot == null) return;
 
         var pt = e.GetPosition(_canvasView);
         if (pt == null) return;
 
-        // ── CRITICAL: e.GetPosition returns DIPs, but OnPaint uses PHYSICAL PIXELS.
-        // ── We must convert the touch position to pixels to match the canvas transform.
-        // ── _canvasView.CanvasSize is always in physical pixels.
         float canvasW = _canvasView.CanvasSize.Width;
         float canvasH = _canvasView.CanvasSize.Height;
-
         if (canvasW <= 0 || canvasH <= 0) return;
 
-        // Scale factor: how many physical pixels per DIP
+        // DIPs → physical pixels
         float density = canvasW / (float)_canvasView.Width;
-
         float pxX = (float)pt.Value.X * density;
         float pxY = (float)pt.Value.Y * density;
 
-        // Invert the canvas transform (which is in physical pixels):
-        //   cx = (wx - camX)*zoom + canvasW/2  →  wx = (cx - canvasW/2)/zoom + camX
-        //   cy = -(wy - camY)*zoom + canvasH/2 →  wy = camY - (cy - canvasH/2)/zoom
+        // Screen → world (Y-up)
         float wx = (pxX - canvasW / 2f) / _zoom + _camX;
         float wy = _camY - (pxY - canvasH / 2f) / _zoom;
 
-        Debug.WriteLine($"[MapView TAP] screen=({pxX:F0},{pxY:F0}) world=({wx:F0},{wy:F0})");
+        Debug.WriteLine($"[TAP] screen=({pxX:F0},{pxY:F0})  world=({wx:F0},{wy:F0})");
 
-        string hit = HitTestContent(_sceneRoot.content, 0f, 0f, wx, wy);
+        string hit = HitTestImages(_sceneRoot.content, 0f, 0f, wx, wy);
         if (!string.IsNullOrEmpty(hit))
         {
-            Debug.WriteLine($"[MapView HIT] {hit}");
+            Debug.WriteLine($"[HIT] {hit}");
             BuildingTapped?.Invoke(this, hit);
         }
     }
 
     /// <summary>
-    /// All coordinates here are world Y-up.
-    /// parentX/Y = accumulated world position of the current composite's bottom-left.
+    /// Hit-test all images in the content tree.
+    /// parentX/Y = accumulated world bottom-left of the current composite.
+    ///
+    /// Supports two scene layouts:
+    ///   1. Composite-based: buildings live inside CompositeItemVO with an itemIdentifier.
+    ///   2. Flat scene (current MainScene.dt): all sprites are direct SimpleImageVO items
+    ///      — the imageName is used to look up the building ID via GetBuildingId().
     /// </summary>
-    private string HitTestContent(ContentVO content, float parentX, float parentY, float wx, float wy)
+    private string HitTestImages(ContentVO content, float parentX, float parentY,
+                                  float wx, float wy)
     {
         if (content == null) return null;
 
+        // ── 1. Test nested composites (composite-based layout) ────────────────
         if (content.items != null)
         {
-            // Reverse order: highest zIndex drawn last = on top = hit first
-            for (int i = content.items.Count - 1; i >= 0; i--)
+            // Highest zIndex = drawn last = on top → test first
+            var sorted = content.items
+                .OrderByDescending(c => c.zIndex)
+                .ToList();
+
+            foreach (var civo in sorted)
             {
-                var civo = content.items[i];
                 float cblX = parentX + civo.x;
                 float cblY = parentY + civo.y;
-                bool isNamedBuilding = !string.IsNullOrEmpty(civo.itemIdentifier);
+                bool isNamed = !string.IsNullOrEmpty(civo.itemIdentifier);
 
-                // Check each image inside this composite
                 if (civo.content?.images != null)
                 {
                     foreach (var img in civo.content.images)
                     {
-                        float iblX = cblX + img.x;
-                        float iblY = cblY + img.y;
-                        float logW = img.originX * 2f;
-                        float logH = img.originY * 2f;
+                        if (!_imageCache.TryGetValue(img.imageName, out var bmp)) continue;
 
-                        if (wx >= iblX && wx <= iblX + logW &&
-                            wy >= iblY && wy <= iblY + logH)
+                        float imgLeft = cblX + img.x;
+                        float imgBottom = cblY + img.y;
+                        float imgRight = imgLeft + bmp.Width;
+                        float imgTop = imgBottom + bmp.Height;
+
+                        if (wx >= imgLeft && wx <= imgRight &&
+                            wy >= imgBottom && wy <= imgTop)
                         {
-                            // Only return a hit for named buildings — ignore unnamed composites
-                            if (isNamedBuilding) return civo.itemIdentifier;
+                            if (isNamed) return civo.itemIdentifier;
                         }
                     }
                 }
 
-                // Recurse into nested composites
-                string inner = HitTestContent(civo.content, cblX, cblY, wx, wy);
+                string inner = HitTestImages(civo.content, cblX, cblY, wx, wy);
                 if (inner != null)
-                    return isNamedBuilding ? civo.itemIdentifier : inner;
+                    return isNamed ? civo.itemIdentifier : inner;
             }
         }
 
-        // Do NOT test content.images here.
-        // Top-level images are floor tiles, roads, and decorations — not clickable.
+        // ── 2. Test root-level building images (flat scene layout) ────────────
+        //
+        // In a flat scene, all sprites (floor, roads, buildings) live directly
+        // in content.images. We only want to hit "real" named buildings — not
+        // floor tiles, roads, fake buildings, trees, or decorations.
+        // GetBuildingId() returns null for everything that is not clickable.
+        if (content.images != null)
+        {
+            // Highest zIndex = drawn on top → test first
+            var buildingImgs = content.images
+                .Where(img => img.layerName == "buildings")
+                .OrderByDescending(img => img.zIndex);
+
+            foreach (var img in buildingImgs)
+            {
+                string buildingId = GetBuildingId(img.imageName);
+                if (string.IsNullOrEmpty(buildingId)) continue;
+
+                if (!_imageCache.TryGetValue(img.imageName, out var bmp)) continue;
+
+                float imgLeft = parentX + img.x;
+                float imgBottom = parentY + img.y;
+                float imgRight = imgLeft + bmp.Width;
+                float imgTop = imgBottom + bmp.Height;
+
+                if (wx >= imgLeft && wx <= imgRight &&
+                    wy >= imgBottom && wy <= imgTop)
+                {
+                    Debug.WriteLine($"[HitTest] hit '{buildingId}' at world({wx:F0},{wy:F0})  bounds([{imgLeft:F0},{imgRight:F0}]×[{imgBottom:F0},{imgTop:F0}])");
+                    return buildingId;
+                }
+            }
+        }
+
         return null;
+    }
+
+    /// <summary>
+    /// Maps a HyperLap2D image name to the building identifier used by CityMapPage.
+    /// Returns null for decorations, fake buildings, trees, roads, and floor tiles
+    /// — these should never trigger navigation.
+    /// </summary>
+    private static string GetBuildingId(string imageName)
+    {
+        return imageName?.TrimStart('@') switch
+        {
+            "building_casino" => "Casino",
+            "building_airport" => "Airport",
+            "building_lucky_wheel" => "LuckyWheel",
+            "building_cinema" => "Cinema",
+            "building_black market" => "BlackMarket",
+            "building_bank" => "Bank",
+            "building_estate" => "Estate",
+            "building_city_market" => "CityMarket",
+            "building_city_database" => "CityDatabase",
+            "building_fight_club" => "FightClub",
+            "building_gang_base" => "GangBase",
+            "building_gym" => "Gym",
+            "building_gang_market" => "GangMarket",
+            "building_mercenary_base" => "MercenaryBase",
+            "building_prison" => "Prison",
+            "building_skyscraper" => "Skyscraper",
+            "building_upgrade_lab" => "UpgradeLab",
+            "building_work_office" => "WorkOffice",
+            "building_hospital" => "Hospital",
+            "building_school" => "School",
+            // ── Not clickable ───────────────────────────────────────────────
+            // fake buildings, war banners, decorations → return null
+            _ => null
+        };
     }
 
     // ════════════════════════════════════════════════════════════════════════
@@ -195,12 +340,14 @@ public class MapView : ContentView
         {
             try
             {
+                // ── Load scene JSON ──────────────────────────────────────────
                 string json = "";
-                foreach (var name in new[] { "MainScene.dt", "MainScene.json" })
+                foreach (var file in new[] { "MainScene.dt"})
                 {
-                    try { json = await LoadText(name); break; }
+                    try { json = await LoadText(file); break; }
                     catch { /* try next */ }
                 }
+
                 if (string.IsNullOrEmpty(json))
                 {
                     Debug.WriteLine("[MapView] ERROR: scene file not found");
@@ -210,10 +357,14 @@ public class MapView : ContentView
                 var data = JsonConvert.DeserializeObject<SceneRoot>(json);
                 if (data?.composite?.content == null) return;
 
+                // ── Collect all unique image names ───────────────────────────
                 var imageNames = new HashSet<string>();
                 CollectImageNames(data.composite.content, imageNames);
-                Debug.WriteLine($"[MapView] {imageNames.Count} unique assets");
+                Debug.WriteLine($"[MapView] {imageNames.Count} unique assets to load");
 
+                // ── Load bitmaps ─────────────────────────────────────────────
+                // FIX #3: expanded variants list — handles spaces in names
+                // e.g. "@building_black market" → "building_black_market.png"
                 var folders = new[] { "", "floor/", "roads/", "banners/", "buildings/", "others/" };
                 var exts = new[] { ".png", ".PNG", ".jpg", ".jpeg" };
 
@@ -222,60 +373,75 @@ public class MapView : ContentView
                     string name = raw.Trim();
                     if (_imageCache.ContainsKey(name)) continue;
 
-                    var variants = new HashSet<string>
+                    string bare = name.TrimStart('@');
+                    string bareUnderscore = bare.Replace(" ", "_");
+                    string bareSpace = bare.Replace("_", " ");
+
+                    // All variants we'll try (with and without @, case variants,
+                    // space/underscore swapped)
+                    var variants = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
                     {
-                        name,
-                        name.TrimStart('@'),
-                        "@" + name.TrimStart('@'),
-                        name.Replace(" ", "_"),
-                        name.Replace("_", " "),
+                        name,                              // @building_black market
+                        bare,                              // building_black market
+                        "@" + bare,                        // @building_black market
+                        bareUnderscore,                    // building_black_market  ✅ NEW
+                        "@" + bareUnderscore,              // @building_black_market ✅ NEW
+                        bareSpace,                         // building black market
                         name.ToLower(),
-                        name.TrimStart('@').ToLower(),
-                        name.TrimStart('@').Replace("_", " ").ToLower()
+                        bare.ToLower(),
+                        bareUnderscore.ToLower(),          // ✅ NEW lowercase variant
+                        bareSpace.ToLower(),
                     };
 
                     bool found = false;
                     foreach (var folder in folders)
                     {
+                        if (found) break;
                         foreach (var variant in variants)
                         {
+                            if (found) break;
                             foreach (var ext in exts)
                             {
-                                if (await TryLoad($"{folder}{variant}", name, ext))
-                                { found = true; break; }
+                                if (await TryLoadBitmap($"{folder}{variant}", name, ext))
+                                {
+                                    found = true;
+                                    break;
+                                }
                             }
-                            if (found) break;
                         }
-                        if (found) break;
                     }
 
-                    if (!found) Debug.WriteLine($"[MapView] MISSING: {name}");
+                    if (!found)
+                        Debug.WriteLine($"[MapView] MISSING: {name}");
                 }
 
                 _sceneRoot = data.composite;
-                Debug.WriteLine($"[MapView] Done — {_imageCache.Count} images loaded");
+                Debug.WriteLine($"[MapView] Loaded — {_imageCache.Count}/{imageNames.Count} images");
                 _isMapLoaded = true;
                 MainThread.BeginInvokeOnMainThread(_canvasView.InvalidateSurface);
             }
-            catch (Exception ex) { Debug.WriteLine($"[MapView] CRITICAL: {ex.Message}"); }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"[MapView] CRITICAL: {ex.Message}");
+            }
         });
     }
 
     private void CollectImageNames(ContentVO content, HashSet<string> names)
     {
         if (content == null) return;
-        content.images?.ForEach(img => names.Add(img.imageName));
+        content.images?.ForEach(img => { if (!string.IsNullOrEmpty(img.imageName)) names.Add(img.imageName); });
         content.items?.ForEach(civo => CollectImageNames(civo.content, names));
     }
 
-    private async Task<bool> TryLoad(string file, string key, string ext)
+    private async Task<bool> TryLoadBitmap(string file, string cacheKey, string ext)
     {
         try
         {
-            using var stream = await FileSystem.OpenAppPackageFileAsync($"Assets/images/{file}{ext}");
+            using var stream = await FileSystem.OpenAppPackageFileAsync($"Assets/images/maincity/{file}{ext}");
             var bmp = SKBitmap.Decode(stream);
             if (bmp == null) return false;
-            _imageCache[key] = bmp;
+            _imageCache[cacheKey] = bmp;
             return true;
         }
         catch { return false; }
@@ -298,20 +464,33 @@ public class MapView : ContentView
         canvas.Clear(new SKColor(18, 18, 20));
         if (!_isMapLoaded || _sceneRoot == null) return;
 
-        // World → screen:
-        //   cx = (wx - camX)*zoom + W/2
-        //   cy = -(wy - camY)*zoom + H/2   ← Y-flip (world Y-up → Skia Y-down)
-        canvas.Translate(e.Info.Width / 2f, e.Info.Height / 2f);
-        canvas.Scale(_zoom, _zoom);
-        canvas.Translate(-_camX, _camY);  // +camY because sprites draw at −y
+        float W = e.Info.Width;
+        float H = e.Info.Height;
 
-        RenderContent(canvas, _sceneRoot.content);
+        // Compute visible world rectangle for culling
+        float halfW = W / 2f / _zoom;
+        float halfH = H / 2f / _zoom;
+        _visMinX = _camX - halfW;
+        _visMaxX = _camX + halfW;
+        _visMinY = _camY - halfH;
+        _visMaxY = _camY + halfH;
+
+        // World → screen transform
+        //   screen_x = (world_x − camX) × zoom + W/2
+        //   screen_y = −(world_y − camY) × zoom + H/2   ← Y-flip
+        canvas.Translate(W / 2f, H / 2f);
+        canvas.Scale(_zoom, _zoom);
+        canvas.Translate(-_camX, _camY);
+
+        RenderContent(canvas, _sceneRoot.content, 0f, 0f);
     }
 
-    private void RenderContent(SKCanvas canvas, ContentVO content)
+    private void RenderContent(SKCanvas canvas, ContentVO content,
+                               float parentX, float parentY)
     {
         if (content == null) return;
 
+        // Merge images and composites into one draw list sorted by zIndex
         var drawList = new List<(int z, object obj)>();
         content.images?.ForEach(img => drawList.Add((img.zIndex, img)));
         content.items?.ForEach(civo => drawList.Add((civo.zIndex, civo)));
@@ -321,64 +500,93 @@ public class MapView : ContentView
         {
             if (obj is SimpleImageVO sivo)
             {
-                DrawSprite(canvas, sivo);
+                // ── Per-sprite culling using actual bitmap size ────────────
+                if (!_imageCache.TryGetValue(sivo.imageName, out var bmp)) continue;
+
+                float spriteLeft = parentX + sivo.x;
+                float spriteBottom = parentY + sivo.y;
+                float spriteRight = spriteLeft + bmp.Width;
+                float spriteTop = spriteBottom + bmp.Height;
+
+                if (spriteRight < _visMinX || spriteLeft > _visMaxX ||
+                    spriteTop < _visMinY || spriteBottom > _visMaxY)
+                    continue;   // off-screen — skip
+                // ─────────────────────────────────────────────────────────
+
+                DrawSprite(canvas, sivo, bmp);
             }
             else if (obj is CompositeItemVO civo)
             {
+                // Translate canvas to composite's bottom-left (Y-flipped for Skia)
                 canvas.Save();
-
-                // Move canvas to composite's BOTTOM-LEFT corner (Y-flip: world +y → Skia −y)
                 canvas.Translate(civo.x, -civo.y);
-
-                RenderContent(canvas, civo.content);
-
+                RenderContent(canvas, civo.content,
+                              parentX + civo.x, parentY + civo.y);
                 canvas.Restore();
             }
         }
     }
 
-    /// <summary>
-    /// Draw a single sprite image.
-    ///
-    /// In HyperLap2D:
-    ///   (img.x, img.y)   = image BOTTOM-LEFT corner in parent local space
-    ///   (originX, originY) = rotation pivot from image bottom-left = centre of image
-    ///
-    /// So image CENTRE in world = (parentBL.x + img.x + originX,
-    ///                             parentBL.y + img.y + originY)
-    ///
-    /// We translate the canvas to that CENTRE and draw a rect
-    ///   (−originX, −originY, +originX, +originY)
-    /// which is the image centred at (0,0) in the local space.
-    ///
-    /// DrawBitmap stretches the bitmap to fill the rect, so the image renders
-    /// at exactly (2*originX) × (2*originY) world units regardless of the
-    /// actual pixel dimensions of the PNG file.
-    /// </summary>
-    private void DrawSprite(SKCanvas canvas, SimpleImageVO img)
+    // ════════════════════════════════════════════════════════════════════════
+    //  DRAW SPRITE  (the core fix)
+    // ════════════════════════════════════════════════════════════════════════
+    //
+    //  HyperLap2D places a sprite with its BOTTOM-LEFT at (img.x, img.y)
+    //  and draws it at the PNG's actual pixel size (bmp.Width × bmp.Height).
+    //  The originX/Y is ONLY a rotation/scale pivot — it does NOT define size.
+    //
+    //  We translate the Skia canvas to the PIVOT POINT, then draw a rect
+    //  that is positioned such that:
+    //    • left   edge is originX pixels LEFT  of the pivot
+    //    • bottom edge is originY pixels BELOW the pivot   (in Y-up world)
+    //    • right  edge is (bmpWidth  − originX) pixels RIGHT of the pivot
+    //    • top    edge is (bmpHeight − originY) pixels ABOVE the pivot
+    //
+    //  In Skia coordinates (Y-down):
+    //    SKRect( left           = −originX,
+    //            top (Skia-up)  = −(bmpHeight − originY)  = originY − bmpHeight,
+    //            right          = bmpWidth − originX,
+    //            bottom (Skia)  = originY )
+    // ════════════════════════════════════════════════════════════════════════
+
+    private void DrawSprite(SKCanvas canvas, SimpleImageVO img, SKBitmap bmp)
     {
-        if (string.IsNullOrEmpty(img.imageName) ||
-            !_imageCache.TryGetValue(img.imageName, out var bmp)) return;
+        float bw = bmp.Width;
+        float bh = bmp.Height;
+        float ox = img.originX;
+        float oy = img.originY;
 
         canvas.Save();
 
-        // ── THE FIX ──────────────────────────────────────────────────────────
-        // Translate to the image's CENTRE (pivot), not to its bottom-left.
-        //   world centre X = img.x + originX
-        //   world centre Y = img.y + originY   → Skia: -(img.y + originY)
-        canvas.Translate(img.x + img.originX, -(img.y + img.originY));
-        // ─────────────────────────────────────────────────────────────────────
+        // Move canvas origin to the sprite's pivot point in world space
+        //   pivot world X = img.x + originX
+        //   pivot world Y = img.y + originY  →  Skia: −(img.y + originY)
+        canvas.Translate(img.x + ox, -(img.y + oy));
 
-        // Horizontal/vertical flip around the centre
+        // Horizontal / vertical flip around the pivot
         if (img.flipX || img.flipY)
             canvas.Scale(img.flipX ? -1f : 1f, img.flipY ? -1f : 1f);
 
-        // Rect centred at pivot: logical size = 2*originX × 2*originY world units
-        // DrawBitmap stretches bmp to fill → correct size regardless of file resolution
-        var dst = new SKRect(-img.originX, -img.originY, img.originX, img.originY);
+        // ── FIX #1: use actual PNG dimensions, not 2*origin ──────────────────
+        var dst = new SKRect(
+            left: -ox,       // originX px left  of pivot
+            top: oy - bh,   // (bh−oy) px above pivot  (Skia Y-down: negative = up)
+            right: bw - ox,   // (bw−ox) px right of pivot
+            bottom: oy         // originY px below pivot
+        );
+
+        // ── FIX #2: close sub-pixel gaps between floor / road tiles ──────────
+        // At non-integer zoom levels, Skia's antialiasing creates hairline seams.
+        // Expanding each tile by half a screen-pixel in world units closes them.
+        if (img.layerName == "floor" || img.layerName == "roads")
+        {
+            float px = 0.6f / _zoom;    // half screen-pixel in world units
+            dst = new SKRect(dst.Left - px, dst.Top - px,
+                             dst.Right + px, dst.Bottom + px);
+        }
+        // ─────────────────────────────────────────────────────────────────────
+
         canvas.DrawBitmap(bmp, dst);
         canvas.Restore();
     }
-
-    /// <summary>
 }

@@ -2,9 +2,11 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="GameProject02.Views.GangLevelUpgradePage"
+             ControlTemplate="{StaticResource StickyHeaderTemplate}"
              BackgroundColor="#1a1a1a"
              Title="⭐ ترقية العصابة"
-             FlowDirection="RightToLeft">
+             FlowDirection="RightToLeft"
+             NavigationPage.HasNavigationBar="False">
     <Grid RowDefinitions="Auto,*,Auto">
         <Border BackgroundColor="#0a0a0a" Stroke="#e74c3c" StrokeThickness="2" Padding="10">
             <Label Text="⭐ ترقية مستوى العصابة" TextColor="White" FontSize="18" FontAttributes="Bold" HorizontalOptions="Center"/>

@@ -11,22 +11,18 @@ public static class GymService
         return player.Energy > 0;
     }
 
-    // Train with ENERGY ALLOCATION PER STAT (not minutes!)
-    // energyPerStat = [Strength, Defense, Speed, Dexterity] energy values
+    // Train with ENERGY ALLOCATION PER STAT
+    // energyPerStat = [Strength, Defense, Speed, Dexterity]
     public static (bool success, string message, int energySpent) Train(PlayerAccount player, int[] energyPerStat)
     {
         return player.Gym.Train(player, energyPerStat);
     }
 
-    // Regenerate energy over time (call this on app resume/periodically)
-    public static void RegenerateEnergy(PlayerAccount player)
-    {
-        player.RegenerateEnergy();
-    }
-
     // Get energy percentage for UI display (0.0 to 1.0)
     public static double GetEnergyPercentage(PlayerAccount player)
     {
-        return (double)player.Energy / player.MaxEnergy;
+        return player.MaxEnergy > 0 ? (double)player.Energy / player.MaxEnergy : 0;
     }
+
+    // ── RegenerateEnergy حُذفت — يتولى RegenerationService هذه المهمة الآن ──
 }

@@ -5,7 +5,7 @@
              BackgroundColor="#1a1a1a"
              Title="⚔️ المعركة"
              FlowDirection="RightToLeft"
-             Shell.NavBarIsVisible="False">
+             NavigationPage.HasNavigationBar="False">
 
     <Grid RowDefinitions="Auto,*,Auto">
 

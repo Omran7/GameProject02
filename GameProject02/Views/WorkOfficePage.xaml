@@ -4,6 +4,7 @@
              xmlns:local="clr-namespace:GameProject02.Views"
              xmlns:controls="clr-namespace:GameProject02.Controls"
              x:Class="GameProject02.Views.WorkOfficePage"
+             ControlTemplate="{StaticResource StickyHeaderTemplate}"
              Title="مكتب العمل"
              FlowDirection="RightToLeft"
              NavigationPage.HasNavigationBar="False">

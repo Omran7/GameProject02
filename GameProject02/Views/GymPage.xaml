@@ -2,8 +2,10 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="GameProject02.Views.GymPage"
+             ControlTemplate="{StaticResource StickyHeaderTemplate}"
              BackgroundColor="#1e1e1e"
-             Title="Gym">
+             Title="Gym"
+             NavigationPage.HasNavigationBar="False">
 
     <Grid RowDefinitions="Auto,Auto,*,Auto">
 

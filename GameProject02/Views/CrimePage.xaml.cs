@@ -99,7 +99,6 @@ public partial class CrimePage : ContentPage
     {
         if (_player == null) return;
 
-        _player.CrimeObject.RegenerateCourage();
 
         var firstCrime = CrimeDatabase.GetCrimeItem(0, 0);
         if (firstCrime != null && !_player.CrimeObject.TaskProgress.ContainsKey(0))

@@ -2,56 +2,52 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="GameProject02.Views.LoginPage"
-             BackgroundColor="#1a1a1a"
-             Title="Login">
+             BackgroundColor="#2c3e50">
 
     <ScrollView>
-        <VerticalStackLayout Padding="20" Spacing="25" VerticalOptions="Center">
+        <VerticalStackLayout Padding="30" Spacing="15" VerticalOptions="Center">
 
-            <Label Text="START GAME" FontSize="32" FontAttributes="Bold" TextColor="White" 
-                   HorizontalOptions="Center"/>
+            <Label Text="تسجيل الدخول"
+                   FontSize="32"
+                   FontAttributes="Bold"
+                   HorizontalOptions="Center"
+                   TextColor="White" />
 
-            <Frame BackgroundColor="#2d2d2d" BorderColor="#404040" CornerRadius="15" Padding="25">
-                <VerticalStackLayout Spacing="20">
+            <Entry x:Name="UsernameEntry"
+                   Placeholder="اسم المستخدم"
+                   BackgroundColor="#34495e"
+                   TextColor="White"
+                   PlaceholderColor="#bdc3c7" />
 
-                    <VerticalStackLayout Spacing="5">
-                        <Label Text="USERNAME" FontSize="12" TextColor="#aaaaaa"/>
-                        <Entry x:Name="UsernameEntry" Placeholder="Enter your nickname" 
-                               TextColor="White" PlaceholderColor="#888888"
-                               BackgroundColor="#3a3a3a" HeightRequest="45"
-                               Keyboard="Text" MaxLength="15"/>
-                    </VerticalStackLayout>
+            <Entry x:Name="PasswordEntry"
+                   Placeholder="كلمة المرور"
+                   IsPassword="True"
+                   BackgroundColor="#34495e"
+                   TextColor="White"
+                   PlaceholderColor="#bdc3c7" />
 
-                    <VerticalStackLayout Spacing="5">
-                        <Label Text="PASSWORD" FontSize="12" TextColor="#aaaaaa"/>
-                        <Entry x:Name="PasswordEntry" Placeholder="Enter password" IsPassword="True"
-                               TextColor="White" PlaceholderColor="#888888"
-                               BackgroundColor="#3a3a3a" HeightRequest="45"
-                               Keyboard="Default" MaxLength="20"/>
-                    </VerticalStackLayout>
+            <Button x:Name="LoginButton"
+                    Text="دخول"
+                    BackgroundColor="#27ae60"
+                    TextColor="White"
+                    Clicked="OnLoginClicked" />
 
-                    <Button Text="LOGIN" 
-                            BackgroundColor="#45b7d1" 
-                            TextColor="White" 
-                            CornerRadius="12"
-                            HeightRequest="50"
-                            Clicked="OnLoginClicked"/>
+            <ActivityIndicator x:Name="LoadingIndicator"
+                               IsRunning="False"
+                               IsVisible="False"
+                               Color="White"
+                               HorizontalOptions="Center" />
 
-                    <Button Text="CREATE NEW ACCOUNT" 
-                            BackgroundColor="#2e2e2e" 
-                            TextColor="#45b7d1" 
-                            BorderColor="#45b7d1" 
-                            BorderWidth="1"
-                            CornerRadius="12"
-                            HeightRequest="45"
-                            Clicked="OnRegisterClicked"/>
-                </VerticalStackLayout>
-            </Frame>
+            <Label x:Name="ErrorMessage"
+                   Text=""
+                   TextColor="#e74c3c"
+                   HorizontalOptions="Center"
+                   IsVisible="False" />
 
-            <Label x:Name="ErrorMessage" TextColor="#ff6b6b" HorizontalOptions="Center" 
-                   FontAttributes="Italic" IsVisible="False"/>
-
+            <Button Text="تسجيل حساب جديد"
+                    BackgroundColor="Transparent"
+                    TextColor="#3498db"
+                    Clicked="OnRegisterClicked" />
         </VerticalStackLayout>
     </ScrollView>
-
 </ContentPage>

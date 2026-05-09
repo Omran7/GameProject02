@@ -2,8 +2,11 @@
 using GameProject02.Services;
 using GameProject02.Views;
 using System.Timers;
+using System.Collections.Generic;
+using System.Linq;
 using Microsoft.Maui.Controls;
 using Microsoft.Maui.ApplicationModel;
+using System.Threading.Tasks;
 
 namespace GameProject02;
 
@@ -20,17 +23,7 @@ public partial class App : Application
         StartConfinementTimer();
 
 #if DEBUG
-        CreateTestAccount();
-        CreateTestAccount1();
-        CreateTestAccount2();
-        CreateTestAccount3();
-        CreateTestAccount4();
-        CreateTestAccount5();
-        CreateTestAccount6();
-        CreateTestAccount7();
-        CreateTestAccount8();
-        CreateTestAccount9();
-        CreateTestAccount10();
+        CreateTestAccounts();
 #endif
     }
 
@@ -68,279 +61,67 @@ public partial class App : Application
         base.OnSleep();
     }
 
-    // ✅ UPDATE NOBILITY ON APP RESUME (HANDLES OFFLINE RECOVERY)
     protected override void OnResume()
     {
         base.OnResume();
         _confinementTimer?.Start();
 
-        // ✅ CRITICAL: UPDATE NOBILITY AFTER OFFLINE TIME (AUTHENTIC OLD GAME)
         var player = AccountService.GetCurrentPlayer();
         if (player != null)
         {
             NobilityService.UpdateNobility(player);
-            System.Diagnostics.Debug.WriteLine($"[APP RESUME] Nobility updated to {player.NobilityCurrent}/100");
         }
 
         CheckAndNavigateToPrisonIfNeeded();
         CheckAndNavigateToHospitalIfNeeded();
     }
 
-    private void CreateTestAccount()
+    // ── Test accounts (debug only) ──────────────────────────────────
+#if DEBUG
+    private async void CreateTestAccounts()
     {
-        var existingAccount = AccountService.GetAllPlayers()
-            .FirstOrDefault(p => p.Username.Equals("omran", StringComparison.OrdinalIgnoreCase));
-
-        if (existingAccount != null)
+        // List of (username, password) to create
+        var testAccounts = new[]
         {
-            AccountService.Login("omran", "omran");
-            return;
-        }
+            ("1234", "1234"),
+            ("omran1", "omran"),
+            ("omran2", "omran"),
+            ("omran3", "omran"),
+            ("omran4", "omran"),
+            ("omran5", "omran"),
+            ("omran6", "omran"),
+            ("omran7", "omran"),
+            ("omran8", "omran"),
+            ("omran9", "omran"),
+            ("omran10", "omran"),
+        };
 
-        bool success = AccountService.RegisterAccount("omran", "omran");
-        if (success)
+        foreach (var (username, password) in testAccounts)
         {
-            var player = AccountService.GetCurrentPlayer();
-            if (player != null)
+            // Skip if already exists locally
+            if (AccountService.GetAllPlayers().Any(p => p.Username.Equals(username, StringComparison.OrdinalIgnoreCase)))
+                continue;
+
+            bool success = await AccountService.RegisterAccountAsync(username, password);
+            if (success)
             {
-                player.Gold = 999999999;
-                
-                AddTestEstates(player);
-                AccountService.Login("omran", "omran");
-            }
-        }
-    }
-
-    private void CreateTestAccount1()
-    {
-        var existingAccount = AccountService.GetAllPlayers()
-            .FirstOrDefault(p => p.Username.Equals("omran1", StringComparison.OrdinalIgnoreCase));
-
-        if (existingAccount != null)
-        {
-            AccountService.Login("omran1", "omran");
-            return;
-        }
-
-        bool success = AccountService.RegisterAccount("omran1", "omran");
-        if (success)
-        {
-            var player = AccountService.GetCurrentPlayer();
-            if (player != null)
-            {
+                var player = AccountService.GetCurrentPlayer();
                 player.Gold = 999999999;
                 AddTestEstates(player);
-                AccountService.Login("omran1", "omran");
+
+                // Save to cloud immediately (so they appear in remote store)
+                _ = FirebaseService.SavePlayerAsync(player);
+                System.Diagnostics.Debug.WriteLine($"[TEST] Created & saved: {username}");
             }
         }
+
+        // Finally, log in as the main test account "1234"
+        await AccountService.LoginAsync("1234", "1234");
+        var mainPlayer = AccountService.GetCurrentPlayer();
+        if (mainPlayer != null)
+            NobilityService.UpdateNobility(mainPlayer);
     }
-    private void CreateTestAccount2()
-    {
-        var existingAccount = AccountService.GetAllPlayers()
-            .FirstOrDefault(p => p.Username.Equals("omran2", StringComparison.OrdinalIgnoreCase));
-
-        if (existingAccount != null)
-        {
-            AccountService.Login("omran2", "omran");
-            return;
-        }
-
-        bool success = AccountService.RegisterAccount("omran2", "omran");
-        if (success)
-        {
-            var player = AccountService.GetCurrentPlayer();
-            if (player != null)
-            {
-                player.Gold = 999999999;
-                AddTestEstates(player);
-                AccountService.Login("omran2", "omran");
-            }
-        }
-    }
-    private void CreateTestAccount3()
-    {
-        var existingAccount = AccountService.GetAllPlayers()
-            .FirstOrDefault(p => p.Username.Equals("omran3", StringComparison.OrdinalIgnoreCase));
-
-        if (existingAccount != null)
-        {
-            AccountService.Login("omran3", "omran");
-            return;
-        }
-
-        bool success = AccountService.RegisterAccount("omran3", "omran");
-        if (success)
-        {
-            var player = AccountService.GetCurrentPlayer();
-            if (player != null)
-            {
-                player.Gold = 999999999;
-                AddTestEstates(player);
-                AccountService.Login("omran3", "omran");
-            }
-        }
-    }
-    private void CreateTestAccount4()
-    {
-        var existingAccount = AccountService.GetAllPlayers()
-            .FirstOrDefault(p => p.Username.Equals("omran4", StringComparison.OrdinalIgnoreCase));
-
-        if (existingAccount != null)
-        {
-            AccountService.Login("omran4", "omran");
-            return;
-        }
-
-        bool success = AccountService.RegisterAccount("omran4", "omran");
-        if (success)
-        {
-            var player = AccountService.GetCurrentPlayer();
-            if (player != null)
-            {
-                player.Gold = 999999999;
-                AddTestEstates(player);
-                AccountService.Login("omran4", "omran");
-            }
-        }
-    }
-    private void CreateTestAccount5()
-    {
-        var existingAccount = AccountService.GetAllPlayers()
-            .FirstOrDefault(p => p.Username.Equals("omran5", StringComparison.OrdinalIgnoreCase));
-
-        if (existingAccount != null)
-        {
-            AccountService.Login("omran5", "omran");
-            return;
-        }
-
-        bool success = AccountService.RegisterAccount("omran5", "omran");
-        if (success)
-        {
-            var player = AccountService.GetCurrentPlayer();
-            if (player != null)
-            {
-                player.Gold = 999999999;
-                AddTestEstates(player);
-                AccountService.Login("omran5", "omran");
-            }
-        }
-    }
-    private void CreateTestAccount6()
-    {
-        var existingAccount = AccountService.GetAllPlayers()
-            .FirstOrDefault(p => p.Username.Equals("omran6", StringComparison.OrdinalIgnoreCase));
-
-        if (existingAccount != null)
-        {
-            AccountService.Login("omran6", "omran");
-            return;
-        }
-
-        bool success = AccountService.RegisterAccount("omran6", "omran");
-        if (success)
-        {
-            var player = AccountService.GetCurrentPlayer();
-            if (player != null)
-            {
-                player.Gold = 999999999;
-                AddTestEstates(player);
-                AccountService.Login("omran6", "omran");
-            }
-        }
-    }
-    private void CreateTestAccount7()
-    {
-        var existingAccount = AccountService.GetAllPlayers()
-            .FirstOrDefault(p => p.Username.Equals("omran7", StringComparison.OrdinalIgnoreCase));
-
-        if (existingAccount != null)
-        {
-            AccountService.Login("omran7", "omran");
-            return;
-        }
-
-        bool success = AccountService.RegisterAccount("omran7", "omran");
-        if (success)
-        {
-            var player = AccountService.GetCurrentPlayer();
-            if (player != null)
-            {
-                player.Gold = 999999999;
-                AddTestEstates(player);
-                AccountService.Login("omran7", "omran");
-            }
-        }
-    }
-    private void CreateTestAccount8()
-    {
-        var existingAccount = AccountService.GetAllPlayers()
-            .FirstOrDefault(p => p.Username.Equals("omran8", StringComparison.OrdinalIgnoreCase));
-
-        if (existingAccount != null)
-        {
-            AccountService.Login("omran8", "omran");
-            return;
-        }
-
-        bool success = AccountService.RegisterAccount("omran8", "omran");
-        if (success)
-        {
-            var player = AccountService.GetCurrentPlayer();
-            if (player != null)
-            {
-                player.Gold = 999999999;
-                AddTestEstates(player);
-                AccountService.Login("omran8", "omran");
-            }
-        }
-    }
-    private void CreateTestAccount9()
-    {
-        var existingAccount = AccountService.GetAllPlayers()
-            .FirstOrDefault(p => p.Username.Equals("omran9", StringComparison.OrdinalIgnoreCase));
-
-        if (existingAccount != null)
-        {
-            AccountService.Login("omran9", "omran");
-            return;
-        }
-
-        bool success = AccountService.RegisterAccount("omran9", "omran");
-        if (success)
-        {
-            var player = AccountService.GetCurrentPlayer();
-            if (player != null)
-            {
-                player.Gold = 999999999;
-                AddTestEstates(player);
-                AccountService.Login("omran9", "omran");
-            }
-        }
-    }
-    private void CreateTestAccount10()
-    {
-        var existingAccount = AccountService.GetAllPlayers()
-            .FirstOrDefault(p => p.Username.Equals("omran10", StringComparison.OrdinalIgnoreCase));
-
-        if (existingAccount != null)
-        {
-            AccountService.Login("omran10", "omran");
-            return;
-        }
-
-        bool success = AccountService.RegisterAccount("omran10", "omran");
-        if (success)
-        {
-            var player = AccountService.GetCurrentPlayer();
-            if (player != null)
-            {
-                player.Gold = 999999999;
-                AddTestEstates(player);
-                AccountService.Login("omran10", "omran");
-            }
-        }
-    }
+#endif
 
     private void AddTestEstates(PlayerAccount player)
     {
@@ -370,6 +151,7 @@ public partial class App : Application
         });
     }
 
+    // ── Prison / Hospital redirects ─────────────────────────────────
     private void CheckAndNavigateToPrisonIfNeeded()
     {
         var player = AccountService.GetCurrentPlayer();
@@ -383,10 +165,7 @@ public partial class App : Application
                 await Task.Delay(500);
                 if (MainPage is NavigationPage navPage)
                 {
-                    // ✅ إذا كانت الصفحة الحالية هي السجن بالفعل، لا تفعل شيئاً
-                    if (navPage.CurrentPage is PrisonPage)
-                        return;
-
+                    if (navPage.CurrentPage is PrisonPage) return;
                     if (navPage.CurrentPage is MainPage)
                     {
                         await navPage.Navigation.PushModalAsync(new PrisonPage());
@@ -409,10 +188,7 @@ public partial class App : Application
                 await Task.Delay(500);
                 if (MainPage is NavigationPage navPage)
                 {
-                    // ✅ إذا كانت الصفحة الحالية هي المستشفى بالفعل، لا تفعل شيئاً
-                    if (navPage.CurrentPage is HospitalPage)
-                        return;
-
+                    if (navPage.CurrentPage is HospitalPage) return;
                     if (navPage.CurrentPage is MainPage)
                     {
                         await navPage.Navigation.PushModalAsync(new HospitalPage());
@@ -421,6 +197,7 @@ public partial class App : Application
             });
         }
     }
+
     protected override void OnStart()
     {
         base.OnStart();
@@ -428,15 +205,9 @@ public partial class App : Application
         StartConfinementTimer();
 
 #if DEBUG
-        CreateTestAccount();
-        CreateTestAccount1();
-
-        // ✅ UPDATE NOBILITY AFTER TEST ACCOUNT CREATION
         var player = AccountService.GetCurrentPlayer();
         if (player != null)
-        {
             NobilityService.UpdateNobility(player);
-        }
 #endif
     }
 }

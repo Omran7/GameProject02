@@ -1,212 +1,90 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:controls="clr-namespace:GameProject02.Controls"
+             xmlns:views="clr-namespace:GameProject02.Views"
              x:Class="GameProject02.Views.HospitalPage"
              BackgroundColor="#1a1a1a"
-             Title="🏥 المستشفى"
              FlowDirection="RightToLeft"
-             Shell.NavBarIsVisible="False">
+             NavigationPage.HasNavigationBar="False">
 
-    <Grid RowDefinitions="Auto,*,Auto">
+    <Grid RowDefinitions="Auto, Auto, *, Auto">
 
-        <!-- الشريط العلوي (يظهر فقط للزائر) -->
-        <Border Grid.Row="0" 
-                BackgroundColor="#2c3e50" 
-                Stroke="Transparent" 
-                StrokeShape="RoundRectangle 0,0,0,0" 
-                Padding="5"
-                IsVisible="{Binding IsFreeMode}">
-            <Grid ColumnDefinitions="Auto,*,Auto">
-                <Button x:Name="BackButton" 
-                        Text="← رجوع"
-                        BackgroundColor="#95a5a6" 
-                        TextColor="White" 
-                        CornerRadius="5" 
-                        FontAttributes="Bold"
-                        Clicked="OnBackClicked"/>
+        <views:TopHeaderView Grid.Row="0"/>
 
-                <StackLayout Grid.Column="1" Spacing="2" VerticalOptions="Center">
-                    <Label Text="🏥 المستشفى" 
-                           TextColor="White" 
-                           FontSize="16" 
-                           FontAttributes="Bold" 
-                           HorizontalOptions="Center"/>
-                    <Label x:Name="BottomTimeLabel" 
-                           Text="00:00:00" 
-                           TextColor="#e74c3c" 
-                           FontSize="14" 
-                           FontAttributes="Bold" 
-                           HorizontalOptions="Center"/>
-                </StackLayout>
+        <Image Source="background.png"
+               Aspect="Fill"
+               HorizontalOptions="Fill"
+               VerticalOptions="Fill"
+               Grid.Row="1"
+               Grid.RowSpan="2"
+               IsVisible="{Binding IsFreeMode}"/>
 
-                <Button x:Name="RefreshButton" 
-                        Text="🔄 تحديث"
-                        BackgroundColor="#3498db" 
-                        TextColor="White" 
-                        CornerRadius="5" 
-                        FontAttributes="Bold"
-                        Clicked="OnRefreshClicked"/>
+        <Image Source="hospital_inmate_bg.png"
+               Aspect="Fill"
+               HorizontalOptions="Fill"
+               VerticalOptions="Fill"
+               Grid.Row="1"
+               Grid.RowSpan="2"
+               IsVisible="{Binding IsInHospital}"/>
+
+        <views:GameHeader Grid.Row="1"
+                          x:Name="PageHeader"
+                          HeaderTitle="المستشفى"/>
+
+        <Grid Grid.Row="2">
+
+            <!-- الوضع 1: المريض -->
+            <Grid x:Name="InmateModeLayout" IsVisible="{Binding IsInHospital}">
+                <ScrollView>
+                    <VerticalStackLayout Spacing="0" Padding="0">
+
+                        <Border x:Name="InmateInfoCard"
+                                Stroke="Transparent"
+                                StrokeThickness="0"
+                                StrokeShape="RoundRectangle 0,0,0,0"
+                                BackgroundColor="Transparent"
+                                Padding="6"
+                                HorizontalOptions="Center">
+                            <VerticalStackLayout Spacing="0">
+                                <Label Text="سبب دخولك المشفى:"
+                                       TextColor="Black"
+                                       FontAttributes="Bold"/>
+                                <Label x:Name="ReasonLabel"
+                                       TextColor="Red"
+                                       LineBreakMode="WordWrap"/>
+                                <Label Text="الوقت المتبقي للخروج:"
+                                       TextColor="Black"
+                                       FontAttributes="Bold"/>
+                                <Label x:Name="TimeRemainingLabel"
+                                       Text="00:00:00"
+                                       TextColor="#e74c3c"
+                                       FontAttributes="Bold"/>
+                                <Label Text="عدد مرات الدخول:"
+                                       TextColor="Black"
+                                       FontAttributes="Bold"/>
+                                <Label x:Name="VisitCountLabel"
+                                       Text="0"
+                                       TextColor="Red"/>
+                            </VerticalStackLayout>
+                        </Border>
+
+                    </VerticalStackLayout>
+                </ScrollView>
             </Grid>
-        </Border>
 
-        <!-- المحتوى الرئيسي -->
-        <Grid Grid.Row="1" Margin="10,5,10,5">
-
-            <!-- الوضع 1: المريض (داخل المستشفى) - بدون أي أزرار رجوع -->
-            <ScrollView x:Name="InmateModeLayout" IsVisible="{Binding IsInHospital}">
-                <VerticalStackLayout Spacing="15">
-
-                    <Border Stroke="Transparent" 
-                            StrokeShape="RoundRectangle 10,10,10,10"
-                            BackgroundColor="#2c2c2c"
-                            Padding="15" 
-                            Margin="0,0,0,10">
-                        <VerticalStackLayout Spacing="8">
-                            <Label Text="سبب دخولك" 
-                                   TextColor="#f1c40f" 
-                                   FontSize="14" 
-                                   FontAttributes="Bold"/>
-                            <Label x:Name="ReasonLabel" 
-                                   Text="جرحت نفسك أثناء جريمة" 
-                                   TextColor="White" 
-                                   FontSize="16" 
-                                   LineBreakMode="WordWrap"/>
-
-                            <Label Text="الوقت المتبقي للخروج" 
-                                   TextColor="#f1c40f" 
-                                   FontSize="14" 
-                                   FontAttributes="Bold"/>
-                            <Label x:Name="TimeRemainingLabel" 
-                                   Text="00:00:00" 
-                                   TextColor="#e74c3c" 
-                                   FontSize="18" 
-                                   FontAttributes="Bold"/>
-
-                            <Label Text="عدد مرات الدخول" 
-                                   TextColor="#f1c40f" 
-                                   FontSize="14" 
-                                   FontAttributes="Bold"/>
-                            <Label x:Name="VisitCountLabel" 
-                                   Text="0" 
-                                   TextColor="White" 
-                                   FontSize="16"/>
-                        </VerticalStackLayout>
-                    </Border>
-
-                    <!-- أزرار المريض: صيدلية - سوق - مخزن - تسجيل خروج (لا يوجد علاج ولا رجوع) -->
-                    <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto,Auto" ColumnSpacing="10" RowSpacing="10">
-                        <Button Text="💊 صيدلية" 
-                                Grid.Column="0" Grid.Row="0"
-                                BackgroundColor="#9b59b6" 
-                                TextColor="White" 
-                                CornerRadius="8" 
-                                Clicked="OnPharmacyClicked"/>
-                        <Button Text="🛒 السوق" 
-                                Grid.Column="1" Grid.Row="0"
-                                BackgroundColor="#16a085" 
-                                TextColor="White" 
-                                CornerRadius="8" 
-                                Clicked="OnMarketClicked"/>
-                        <Button Text="📦 المخزن" 
-                                Grid.Column="0" Grid.Row="1"
-                                BackgroundColor="#27ae60" 
-                                TextColor="White" 
-                                CornerRadius="8" 
-                                Clicked="OnStockClicked"/>
-                        <Button Text="تسجيل الخروج" 
-                                Grid.Column="1" Grid.Row="1"
-                                BackgroundColor="#e74c3c" 
-                                TextColor="White" 
-                                CornerRadius="8" 
-                                FontSize="14" 
-                                Clicked="OnSignOutClicked"/>
-                    </Grid>
-                </VerticalStackLayout>
-            </ScrollView>
-
-            <!-- الوضع 2: الزائر (خارج المستشفى) - يعرض قائمة المرضى -->
-            <ScrollView x:Name="VisitorModeLayout" IsVisible="{Binding IsFreeMode}">
-                <VerticalStackLayout Spacing="10">
-                    <Label Text="قائمة المرضى" 
-                           TextColor="#f1c40f" 
-                           FontSize="18" 
-                           FontAttributes="Bold" 
-                           HorizontalOptions="Center" 
-                           Margin="0,0,0,10"/>
-
-                    <CollectionView x:Name="PatientsListView" 
-                                    ItemsSource="{Binding Patients}"
-                                    EmptyView="لا يوجد مرضى حالياً">
-                        <CollectionView.ItemTemplate>
-                            <DataTemplate>
-                                <Border Stroke="#2c3e50" 
-                                        StrokeThickness="2" 
-                                        StrokeShape="RoundRectangle 10,10,10,10" 
-                                        BackgroundColor="#2c2c2c" 
-                                        Padding="12" 
-                                        Margin="0,0,0,8">
-                                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10">
-                                        <Frame CornerRadius="30" 
-                                               IsClippedToBounds="True" 
-                                               HeightRequest="60" 
-                                               WidthRequest="60" 
-                                               Padding="0"
-                                               BackgroundColor="#34495e">
-                                            <Image Source="{Binding ImageResource}" Aspect="AspectFill"/>
-                                        </Frame>
-
-                                        <VerticalStackLayout Grid.Column="1" VerticalOptions="Center">
-                                            <Label Text="{Binding Username}" 
-                                                   TextColor="White" 
-                                                   FontSize="16" 
-                                                   FontAttributes="Bold"/>
-                                            <Label Text="{Binding CrimeObject.HospitalReason}" 
-                                                   TextColor="#bdc3c7" 
-                                                   FontSize="12" 
-                                                   LineBreakMode="TailTruncation"/>
-                                            <Label Text="{Binding HospitalRemainingTime, StringFormat='الوقت: {0}'}" 
-                                                   TextColor="#e74c3c" 
-                                                   FontSize="13" 
-                                                   FontAttributes="Bold"/>
-                                        </VerticalStackLayout>
-                                    </Grid>
-                                </Border>
-                            </DataTemplate>
-                        </CollectionView.ItemTemplate>
-                    </CollectionView>
-                </VerticalStackLayout>
-            </ScrollView>
+            <!-- الوضع 2: الزائر -->
+            <Grid x:Name="VisitorModeLayout" IsVisible="{Binding IsFreeMode}">
+                <ScrollView VerticalOptions="Fill">
+                    <VerticalStackLayout x:Name="PatientsContainer"
+                                         Spacing="0"
+                                         Padding="10,5"
+                                         VerticalOptions="Fill"/>
+                </ScrollView>
+            </Grid>
         </Grid>
 
-        <!-- الشريط السفلي (للزائر فقط) - يحتوي على أزرار: رجوع، علاج، تحديث -->
-        <Border Grid.Row="2" 
-                BackgroundColor="#2c3e50" 
-                Stroke="Transparent" 
-                StrokeShape="RoundRectangle 0,0,0,0" 
-                Padding="5"
-                IsVisible="{Binding IsFreeMode}">
-            <Grid ColumnDefinitions="*,*,*" ColumnSpacing="10">
-                <Button Text="🏠 رجوع" 
-                        BackgroundColor="#95a5a6" 
-                        TextColor="White" 
-                        CornerRadius="12" 
-                        HeightRequest="45"
-                        Clicked="OnBackClicked"/>
-
-                <Button Text="💊 علاج" 
-                        BackgroundColor="#e74c3c" 
-                        TextColor="White" 
-                        CornerRadius="12" 
-                        HeightRequest="45"
-                        Clicked="OnTreatmentClicked"/>
-
-                <Button Text="🔄 تحديث" 
-                        BackgroundColor="#3498db" 
-                        TextColor="White" 
-                        CornerRadius="12" 
-                        HeightRequest="45"
-                        Clicked="OnRefreshClicked"/>
-            </Grid>
-        </Border>
+        <controls:FooterView Grid.Row="3"
+                             x:Name="PageFooter"/>
     </Grid>
 </ContentPage>
