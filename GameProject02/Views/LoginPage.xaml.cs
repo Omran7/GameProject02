@@ -23,7 +23,6 @@ namespace GameProject02.Views
                 return;
             }
 
-            // Show loading indicator
             LoginButton.IsEnabled = false;
             LoadingIndicator.IsRunning = true;
 

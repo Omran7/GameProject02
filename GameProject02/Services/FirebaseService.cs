@@ -190,6 +190,23 @@ namespace GameProject02.Services
             // ── Gang (store only reference ID) ──
             fields["gangId"] = StringValue(p.GangObject?.GangId ?? "");
 
+            // ✅ NOTIFICATIONS (embedded list)
+            fields["notifications"] = ArrayValue(
+                p.Notifications?.Select(n => MapValue(new Dictionary<string, object>
+                {
+                    { "id", StringValue(n.Id) },
+                    { "title", StringValue(n.Title) },
+                    { "message", StringValue(n.Message) },
+                    { "timestamp", TimestampValue(n.Timestamp) },
+                    { "category", IntegerValue((int)n.Category) },
+                    { "priority", IntegerValue((int)n.Priority) },
+                    { "icon", StringValue(n.Icon) },
+                    { "isRead", BooleanValue(n.IsRead) },
+                    { "actionTarget", StringValue(n.ActionTarget) },
+                    { "playerId", StringValue(n.PlayerId) }
+                })).ToArray() ?? Array.Empty<object>()
+            );
+
             return fields;
         }
 
@@ -306,7 +323,13 @@ namespace GameProject02.Services
             p.PrimaryResidenceEstateId = fields.GetInt32("primaryResidenceEstateId");
             p.PrimaryResidenceEstateInstanceId = fields.GetString("primaryResidenceEstateInstanceId") ?? "";
 
-            // After loading, recalculate combat stats
+            // ✅ NOTIFICATIONS: Parse embedded array
+            if (fields.TryGetProperty("notifications", out var notificationsProp))
+            {
+                p.Notifications = ParseNotificationsList(notificationsProp);
+            }
+
+            // Recalculate combat stats
             p.Combat.RecalculateStats(p);
 
             return p;
@@ -780,6 +803,37 @@ namespace GameProject02.Services
             g.LessonProgress = ParseIntList(fields.Value, "lessonProgress");
             g.LessonUnlocked = ParseBoolList(fields.Value, "lessonUnlocked");
             return g;
+        }
+
+        // ✅ NEW: Parse the notifications array from Firestore fields
+        private static List<NotificationItem> ParseNotificationsList(JsonElement prop)
+        {
+            var list = new List<NotificationItem>();
+            if (prop.TryGetProperty("arrayValue", out var arrVal) &&
+                arrVal.TryGetProperty("values", out var values))
+            {
+                foreach (var val in values.EnumerateArray())
+                {
+                    var fields = val.GetMapFieldsNullable();
+                    if (fields != null)
+                    {
+                        list.Add(new NotificationItem
+                        {
+                            Id = fields.Value.GetString("id") ?? Guid.NewGuid().ToString(),
+                            Title = fields.Value.GetString("title") ?? "",
+                            Message = fields.Value.GetString("message") ?? "",
+                            Timestamp = fields.Value.GetTimestamp("timestamp"),
+                            Category = (NotificationCategory)fields.Value.GetInt32("category"),
+                            Priority = (GameNotificationPriority)fields.Value.GetInt32("priority"),
+                            Icon = fields.Value.GetString("icon") ?? "🔔",
+                            IsRead = fields.Value.GetBoolean("isRead"),
+                            ActionTarget = fields.Value.GetString("actionTarget") ?? "",
+                            PlayerId = fields.Value.GetString("playerId") ?? ""
+                        });
+                    }
+                }
+            }
+            return list;
         }
 
         // ═══════════════════════════════════════════════════════════════

@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:models="clr-namespace:GameProject02.Models"
+             x:Class="GameProject02.Views.NotificationCenterPage"
+             Title="🔔 Notifications"
+             BackgroundColor="#1a1a1a">
+
+    <Grid RowDefinitions="Auto,*">
+        <!-- Header -->
+        <Border Grid.Row="0" BackgroundColor="#0a0a0a" Stroke="#f39c12" StrokeThickness="2" Padding="10">
+            <Grid ColumnDefinitions="*,Auto">
+                <Label Text="Notifications" TextColor="White" FontSize="18" FontAttributes="Bold"/>
+                <Button Grid.Column="1" Text="Mark All Read" 
+                        BackgroundColor="#3498db" TextColor="White" 
+                        CornerRadius="8" Padding="10,5"
+                        Clicked="OnMarkAllReadClicked"/>
+            </Grid>
+        </Border>
+
+        <!-- Notifications List -->
+        <CollectionView Grid.Row="1" x:Name="NotificationsList"
+                        ItemsSource="{Binding Notifications}"
+                        SelectionMode="None"
+                        BackgroundColor="#2d2d2d">
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="models:NotificationItem">
+                    <!-- ✅ FIX: GestureRecognizers on Border, not Grid -->
+                    <Border BackgroundColor="{Binding IsRead, Converter={StaticResource ReadStateToBg}}"
+                            StrokeThickness="0" Margin="5" Padding="10">
+
+                        <!-- Add TapGestureRecognizer here -->
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.OnNotificationTappedCommand}"
+                                                  CommandParameter="{Binding .}"/>
+                        </Border.GestureRecognizers>
+
+                        <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto,Auto">
+                            <!-- Icon -->
+                            <Label Grid.RowSpan="3" Text="{Binding Icon}" 
+                                   FontSize="24" VerticalOptions="Center" Margin="0,0,10,0"/>
+
+                            <!-- Title -->
+                            <Label Grid.Column="1" Text="{Binding Title}" 
+                                   TextColor="White" FontAttributes="Bold" FontSize="14"/>
+
+                            <!-- Message -->
+                            <Label Grid.Row="1" Grid.Column="1" Text="{Binding Message}" 
+                                   TextColor="#cccccc" FontSize="12" LineBreakMode="WordWrap"/>
+
+                            <!-- Timestamp -->
+                            <Label Grid.Row="2" Grid.Column="1" 
+                                   Text="{Binding Timestamp, StringFormat='{0:MMM dd, HH:mm}'}" 
+                                   TextColor="#888888" FontSize="10"/>
+                        </Grid>
+                    </Border>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+    </Grid>
+</ContentPage>

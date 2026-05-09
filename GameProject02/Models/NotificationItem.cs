@@ -1,19 +1,36 @@
-﻿namespace GameProject02.Models;
+﻿using System;
 
-public enum NotificationType
+namespace GameProject02.Models;
+
+// ✅ RENAMED to avoid conflict with Android.App.NotificationPriority
+public enum GameNotificationPriority
 {
-    Alert,      // Attacks, Prison, etc.
-    Reward,     // Daily bonuses, Level up
-    System,     // Server updates
-    Social      // Friend requests, Gang invites
+    Low = 0,
+    Normal = 1,
+    High = 2,
+    Critical = 3
+}
+
+public enum NotificationCategory
+{
+    Game = 0,
+    Social = 1,
+    System = 2
 }
 
 public class NotificationItem
 {
-    public string Title { get; set; }
-    public string Message { get; set; }
-    public DateTime Timestamp { get; set; }
-    public NotificationType Type { get; set; }
-    public string Icon { get; set; }
-    public bool IsRead { get; set; }
+    public string Id { get; set; } = Guid.NewGuid().ToString();
+    public string Title { get; set; } = string.Empty;
+    public string Message { get; set; } = string.Empty;
+    public DateTime Timestamp { get; set; } = DateTime.UtcNow;
+    public NotificationCategory Category { get; set; } = NotificationCategory.Game;
+    public GameNotificationPriority Priority { get; set; } = GameNotificationPriority.Normal;
+    public string Icon { get; set; } = "🔔";
+    public bool IsRead { get; set; } = false;
+    public string ActionTarget { get; set; } = string.Empty;
+    public string PlayerId { get; set; } = string.Empty;
+
+    public bool IsHighPriority => Priority >= GameNotificationPriority.High;
+    public bool IsGameNotification => Category == NotificationCategory.Game;
 }

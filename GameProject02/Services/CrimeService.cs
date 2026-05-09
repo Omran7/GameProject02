@@ -18,10 +18,8 @@ public static class CrimeService
         return prevProgress >= prevCrime.RequiredSuccesses;
     }
 
-    public static (bool success, string message) AttemptCrime(
-        PlayerAccount player, int crimeTypeId, int crimeItemId)
+    public static (bool success, string message) AttemptCrime(PlayerAccount player, int crimeTypeId, int crimeItemId)
     {
-        // ── تحقق من وضع السجن/المستشفى ────────────────────────────────────────
         player.CrimeObject.CheckConfinementStatus();
 
         var crime = CrimeDatabase.GetCrimeItem(crimeTypeId, crimeItemId);
@@ -36,15 +34,13 @@ public static class CrimeService
         if (player.CrimeObject.IsInPrison)
         {
             var p = Microsoft.Maui.Controls.Application.Current.MainPage;
-            p?.Dispatcher.Dispatch(async () =>
-                await p.Navigation.PushModalAsync(new PrisonPage()));
+            p?.Dispatcher.Dispatch(async () => await p.Navigation.PushModalAsync(new PrisonPage()));
             return (false, "أنت في السجن حالياً!");
         }
 
         if (player.CrimeObject.IsInHospital)
             return (false, "أنت في المستشفى حالياً!");
 
-        // ── الأدوات ────────────────────────────────────────────────────────────
         var consumedTools = new List<string>();
         bool toolsLost = false;
 
@@ -52,8 +48,7 @@ public static class CrimeService
         {
             if (!player.StockObject.ItemsInStock.TryGetValue(toolReq.ToolItemId, out var toolItem) ||
                 toolItem.Count < toolReq.RequiredCount)
-                return (false,
-                    $"لا تملك أدوات كافية!\nتحتاج {toolReq.RequiredCount} × {toolReq.ToolName}.");
+                return (false, $"لا تملك أدوات كافية!\nتحتاج {toolReq.RequiredCount} × {toolReq.ToolName}.");
         }
 
         var random = new Random();
@@ -70,17 +65,12 @@ public static class CrimeService
             }
         }
 
-        // ── الشجاعة ────────────────────────────────────────────────────────────
-        // ✅ نستخدم player.Courage (المصدر الموحد) وليس CrimeObject.Courage
         if (player.Courage < crime.CourageCost)
-            return (false,
-                $"ليس لديك ما يكفي من الشجاعة!\nتحتاج {crime.CourageCost} / لديك {player.Courage}.");
+            return (false, $"ليس لديك ما يكفي من الشجاعة!\nتحتاج {crime.CourageCost} / لديك {player.Courage}.");
 
-        // ✅ استهلاك الشجاعة من PlayerAccount مباشرة
         player.Courage -= crime.CourageCost;
         player.CrimeObject.TotalCrimesAttempted++;
 
-        // ── نسبة النجاح ────────────────────────────────────────────────────────
         int currentProgress = player.CrimeObject.TaskProgress.GetValueOrDefault(linearIndex, 0);
         double percent = crime.RequiredSuccesses > 0
                               ? Math.Clamp((double)currentProgress / crime.RequiredSuccesses, 0, 1)
@@ -94,7 +84,6 @@ public static class CrimeService
 
         if (success)
         {
-            // ── مكافآت النجاح ──────────────────────────────────────────────────
             int cashReward = random.Next(crime.Reward.CashRewardMin, crime.Reward.CashRewardMax + 1);
             player.Gold += cashReward;
 
@@ -115,7 +104,6 @@ public static class CrimeService
                 }
             }
 
-            // ── تقدم السلسلة ────────────────────────────────────────────────────
             int ownProgress = player.CrimeObject.TaskProgress.GetValueOrDefault(linearIndex, 0);
             player.CrimeObject.TaskProgress[linearIndex] = ownProgress + 1;
 
@@ -135,15 +123,20 @@ public static class CrimeService
             player.CrimeObject.TotalCrimesSuccessful++;
             MissionService.OnCrimeDone(player, crimeTypeId, true);
 
+            // ✅ NOTIFICATION: Crime Success
+            NotificationService.AddGameNotification(
+                title: "✅ جريمة ناجحة!",
+                message: $"نجحت في {crime.Name}!\n+{cashReward:N0} ذهب، +{xpReward} خبرة",
+                priority: GameNotificationPriority.High,
+                icon: "💰",
+                actionTarget: "CrimePage"
+            );
+
             string message = $"نجحت في {crime.Name}!\nحصلت على {cashReward:N0} ذهب و {xpReward} خبرة.";
-            if (leveledUp)
-                message += $"\n\n🎉 تمت ترقيتك إلى المستوى {player.Level}!";
-            if (toolsLost && consumedTools.Count > 0)
-                message += $"\n\nضاعت منك الأدوات:\n{string.Join("\n", consumedTools)}";
-            else if (!toolsLost && crime.ToolRequirements.Count > 0)
-                message += "\n\nلحسن الحظ، لم تضع أدواتك هذه المرة!";
-            if (receivedItems.Count > 0)
-                message += $"\n\nالغنيمة:\n{string.Join("\n", receivedItems)}";
+            if (leveledUp) message += $"\n\n🎉 تمت ترقيتك إلى المستوى {player.Level}!";
+            if (toolsLost && consumedTools.Count > 0) message += $"\n\nضاعت منك الأدوات:\n{string.Join("\n", consumedTools)}";
+            else if (!toolsLost && crime.ToolRequirements.Count > 0) message += "\n\nلحسن الحظ، لم تضع أدواتك هذه المرة!";
+            if (receivedItems.Count > 0) message += $"\n\nالغنيمة:\n{string.Join("\n", receivedItems)}";
 
             return (true, message);
         }
@@ -154,55 +147,61 @@ public static class CrimeService
 
             if (random.Next(100) < 30)
             {
-                // ── مستشفى ─────────────────────────────────────────────────────
                 player.CrimeObject.IsInHospital = true;
                 player.CrimeObject.HospitalReason = $"فشلت في {crime.Name} وجرحت نفسك";
                 player.CrimeObject.TotalHospitalVisits++;
 
                 int hospitalMinutes = 2 + (crimeTypeId * 5);
                 player.CrimeObject.HospitalReleaseTime =
-                    DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() +
-                    (long)TimeSpan.FromMinutes(hospitalMinutes).TotalMilliseconds;
-                player.CrimeObject.HealthCurrent =
-                    Math.Max(1, player.CrimeObject.HealthCurrent - 50);
+                    DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() + (long)TimeSpan.FromMinutes(hospitalMinutes).TotalMilliseconds;
+                player.CrimeObject.HealthCurrent = Math.Max(1, player.CrimeObject.HealthCurrent - 50);
+
+                // ✅ NOTIFICATION: Hospital
+                NotificationService.AddGameNotification(
+                    title: "🏥 في المستشفى",
+                    message: $"فشلت في {crime.Name}\nالعلاج: {hospitalMinutes} دقيقة",
+                    priority: GameNotificationPriority.Normal,
+                    icon: "🏥",
+                    actionTarget: "HospitalPage"
+                );
 
                 string message = $"فشلت في {crime.Name}!\nتم نقلك إلى المستشفى لمدة {hospitalMinutes} دقائق.";
-                if (toolsLost && consumedTools.Count > 0)
-                    message += $"\n\n⚠️ ضاعت منك الأدوات:\n{string.Join("\n", consumedTools)}";
-                else if (!toolsLost && crime.ToolRequirements.Count > 0)
-                    message += "\n\n✨ هربت بسلام مع أدواتك.";
+                if (toolsLost && consumedTools.Count > 0) message += $"\n\n⚠️ ضاعت منك الأدوات:\n{string.Join("\n", consumedTools)}";
+                else if (!toolsLost && crime.ToolRequirements.Count > 0) message += "\n\n✨ هربت بسلام مع أدواتك.";
 
                 MissionService.OnCrimeDone(player, crimeTypeId, false);
 
                 var currentPage = Microsoft.Maui.Controls.Application.Current.MainPage;
-                currentPage?.Dispatcher.Dispatch(async () =>
-                    await currentPage.Navigation.PushModalAsync(new HospitalPage()));
+                currentPage?.Dispatcher.Dispatch(async () => await currentPage.Navigation.PushModalAsync(new HospitalPage()));
 
                 return (false, message);
             }
             else
             {
-                // ── سجن ────────────────────────────────────────────────────────
                 player.CrimeObject.IsInPrison = true;
                 player.CrimeObject.PrisonReleaseTime =
-                    DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() +
-                    (long)TimeSpan.FromMinutes(confinementMinutes).TotalMilliseconds;
+                    DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() + (long)TimeSpan.FromMinutes(confinementMinutes).TotalMilliseconds;
                 player.CrimeObject.TotalPrisonVisits++;
-                player.CrimeObject.PrisonBailAmount =
-                    (crimeTypeId + 1) * 1000 + (player.Level * 500);
+                player.CrimeObject.PrisonBailAmount = (crimeTypeId + 1) * 1000 + (player.Level * 500);
                 player.CrimeObject.PrisonReason = $"فشلت في {crime.Name}";
 
+                // ✅ NOTIFICATION: Prison
+                NotificationService.AddGameNotification(
+                    title: "⛓️ في السجن",
+                    message: $"فشلت في {crime.Name}\nالكفالة: {player.CrimeObject.PrisonBailAmount:N0} ذهب",
+                    priority: GameNotificationPriority.High,
+                    icon: "⛓️",
+                    actionTarget: "PrisonPage"
+                );
+
                 string message = $"فشلت في {crime.Name}!\nتم سجنك لمدة {confinementMinutes} دقائق.";
-                if (toolsLost && consumedTools.Count > 0)
-                    message += $"\n\n⚠️ ضاعت منك الأدوات:\n{string.Join("\n", consumedTools)}";
-                else if (!toolsLost && crime.ToolRequirements.Count > 0)
-                    message += "\n\n✨ هربت بسلام مع أدواتك.";
+                if (toolsLost && consumedTools.Count > 0) message += $"\n\n⚠️ ضاعت منك الأدوات:\n{string.Join("\n", consumedTools)}";
+                else if (!toolsLost && crime.ToolRequirements.Count > 0) message += "\n\n✨ هربت بسلام مع أدواتك.";
 
                 MissionService.OnCrimeDone(player, crimeTypeId, false);
 
                 var currentPage = Microsoft.Maui.Controls.Application.Current.MainPage;
-                currentPage?.Dispatcher.Dispatch(async () =>
-                    await currentPage.Navigation.PushModalAsync(new PrisonPage()));
+                currentPage?.Dispatcher.Dispatch(async () => await currentPage.Navigation.PushModalAsync(new PrisonPage()));
 
                 return (false, message);
             }

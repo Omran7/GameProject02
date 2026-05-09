@@ -170,6 +170,9 @@
 		<Compile Update="Controls\GameHeader.xaml.cs">
 			<DependentUpon>GameHeader.xaml</DependentUpon>
 		</Compile>
+		<Compile Update="Views\NotificationCenterPage.xaml.cs">
+		  <DependentUpon>NotificationCenterPage.xaml</DependentUpon>
+		</Compile>
 	</ItemGroup>
 
 	<ItemGroup>

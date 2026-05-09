@@ -2,10 +2,11 @@
 
 public class NotificationState
 {
-    public bool HasUnreadNews { get; set; }
-    public bool HasUnreadMessages { get; set; }
-    public bool HasUnseenProfileUpdate { get; set; }
-    public bool HasUncollectedRewards { get; set; }
+    public int TotalCount { get; set; } = 0;
+    public int UnreadCount { get; set; } = 0;
+    public bool HasUnreadGameNotifications => UnreadCount > 0;
 
-    public bool HasAny => HasUnreadNews || HasUnreadMessages || HasUnseenProfileUpdate || HasUncollectedRewards;
+    // Last checked timestamps (for polling/sync)
+    public DateTime LastSyncTime { get; set; } = DateTime.MinValue;
+    public string LastNotificationId { get; set; } = string.Empty;
 }

@@ -14,17 +14,12 @@ namespace GameProject02.Services
     {
         private static readonly Dictionary<string, PlayerAccount> _localAccounts = new();
         private static PlayerAccount _currentUser;
-
-        // In‑memory fallback for non‑cloud scenarios
         private static readonly List<PlayerAccount> _allPlayers = new();
 
-        // ── Firebase REST endpoints ──────────────────────────────────
-        // For username → playerId mapping, we store a separate collection.
         private const string FirestoreBaseUrl = "https://firestore.googleapis.com/v1/projects/gameproject02-4207f/databases/(default)/documents";
-        private const string WebApiKey = "AIzaSyCM61YoJzqt9X7lOndV2oBJGeoBtU9U_Uo";
+        private const string WebApiKey = "AIzaSyCM61YoJzqt9x7lOndV2oBJGeoBtU9U_Uo";
         private static readonly HttpClient _httpClient = new();
 
-        // ── Hashing ─────────────────────────────────────────────────
         public static string HashPassword(string password)
         {
             using var sha256 = SHA256.Create();
@@ -32,7 +27,6 @@ namespace GameProject02.Services
             return BitConverter.ToString(hashedBytes).Replace("-", "").ToLower();
         }
 
-        // ── REGISTRATION (async, cloud‑backed) ──────────────────────
         public static async Task<bool> RegisterAccountAsync(string username, string password)
         {
             if (string.IsNullOrWhiteSpace(username) || username.Length < 3) return false;
@@ -55,70 +49,76 @@ namespace GameProject02.Services
             _currentUser = account;
             RegisterPlayer(account);
 
-            // Save player document first
-            bool playerSaved = await FirebaseService.SavePlayerAsync(account);
-            if (!playerSaved)
+            bool saved = await FirebaseService.SavePlayerAsync(account);
+            if (!saved)
             {
                 _localAccounts.Remove(account.PlayerId);
                 _currentUser = null;
-                await ShowAlert("Registration Failed", "Could not save player data to the cloud. Check your connection and try again.");
+                await ShowAlert("Registration Failed", "Could not save player data to the cloud.");
                 return false;
             }
 
-            // Then save username mapping
             bool mappingSaved = await SaveUsernameMappingAsync(username, account.PlayerId);
             if (!mappingSaved)
-            {
-                await ShowAlert("Warning", "Account created, but the username lookup may not work on other devices.");
-            }
+                await ShowAlert("Warning", "Account created, but username lookup may not work on other devices.");
+
+            // ✅ CLEAR any leftover notifications from previous user, then add the welcome
+            NotificationService.ClearAll();
+
+            // ✅ WELCOME NOTIFICATION
+            NotificationService.AddGameNotification(
+                title: "🎉 مرحباً!",
+                message: $"أهلاً بك {username}! ابدأ رحلتك في عالم الجريمة",
+                priority: GameNotificationPriority.High,
+                icon: "🎮",
+                actionTarget: "MainPage"
+            );
 
             RegenerationService.Start(_currentUser);
             return true;
         }
-        // ── LOGIN (async, tries cloud if not in memory) ────────────
+
+        // ... (rest of AccountService code unchanged until LoginAsync)
+
         public static async Task<bool> LoginAsync(string username, string password)
         {
-            // 1. Local cache
             var account = _localAccounts.Values
                 .FirstOrDefault(x => x.Username.Equals(username, StringComparison.OrdinalIgnoreCase));
 
             if (account == null)
             {
-                // 2. Get playerId from cloud
                 string playerId = await GetPlayerIdByUsernameAsync(username);
                 if (playerId == null)
                 {
-                    await ShowAlert("Cloud Error", $"Username '{username}' not found in the database.\nCheck usernames/{username} exists with a playerId field.");
+                    await ShowAlert("Cloud Error", $"Username '{username}' not found.");
                     return false;
                 }
 
-                // 3. Load full player
                 account = await FirebaseService.LoadPlayerAsync(playerId);
                 if (account == null)
                 {
-                    await ShowAlert("Cloud Error", $"Player data for ID '{playerId}' could not be loaded.\nMake sure players/{playerId} exists and rules allow read.");
+                    await ShowAlert("Cloud Error", "Player data could not be loaded.");
                     return false;
                 }
 
-                // Cache locally
                 _localAccounts[account.PlayerId] = account;
                 RegisterPlayer(account);
             }
 
-            // 4. Check password
-            string enteredHash = HashPassword(password);
-            if (account.PasswordHash != enteredHash)
+            if (account.PasswordHash != HashPassword(password))
             {
-                await ShowAlert("Login Failed", $"Incorrect password.\nExpected hash: {account.PasswordHash}\nEntered hash: {enteredHash}");
+                await ShowAlert("Login Failed", "Incorrect password.");
                 return false;
             }
 
             _currentUser = account;
             EnsurePlayerRegistered(account);
+
+            // No need to clear or load notifications – they are part of the player object
+
             RegenerationService.Start(_currentUser);
             return true;
         }
-
         private static async Task ShowAlert(string title, string message)
         {
             await MainThread.InvokeOnMainThreadAsync(async () =>
@@ -127,20 +127,19 @@ namespace GameProject02.Services
                     await Application.Current.MainPage.DisplayAlert(title, message, "OK");
             });
         }
-        // ── LOGOUT (save to cloud) ─────────────────────────────────
+
         public static void Logout()
         {
             RegenerationService.Stop();
             var player = _currentUser;
             if (player != null)
-            {
-                // Save async, we don't need to await here
                 _ = FirebaseService.SavePlayerAsync(player);
-            }
+
+            // ✅ Clear notifications (already there, but good to keep)
+            NotificationService.ClearAll();
             _currentUser = null;
         }
 
-        // ── Current player helpers ─────────────────────────────────
         public static PlayerAccount GetCurrentPlayer() => _currentUser;
         public static bool IsLoggedIn() => _currentUser != null;
 
@@ -150,13 +149,11 @@ namespace GameProject02.Services
             return (int)(DateTime.UtcNow - _currentUser.CreatedAt).TotalDays;
         }
 
-        // ── Persistence placeholder (still used by some services) ──
         public static void SavePlayer(PlayerAccount player)
         {
             System.Diagnostics.Debug.WriteLine($"[SAVE] Player {player?.Username} state preserved");
         }
 
-        // ── Legacy training methods (unchanged) ────────────────────
         public static void TrainAtGym()
         {
             if (_currentUser == null) return;
@@ -164,15 +161,7 @@ namespace GameProject02.Services
             _currentUser.Speed += 1;
             _currentUser.Gold -= 10;
             _currentUser.CurrentXP += 5;
-
-            if (_currentUser.CurrentXP >= _currentUser.MaxXP)
-            {
-                LevelUp();
-            }
-            else
-            {
-                _currentUser.LevelProgress = (double)_currentUser.CurrentXP / _currentUser.MaxXP;
-            }
+            CheckLevelUp();
         }
 
         public static void StudyAtSchool()
@@ -181,10 +170,29 @@ namespace GameProject02.Services
             _currentUser.Intelligence += 3;
             _currentUser.Gold -= 15;
             _currentUser.CurrentXP += 8;
+            CheckLevelUp();
+        }
 
+        private static void CheckLevelUp()
+        {
+            if (_currentUser == null) return;
             if (_currentUser.CurrentXP >= _currentUser.MaxXP)
             {
-                LevelUp();
+                _currentUser.Level++;
+                _currentUser.MaxXP = _currentUser.Level * 100;
+                _currentUser.CurrentXP = 0;
+                _currentUser.LevelProgress = 0.0;
+                _currentUser.Gold += _currentUser.Level * 50;
+                _currentUser.Medals++;
+
+                // ✅ LEVEL UP NOTIFICATION
+                NotificationService.AddGameNotification(
+                    title: $"🎉 المستوى {_currentUser.Level}!",
+                    message: $"تهانينا! وصلت للمستوى {_currentUser.Level}\n+{_currentUser.Level * 50} ذهب مكافأة",
+                    priority: GameNotificationPriority.High,
+                    icon: "🏆",
+                    actionTarget: "ProfilePage"
+                );
             }
             else
             {
@@ -192,33 +200,14 @@ namespace GameProject02.Services
             }
         }
 
-        private static void LevelUp()
-        {
-            if (_currentUser == null) return;
-            _currentUser.Level++;
-            _currentUser.MaxXP = _currentUser.Level * 100;
-            _currentUser.CurrentXP = 0;
-            _currentUser.LevelProgress = 0.0;
-            _currentUser.Gold += _currentUser.Level * 50;
-            _currentUser.Medals++;
-        }
-
-        // ── Multiplayer (in‑memory for now) ────────────────────────
         public static void RegisterPlayer(PlayerAccount player)
         {
             if (!_allPlayers.Any(p => p.PlayerId == player.PlayerId))
-            {
                 _allPlayers.Add(player);
-            }
         }
 
         public static List<PlayerAccount> GetAllPlayers() => _allPlayers;
-
-        public static PlayerAccount GetPlayerById(string id)
-        {
-            return _allPlayers.FirstOrDefault(p => p.PlayerId == id);
-        }
-
+        public static PlayerAccount GetPlayerById(string id) => _allPlayers.FirstOrDefault(p => p.PlayerId == id);
         public static void EnsurePlayerRegistered(PlayerAccount player)
         {
             if (!_allPlayers.Contains(player))
@@ -228,39 +217,30 @@ namespace GameProject02.Services
             }
         }
 
-        // ── Cloud username mapping ─────────────────────────────────
         private static async Task<bool> SaveUsernameMappingAsync(string username, string playerId)
         {
             try
             {
-                var doc = new
-                {
-                    fields = new
-                    {
-                        playerId = new { stringValue = playerId }
-                    }
-                };
+                var doc = new { fields = new { playerId = new { stringValue = playerId } } };
                 var json = JsonSerializer.Serialize(doc);
                 var content = new StringContent(json, Encoding.UTF8, "application/json");
-
                 var url = $"{FirestoreBaseUrl}/usernames/{username}?key={WebApiKey}";
                 var response = await _httpClient.PatchAsync(url, content);
                 return response.IsSuccessStatusCode;
             }
-            catch (Exception ex)
+            catch
             {
-                System.Diagnostics.Debug.WriteLine($"[AUTH] Failed to save username mapping: {ex.Message}");
                 return false;
             }
         }
+
         private static async Task<string> GetPlayerIdByUsernameAsync(string username)
         {
             try
             {
                 var url = $"{FirestoreBaseUrl}/usernames/{username}?key={WebApiKey}";
                 var response = await _httpClient.GetAsync(url);
-                if (!response.IsSuccessStatusCode)
-                    return null;
+                if (!response.IsSuccessStatusCode) return null;
 
                 var json = await response.Content.ReadAsStringAsync();
                 using var doc = JsonDocument.Parse(json);
@@ -272,10 +252,7 @@ namespace GameProject02.Services
                     return val.GetString();
                 }
             }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine($"[AUTH] Failed to get playerId by username: {ex.Message}");
-            }
+            catch { }
             return null;
         }
     }

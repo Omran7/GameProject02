@@ -144,6 +144,7 @@ public partial class MainPage : ContentPage, INotifyPropertyChanged
     private async void OnHospitalClicked(object sender, EventArgs e) => await Navigation.PushAsync(new HospitalPage());
     private async void OnPrisonClicked(object sender, EventArgs e) => await Navigation.PushAsync(new PrisonPage());
     private async void OnFightClubClicked(object sender, EventArgs e) => await Navigation.PushAsync(new FightClubPage());
+    private async void OnNotificationCenterClicked(object sender, EventArgs e) => await Navigation.PushAsync(new NotificationCenterPage());
 
     private async void OnGangClicked(object sender, EventArgs e)
     {

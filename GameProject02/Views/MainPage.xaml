@@ -58,6 +58,9 @@
                     
                     <Button Grid.Row="6" Grid.Column="1" Text="🏙️ مدينة إدلب" 
                             BackgroundColor="#2ecc71" TextColor="White" HeightRequest="60" CornerRadius="12" FontAttributes="Bold" Clicked="OnIdlibCityMapClicked"/>
+                   
+                    <Button Grid.Row="6" Grid.Column="0" Text="🏙️ الإشعارات" 
+                            BackgroundColor="#e74c3c" TextColor="White" HeightRequest="60" CornerRadius="12" FontAttributes="Bold" Clicked="OnNotificationCenterClicked"/>
                 </Grid>
 
                 <Button Text="👤 الملف الشخصي" 

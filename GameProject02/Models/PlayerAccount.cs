@@ -37,7 +37,6 @@ public class PlayerAccount : INotifyPropertyChanged
         }
     }
 
-    // ← أضف هذه الدالة هنا
     public void ClearAvatar()
     {
         _avatarPath = string.Empty;
@@ -46,8 +45,6 @@ public class PlayerAccount : INotifyPropertyChanged
     }
 
     public static event Action<string> AvatarChanged;
-
-
 
     // ══════════════════════════════════════════════════════════════════
     //  معلومات اللاعب
@@ -72,19 +69,14 @@ public class PlayerAccount : INotifyPropertyChanged
     //  البارات الأربعة — القيم والحدود
     //  التجديد يُدار بالكامل من RegenerationService
     // ══════════════════════════════════════════════════════════════════
-
-    // الطاقة → +1 كل 2 دقيقة (حد 100)
     public int Energy { get; set; } = 100;
     public int MaxEnergy { get; set; } = 100;
 
-    // الشجاعة → +1 كل 2 دقيقة (حد 100)
     public int Courage { get => MainStatesObject.CourageCurrent; set => MainStatesObject.CourageCurrent = value; }
     public int MaxCourage { get => MainStatesObject.CourageMax; set => MainStatesObject.CourageMax = value; }
 
-    // الشهامة → +1 كل 5 دقائق (حد 100)
     public int NobilityCurrent { get; set; } = 100;
 
-    // الصحة → +5% كل 2 دقيقة (حد 500)
     public int Health { get; set; } = 500;
     public int MaxHealth { get; set; } = 500;
 
@@ -231,6 +223,9 @@ public class PlayerAccount : INotifyPropertyChanged
     public List<string> MilitiaMemberIds { get; set; } = new List<string>();
     public string MembersIdsJoinedMilitia { get; set; } = string.Empty;
 
+    // ✅ NEW: Notifications embedded directly in the player document
+    public List<NotificationItem> Notifications { get; set; } = new List<NotificationItem>();
+
     // ══════════════════════════════════════════════════════════════════
     //  المُنشئ
     // ══════════════════════════════════════════════════════════════════
@@ -263,6 +258,7 @@ public class PlayerAccount : INotifyPropertyChanged
             LastCourageRechargeTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()
         };
         ArmingObject = new ArmingObject();
+        Notifications = new List<NotificationItem>(); // ✅ initialize notifications list
         AvatarPath = Preferences.Get("AvatarPath", "player_avatar.png");
     }
 }

@@ -1,55 +1,97 @@
 ﻿using GameProject02.Models;
-using GameProject02.Views;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace GameProject02.Services;
-
-public static class NotificationService
+namespace GameProject02.Services
 {
-    private static NotificationState _state = new NotificationState();
-    private static List<NotificationItem> _history = new List<NotificationItem>
+    public static class NotificationService
     {
-        new NotificationItem { Title = "Welcome", Message = "Welcome to Crime City. Keep your head down.", Timestamp = DateTime.Now.AddDays(-1), Type = NotificationType.System, Icon = "🏙️", IsRead = true },
-        new NotificationItem { Title = "Daily Reward", Message = "Your daily login bonus is available!", Timestamp = DateTime.Now.AddMinutes(-10), Type = NotificationType.Reward, Icon = "🎁", IsRead = false }
-    };
+        public static event Action? OnNotificationsUpdated;
 
-    public static NotificationState GetState()
-    {
-        _state.HasUnreadNews = _history.Any(n => !n.IsRead);
-        return _state;
-    }
-
-    public static List<NotificationItem> GetHistory() => _history.OrderByDescending(n => n.Timestamp).ToList();
-
-    public static void MarkAllAsRead()
-    {
-        foreach (var item in _history) item.IsRead = true;
-        _state.HasUnreadNews = false;
-    }
-
-    public static void SetNotification(string type, bool value)
-    {
-        switch (type.ToLower())
+        // ── Add a notification for the current player ──────────────────
+        public static void AddGameNotification(string title, string message,
+            GameNotificationPriority priority = GameNotificationPriority.Normal,
+            string icon = "🔔", string actionTarget = "")
         {
-            case "news": _state.HasUnreadNews = value; break;
-            case "chat": _state.HasUnreadMessages = value; break;
-            case "profile": _state.HasUnseenProfileUpdate = value; break;
-            case "reward": _state.HasUncollectedRewards = value; break;
+            var player = AccountService.GetCurrentPlayer();
+            if (player == null) return;
+
+            var notification = new NotificationItem
+            {
+                Id = Guid.NewGuid().ToString(),
+                Title = title,
+                Message = message,
+                Timestamp = DateTime.UtcNow,
+                Category = NotificationCategory.Game,
+                Priority = priority,
+                Icon = icon,
+                IsRead = false,
+                ActionTarget = actionTarget,
+                PlayerId = player.PlayerId
+            };
+
+            player.Notifications.Insert(0, notification);
+            // Keep only last 50 notifications (optional)
+            if (player.Notifications.Count > 50)
+                player.Notifications = player.Notifications.Take(50).ToList();
+
+            // Sync the entire player to Firestore (fire‑and‑forget)
+            _ = FirebaseService.SavePlayerAsync(player);
+
+            OnNotificationsUpdated?.Invoke();
         }
-    }
 
-    public static void AddNotification(string title, string message, NotificationType type, string icon)
-    {
-        _history.Add(new NotificationItem
+        // ── Get notifications for the current player ──────────────────
+        public static List<NotificationItem> GetGameNotifications(bool unreadOnly = false)
         {
-            Title = title,
-            Message = message,
-            Timestamp = DateTime.Now,
-            Type = type,
-            Icon = icon,
-            IsRead = false
-        });
+            var player = AccountService.GetCurrentPlayer();
+            if (player == null) return new List<NotificationItem>();
+
+            var cutoff = DateTime.UtcNow.AddDays(-3);
+            var query = player.Notifications
+                .Where(n => n.IsGameNotification && n.Timestamp >= cutoff);
+
+            if (unreadOnly)
+                query = query.Where(n => !n.IsRead);
+
+            return query.OrderByDescending(n => n.Timestamp).ToList();
+        }
+
+        public static int GetUnreadCount()
+        {
+            var player = AccountService.GetCurrentPlayer();
+            if (player == null) return 0;
+            var cutoff = DateTime.UtcNow.AddDays(-3);
+            return player.Notifications.Count(n => n.IsGameNotification && !n.IsRead && n.Timestamp >= cutoff);
+        }
+
+        public static void MarkAsRead(string notificationId)
+        {
+            var player = AccountService.GetCurrentPlayer();
+            var notif = player?.Notifications.FirstOrDefault(n => n.Id == notificationId);
+            if (notif != null && !notif.IsRead)
+            {
+                notif.IsRead = true;
+                _ = FirebaseService.SavePlayerAsync(player);
+                OnNotificationsUpdated?.Invoke();
+            }
+        }
+
+        public static void MarkAllAsRead()
+        {
+            var player = AccountService.GetCurrentPlayer();
+            if (player == null) return;
+            foreach (var n in player.Notifications)
+                n.IsRead = true;
+            _ = FirebaseService.SavePlayerAsync(player);
+            OnNotificationsUpdated?.Invoke();
+        }
+
+        public static void ClearAll()
+        {
+            // No need to clear – the list belongs to the player object and is replaced on login.
+            // This method can be left empty or removed.
+        }
     }
 }
