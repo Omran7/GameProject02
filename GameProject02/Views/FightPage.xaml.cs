@@ -437,19 +437,26 @@ public partial class FightPage : ContentPage, INotifyPropertyChanged
             int xpReward = _opponentPlayer.Level * 50;
             _player.CurrentXP += xpReward;
 
-            // Trigger level-up if needed
+            // Handle level‑up(s)
             while (_player.MainStatesObject.CanLevelUp())
+            {
                 _player.MainStatesObject.LevelUp();
+                // ✅ Level‑up notification
+                NotificationService.AddGameNotification(
+                    $"🎉 المستوى {_player.Level}!",
+                    $"تهانينا! وصلت للمستوى {_player.Level}\n+{_player.Level * 50} ذهب مكافأة",
+                    GameNotificationPriority.High, "🏆", "ProfilePage"
+                );
+            }
 
             // ✅ APPLY NOBILITY LOSS FOR LEAVING EARLY (10 POINTS)
             int nobilityLoss = NobilityService.ApplyNobilityLoss(_player, "leave_early");
-            AccountService.SavePlayer(_player); // Persist nobility change
+            AccountService.SavePlayer(_player);
 
             AddLog($"💰 حصلت على {xpReward} خبرة للمغادرة بعد الانتصار!");
             AddLog("🏃 هربت من مكان الشجار قبل وصول الشرطة!");
             AddLog($"⚠️ فقدت {nobilityLoss} نقاط شهامة!");
             await DisplayAlert("هروب ناجح", $"هربت قبل وصول الشرطة!\n❌ فقدت {nobilityLoss} نقاط شهامة\n حصلت على {xpReward} خبرة!", "موافق");
-
         }
 
         await Navigation.PopToRootAsync();

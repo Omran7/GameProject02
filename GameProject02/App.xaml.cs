@@ -80,7 +80,6 @@ public partial class App : Application
 #if DEBUG
     private async void CreateTestAccounts()
     {
-        // List of (username, password) to create
         var testAccounts = new[]
         {
             ("1234", "1234"),
@@ -98,10 +97,20 @@ public partial class App : Application
 
         foreach (var (username, password) in testAccounts)
         {
-            // Skip if already exists locally
-            if (AccountService.GetAllPlayers().Any(p => p.Username.Equals(username, StringComparison.OrdinalIgnoreCase)))
-                continue;
+            // 1) Does this username already exist in the cloud?
+            string existingPlayerId = await AccountService.GetPlayerIdByUsernameAsync(username);
+            if (existingPlayerId != null)
+            {
+                // Username is already taken → log in silently (don't register)
+                bool loggedIn = await AccountService.LoginAsync(username, password);
+                if (!loggedIn)
+                {
+                    System.Diagnostics.Debug.WriteLine($"[TEST] Could not log in existing account {username}");
+                }
+                continue;   // move on to the next test account
+            }
 
+            // 2) Username is free → register normally
             bool success = await AccountService.RegisterAccountAsync(username, password);
             if (success)
             {
@@ -109,9 +118,12 @@ public partial class App : Application
                 player.Gold = 999999999;
                 AddTestEstates(player);
 
-                // Save to cloud immediately (so they appear in remote store)
                 _ = FirebaseService.SavePlayerAsync(player);
                 System.Diagnostics.Debug.WriteLine($"[TEST] Created & saved: {username}");
+            }
+            else
+            {
+                System.Diagnostics.Debug.WriteLine($"[TEST] Registration failed for {username}");
             }
         }
 

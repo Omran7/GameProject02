@@ -329,7 +329,10 @@ public partial class TopHeaderView : ContentView
         UpdateMaxDigits(100);
         GoldLabel.Text = player.Gold.ToString("N0");
         DiamondLabel.Text = player.Diamonds.ToString("N0");
-        XPLabel.Text = $"{player.CurrentXP:N0}/{player.MaxXP:N0}";
+
+        // ✅ Use the actual next‑level requirement instead of player.MaxXP
+        long requiredXp = player.MainStatesObject.GetXpRequiredForNextLevel();
+        XPLabel.Text = $"{player.CurrentXP:N0}/{requiredXp:N0}";
 
         CourageText.Text = $"{player.Courage}/{player.MaxCourage}";
         EnergyText.Text = $"{player.Energy}/{player.MaxEnergy}";
@@ -347,10 +350,12 @@ public partial class TopHeaderView : ContentView
 
         // ═══ شريط الخبرة ═══
         if (XPBarContainer.Width > 10)
-            XPFill.WidthRequest = XPBarContainer.Width *
-                (player.MaxXP > 0
-                    ? Math.Clamp((double)player.CurrentXP / player.MaxXP, 0, 1)
-                    : 0);
+        {
+            double ratio = requiredXp > 0
+                ? Math.Clamp((double)player.CurrentXP / requiredXp, 0, 1)
+                : 0;
+            XPFill.WidthRequest = XPBarContainer.Width * ratio;
+        }
     }
 
     private void UpdateLevelDigits(int level)

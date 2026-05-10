@@ -32,8 +32,18 @@ namespace GameProject02.Services
             if (string.IsNullOrWhiteSpace(username) || username.Length < 3) return false;
             if (string.IsNullOrWhiteSpace(password) || password.Length < 4) return false;
 
+            // ✅ Check local cache (fast)
             if (_localAccounts.Values.Any(x => x.Username.Equals(username, StringComparison.OrdinalIgnoreCase)))
                 return false;
+
+            // ✅ 🔥 NEW: Check the cloud username mapping (prevents overwrite)
+            string existingPlayerId = await GetPlayerIdByUsernameAsync(username);
+            if (existingPlayerId != null)
+            {
+                // Username already exists in the cloud – cannot register again
+                await ShowAlert("Registration Failed", "This username is already taken. Please choose another.");
+                return false;
+            }
 
             var account = new PlayerAccount
             {
@@ -62,10 +72,7 @@ namespace GameProject02.Services
             if (!mappingSaved)
                 await ShowAlert("Warning", "Account created, but username lookup may not work on other devices.");
 
-            // ✅ CLEAR any leftover notifications from previous user, then add the welcome
-            NotificationService.ClearAll();
-
-            // ✅ WELCOME NOTIFICATION
+            // Welcome notification
             NotificationService.AddGameNotification(
                 title: "🎉 مرحباً!",
                 message: $"أهلاً بك {username}! ابدأ رحلتك في عالم الجريمة",
@@ -77,44 +84,47 @@ namespace GameProject02.Services
             RegenerationService.Start(_currentUser);
             return true;
         }
-
-        // ... (rest of AccountService code unchanged until LoginAsync)
-
         public static async Task<bool> LoginAsync(string username, string password)
         {
-            var account = _localAccounts.Values
+            // 1. Attempt to find the player in the local cache
+            var localAccount = _localAccounts.Values
                 .FirstOrDefault(x => x.Username.Equals(username, StringComparison.OrdinalIgnoreCase));
 
-            if (account == null)
+            // 2. Determine the playerId (either from local cache or from the username mapping)
+            string playerId = localAccount?.PlayerId ?? await GetPlayerIdByUsernameAsync(username);
+            if (string.IsNullOrEmpty(playerId))
             {
-                string playerId = await GetPlayerIdByUsernameAsync(username);
-                if (playerId == null)
-                {
-                    await ShowAlert("Cloud Error", $"Username '{username}' not found.");
-                    return false;
-                }
-
-                account = await FirebaseService.LoadPlayerAsync(playerId);
-                if (account == null)
-                {
-                    await ShowAlert("Cloud Error", "Player data could not be loaded.");
-                    return false;
-                }
-
-                _localAccounts[account.PlayerId] = account;
-                RegisterPlayer(account);
+                await ShowAlert("Cloud Error", $"Username '{username}' not found.");
+                return false;
             }
 
-            if (account.PasswordHash != HashPassword(password))
+            // 3. ALWAYS load the latest data from Firestore
+            var cloudAccount = await FirebaseService.LoadPlayerAsync(playerId);
+            if (cloudAccount == null)
+            {
+                await ShowAlert("Cloud Error", "Player data could not be loaded.");
+                return false;
+            }
+
+            // 4. Check password (using the cloud data, which is the source of truth)
+            if (cloudAccount.PasswordHash != HashPassword(password))
             {
                 await ShowAlert("Login Failed", "Incorrect password.");
                 return false;
             }
 
-            _currentUser = account;
-            EnsurePlayerRegistered(account);
+            // 5. Update the local cache with the fresh cloud data
+            _localAccounts[cloudAccount.PlayerId] = cloudAccount;
 
-            // No need to clear or load notifications – they are part of the player object
+            // 6. Remove the old cached instance if its PlayerId changed (shouldn't happen, but safety)
+            if (localAccount != null && localAccount.PlayerId != cloudAccount.PlayerId)
+                _localAccounts.Remove(localAccount.PlayerId);
+
+            _currentUser = cloudAccount;
+            RegisterPlayer(cloudAccount);
+            EnsurePlayerRegistered(cloudAccount);
+
+            // Notifications are already inside the player object – no extra load needed
 
             RegenerationService.Start(_currentUser);
             return true;
@@ -135,8 +145,7 @@ namespace GameProject02.Services
             if (player != null)
                 _ = FirebaseService.SavePlayerAsync(player);
 
-            // ✅ Clear notifications (already there, but good to keep)
-            NotificationService.ClearAll();
+            NotificationService.ClearAll();   // harmless cleanup
             _currentUser = null;
         }
 
@@ -154,6 +163,7 @@ namespace GameProject02.Services
             System.Diagnostics.Debug.WriteLine($"[SAVE] Player {player?.Username} state preserved");
         }
 
+        // Legacy training (kept for compatibility)
         public static void TrainAtGym()
         {
             if (_currentUser == null) return;
@@ -173,6 +183,9 @@ namespace GameProject02.Services
             CheckLevelUp();
         }
 
+        // This is ONLY used by the legacy training methods.
+        // For other XP sources (CrimeService, FightClubService, etc.) 
+        // you must manually add a level‑up notification after calling MainStatesObject.LevelUp().
         private static void CheckLevelUp()
         {
             if (_currentUser == null) return;
@@ -185,7 +198,7 @@ namespace GameProject02.Services
                 _currentUser.Gold += _currentUser.Level * 50;
                 _currentUser.Medals++;
 
-                // ✅ LEVEL UP NOTIFICATION
+                // Level‑up notification (uses the new NotificationService)
                 NotificationService.AddGameNotification(
                     title: $"🎉 المستوى {_currentUser.Level}!",
                     message: $"تهانينا! وصلت للمستوى {_currentUser.Level}\n+{_currentUser.Level * 50} ذهب مكافأة",
@@ -193,6 +206,10 @@ namespace GameProject02.Services
                     icon: "🏆",
                     actionTarget: "ProfilePage"
                 );
+
+                // Also save the player after the level‑up (the notification itself will trigger a save,
+                // but an extra save ensures the new stats are also persisted immediately)
+                _ = FirebaseService.SavePlayerAsync(_currentUser);
             }
             else
             {
@@ -208,6 +225,7 @@ namespace GameProject02.Services
 
         public static List<PlayerAccount> GetAllPlayers() => _allPlayers;
         public static PlayerAccount GetPlayerById(string id) => _allPlayers.FirstOrDefault(p => p.PlayerId == id);
+
         public static void EnsurePlayerRegistered(PlayerAccount player)
         {
             if (!_allPlayers.Contains(player))
@@ -234,7 +252,7 @@ namespace GameProject02.Services
             }
         }
 
-        private static async Task<string> GetPlayerIdByUsernameAsync(string username)
+        public static async Task<string> GetPlayerIdByUsernameAsync(string username)
         {
             try
             {

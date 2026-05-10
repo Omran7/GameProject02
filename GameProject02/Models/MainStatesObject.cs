@@ -36,19 +36,17 @@ public class MainStatesObject
     {
         if (!CanLevelUp()) return;
 
+        // ✅ Store the XP required BEFORE incrementing Level
+        long requiredXp = GetXpRequiredForNextLevel();
+
         Level++;
-        CurrentExperience -= GetXpRequiredForNextLevel();
+        CurrentExperience -= requiredXp;   // subtract the old level's requirement
 
-        // ✅ RESTORE COURAGE TO MAX (AUTHENTIC OLD GAME)
+        // Rest of the original logic unchanged
         CourageCurrent = CourageMax;
-
-        // ✅ INCREASE MAX COURAGE (2 points per level)
         CourageMax += 2;
-
-        // ✅ INCREASE MAX HEALTH (5 points per level)
         HealthMax += 5;
 
-        // ✅ INCREASE STATS (1 point per 5 levels)
         if (Level % 5 == 0)
         {
             Dexterity++;
