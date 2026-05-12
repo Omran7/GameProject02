@@ -1,4 +1,5 @@
 ﻿using GameProject02.Services;
+using GameProject02.Views;
 using Microsoft.Maui.Controls;
 using System;
 using System.Threading.Tasks;
@@ -35,7 +36,19 @@ namespace GameProject02.Views
                     var player = AccountService.GetCurrentPlayer();
                     player.CrimeObject.CheckConfinementStatus();
 
-                    if (player.CrimeObject.IsInPrison)
+                    // ✅ if in plane → present PlanePage modally (cannot go back)
+                    if (player.CrimeObject.IsInPlane &&
+                        player.CrimeObject.FlightReleaseTime > DateTimeOffset.UtcNow.ToUnixTimeMilliseconds())
+                    {
+                        var planePage = new PlanePage(player, player.City, player.CrimeObject.FlightReleaseTime);
+                        Application.Current.MainPage = new NavigationPage(new MainPage()); // temporary root
+                        await Application.Current.MainPage.Navigation.PushModalAsync(new NavigationPage(planePage)
+                        {
+                            BarBackgroundColor = Color.FromArgb("#2c3e50"),
+                            BarTextColor = Colors.White
+                        });
+                    }
+                    else if (player.CrimeObject.IsInPrison)
                     {
                         Application.Current.MainPage = new NavigationPage(new PrisonPage())
                         {
@@ -73,10 +86,8 @@ namespace GameProject02.Views
             }
         }
 
-        private async void OnRegisterClicked(object sender, EventArgs e)
-        {
+        private async void OnRegisterClicked(object sender, EventArgs e) =>
             await Navigation.PushAsync(new RegisterPage());
-        }
 
         private void ShowError(string message)
         {
@@ -84,7 +95,6 @@ namespace GameProject02.Views
             ErrorMessage.IsVisible = true;
             ErrorMessage.Opacity = 0;
             ErrorMessage.FadeTo(1, 700, Easing.CubicInOut);
-
             _ = Task.Delay(5000).ContinueWith(_ =>
             {
                 MainThread.BeginInvokeOnMainThread(() =>

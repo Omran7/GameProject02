@@ -61,7 +61,7 @@ public partial class CityMapPage : ContentPage
                     await DisplayAlert("Bank", "Banking system coming soon.", "OK");
                     break;
                 case "Airport":
-                    await DisplayAlert("Airport", "Banking system coming soon.", "OK");
+                    await Navigation.PushAsync(new AirportPage());
                     break;
                 case "CityDatabase":
                     await DisplayAlert("Settings", "Banking system coming soon.", "OK");

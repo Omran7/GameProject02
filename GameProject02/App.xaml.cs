@@ -51,6 +51,9 @@ public partial class App : Application
                     CheckAndNavigateToPrisonIfNeeded();
                 else if (currentPlayer.CrimeObject.IsInHospital)
                     CheckAndNavigateToHospitalIfNeeded();
+                // ✅ NEW: also check for plane confinement
+                else if (currentPlayer.CrimeObject.IsInPlane)
+                    CheckAndNavigateToPlaneIfNeeded();
             }
         });
     }
@@ -74,6 +77,7 @@ public partial class App : Application
 
         CheckAndNavigateToPrisonIfNeeded();
         CheckAndNavigateToHospitalIfNeeded();
+        CheckAndNavigateToPlaneIfNeeded();   // ✅ NEW
     }
 
     // ── Test accounts (debug only) ──────────────────────────────────
@@ -210,6 +214,40 @@ public partial class App : Application
         }
     }
 
+    // ✅ NEW PLANE REDIRECT
+    // Replace the old CheckAndNavigateToPlaneIfNeeded with this:
+    private void CheckAndNavigateToPlaneIfNeeded()
+    {
+        var player = AccountService.GetCurrentPlayer();
+        if (player == null || !player.CrimeObject.IsInPlane) return;
+
+        long now = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+        if (player.CrimeObject.FlightReleaseTime <= now)
+        {
+            player.CrimeObject.IsInPlane = false;
+            player.CrimeObject.FlightReleaseTime = 0;
+            _ = FirebaseService.SavePlayerAsync(player);
+            return;
+        }
+
+        MainThread.BeginInvokeOnMainThread(async () =>
+        {
+            await Task.Delay(500);
+            if (MainPage is NavigationPage navPage)
+            {
+                if (navPage.CurrentPage is PlanePage) return;
+                if (navPage.CurrentPage is MainPage)
+                {
+                    var planePage = new PlanePage(player, player.City, player.CrimeObject.FlightReleaseTime);
+                    await navPage.Navigation.PushModalAsync(new NavigationPage(planePage)
+                    {
+                        BarBackgroundColor = Color.FromArgb("#2c3e50"),
+                        BarTextColor = Colors.White
+                    });
+                }
+            }
+        });
+    }
     protected override void OnStart()
     {
         base.OnStart();

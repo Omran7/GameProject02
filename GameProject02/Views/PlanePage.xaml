@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="GameProject02.Views.PlanePage"
+			 ControlTemplate="{StaticResource StickyHeaderTemplate}"
+             Title="  ✈️ في الرحلة"
+			 FlowDirection="RightToLeft"
+             BackgroundColor="#1a1a1a"
+			 NavigationPage.HasNavigationBar="False">
+
+	<Grid RowDefinitions="Auto,*,Auto" Padding="8">
+		<!-- Flight info -->
+		<Border Grid.Row="0" BackgroundColor="#0a0a0a" Stroke="#f39c12"
+                StrokeThickness="2" Padding="10">
+			<Grid RowDefinitions="Auto,Auto,Auto,Auto">
+				<Label Text="معلومات الرحلة" TextColor="#f39c12"
+                       FontSize="16" FontAttributes="Bold"/>
+				<HorizontalStackLayout Grid.Row="1" Spacing="4">
+					<Label Text="الوجهة:" TextColor="White" FontSize="12"/>
+					<Label x:Name="DestinationLabel" Text="..." TextColor="#f39c12"
+                           FontSize="12" FontAttributes="Bold"/>
+				</HorizontalStackLayout>
+				<HorizontalStackLayout Grid.Row="2" Spacing="4">
+					<Label Text="الوقت المتبقي:" TextColor="White" FontSize="12"/>
+					<Label x:Name="TimeLabel" Text="00:00:00" TextColor="#2ecc71"
+                           FontSize="12" FontAttributes="Bold"/>
+				</HorizontalStackLayout>
+				<HorizontalStackLayout Grid.Row="3" Spacing="4">
+					<Label Text="الارتفاع:" TextColor="White" FontSize="12"/>
+					<Label x:Name="AltitudeLabel" Text="0 m" TextColor="#cccccc" FontSize="12"/>
+					<Label Text="الحرارة:" TextColor="White" FontSize="12" Margin="20,0,0,0"/>
+					<Label x:Name="TemperatureLabel" Text="0 °C" TextColor="#cccccc" FontSize="12"/>
+				</HorizontalStackLayout>
+			</Grid>
+		</Border>
+
+		<Label Grid.Row="1" Text="✈️ تحلق فوق المدينة..." TextColor="#888" FontSize="18"
+               HorizontalOptions="Center" VerticalOptions="Center"/>
+
+		<!-- Bottom bar (same as old game: Chat, News, Shop) -->
+		<Grid Grid.Row="2" ColumnDefinitions="*,*,*">
+			<Button Text="💬 محادثة" BackgroundColor="#2c3e50" TextColor="White"
+                    Clicked="OnChatClicked"/>
+			<Button Grid.Column="1" Text="📰 أخبار" BackgroundColor="#2c3e50" TextColor="White"
+                    Clicked="OnNewsClicked"/>
+			<Button Grid.Column="2" Text="🛒 متجر" BackgroundColor="#2c3e50" TextColor="White"
+                    Clicked="OnShopClicked"/>
+		</Grid>
+	</Grid>
+</ContentPage>

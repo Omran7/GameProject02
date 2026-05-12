@@ -15,11 +15,13 @@ namespace GameProject02.Services
 
             var allPlayers = AccountService.GetAllPlayers();
 
+            // Build the raw list, then deduplicate by Username (keep highest level)
             return allPlayers
                 .Where(p =>
                     p.PlayerId != currentPlayer.PlayerId &&
                     !p.CrimeObject.IsInHospital &&
                     !p.CrimeObject.IsInPrison &&
+                    !p.CrimeObject.IsInPlane &&          // exclude players in flight
                     p.City == currentPlayer.City)
                 .Select(p => new FightClubPlayer
                 {
@@ -34,6 +36,8 @@ namespace GameProject02.Services
                     Speed = p.Speed,
                     Dexterity = p.Dexterity
                 })
+                .GroupBy(p => p.Username)                 // remove duplicate usernames
+                .Select(g => g.OrderByDescending(p => p.Level).First())
                 .OrderByDescending(p => p.Level)
                 .ToList();
         }

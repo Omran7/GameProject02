@@ -360,6 +360,8 @@ namespace GameProject02.Services
         });
 
         private static object CrimeObjectToMap(CrimeObject c) => MapValue(new Dictionary<string, object> {
+            { "isInPlane"             , BooleanValue(c.IsInPlane) },
+            { "flightReleaseTime"     , IntegerValue(c.FlightReleaseTime) },
             { "currentCrimeType"         , IntegerValue(c.CurrentCrimeType) },
             { "isInPrison"               , BooleanValue(c.IsInPrison) },
             { "prisonReleaseTime"        , IntegerValue(c.PrisonReleaseTime) },
@@ -553,6 +555,8 @@ namespace GameProject02.Services
             var fields = mapField.GetMapFieldsNullable();
             if (fields == null) return new CrimeObject();
             var c = new CrimeObject();
+            c.IsInPlane = fields.Value.GetBoolean("isInPlane");
+            c.FlightReleaseTime = fields.Value.GetInt64("flightReleaseTime");
             c.CurrentCrimeType = fields.Value.GetInt32("currentCrimeType");
             c.IsInPrison = fields.Value.GetBoolean("isInPrison");
             c.PrisonReleaseTime = fields.Value.GetInt64("prisonReleaseTime");

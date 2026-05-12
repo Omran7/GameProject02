@@ -1,92 +1,203 @@
 ﻿using GameProject02.Models;
 using GameProject02.Services;
 using Microsoft.Maui.Controls;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using System.Timers;
 
-namespace GameProject02.Views;
-
-public partial class NewsPage : ContentPage
+namespace GameProject02.Views
 {
-    private System.Timers.Timer _clockTimer;
-
-    public NewsPage()
+    public partial class NewsPage : ContentPage
     {
-        InitializeComponent();
-        LoadNews();
-        StartClock();
-    }
+        private System.Timers.Timer _clockTimer;
+        private List<NewsItem> _playerAds = new();
+        private List<NewsItem> _systemAds = new();
+        private NewsItem _latestBounty;
+        private string _activeTab = "ads"; // ads, system, bounty, all
 
-    private void StartClock()
-    {
-        // Update clock every second like the old project
-        _clockTimer = new System.Timers.Timer(1000);
-        _clockTimer.Elapsed += (s, e) => MainThread.BeginInvokeOnMainThread(UpdateClockUI);
-        _clockTimer.AutoReset = true;
-        _clockTimer.Enabled = true;
-        UpdateClockUI();
-    }
-
-    private void UpdateClockUI()
-    {
-        var now = DateTime.Now;
-        ServerTimeLabel.Text = now.ToString("HH:mm:ss");
-        ServerDateLabel.Text = now.ToString("dd-MM-yyyy");
-        ServerDayLabel.Text = now.ToString("dddd").ToUpper();
-    }
-
-    private void LoadNews()
-    {
-        var news = NewsService.GetLatestNews();
-        NewsList.ItemsSource = news;
-    }
-
-    private async void OnPublishAdClicked(object sender, EventArgs e)
-    {
-        // Check player gold like the old project (20,000 cost)
-        var player = AccountService.GetCurrentPlayer();
-        if (player == null) return;
-
-        if (player.Gold < 20000)
+        public NewsPage()
         {
-            await DisplayAlert("Low Funds", "You need 20,000 gold to broadcast a message city-wide.", "OK");
-            return;
+            InitializeComponent();
+            StartClock();
         }
 
-        string message = await DisplayPromptAsync("City Broadcast",
-            "Enter your message (Max 50 characters):",
-            "Publish", "Cancel",
-            maxLength: 50,
-            keyboard: Keyboard.Text);
-
-        if (!string.IsNullOrWhiteSpace(message))
+        protected override async void OnAppearing()
         {
-            // Deduct funds
-            player.Gold -= 20000;
+            base.OnAppearing();
+            await LoadAllData();
+        }
 
-            // In a real app, this would push to Firebase. 
-            // For now, we add it to our local list.
-            var ad = new NewsItem
+        protected override void OnDisappearing()
+        {
+            base.OnDisappearing();
+            _clockTimer?.Stop();
+            _clockTimer?.Dispose();
+        }
+
+        // ── Live Clock ───────────────────────────────────────────
+        private void StartClock()
+        {
+            _clockTimer = new System.Timers.Timer(1000);
+            _clockTimer.Elapsed += (s, e) =>
+                MainThread.BeginInvokeOnMainThread(UpdateClockUI);
+            _clockTimer.AutoReset = true;
+            _clockTimer.Enabled = true;
+            UpdateClockUI();
+        }
+
+        private void UpdateClockUI()
+        {
+            var now = DateTime.Now;
+            ServerTimeLabel.Text = now.ToString("HH:mm:ss");
+            ServerDateLabel.Text = now.ToString("dd-MM-yyyy");
+            ServerDayLabel.Text = now.ToString("dddd").ToUpper();
+        }
+
+        // ── Firebase Loading ─────────────────────────────────────
+        private async Task LoadAllData()
+        {
+            try
             {
-                Author = player.Username ?? "Anonymous",
-                Content = message,
-                Date = DateTime.Now,
-                Type = NewsType.PlayerAd,
-                Icon = "👤"
-            };
+                _playerAds = await NewsService.GetPlayerAdsAsync();
+                _systemAds = await NewsService.GetSystemAdsAsync();
+                _latestBounty = await NewsService.GetLatestBountyAsync();
 
-            var currentList = (List<NewsItem>)NewsList.ItemsSource;
-            currentList.Insert(0, ad);
-            NewsList.ItemsSource = null;
-            NewsList.ItemsSource = currentList;
-
-            await DisplayAlert("Success", "Your ad has been broadcast to the city!", "OK");
+                UpdateFeaturedSections();
+                ApplyActiveTab();
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"[News] Load error: {ex.Message}");
+            }
         }
-    }
 
-    protected override void OnDisappearing()
-    {
-        base.OnDisappearing();
-        _clockTimer?.Stop();
-        _clockTimer?.Dispose();
+        // ── Featured Sections ────────────────────────────────────
+        private void UpdateFeaturedSections()
+        {
+            // Last ad
+            var lastAd = _playerAds.OrderByDescending(a => a.Timestamp).FirstOrDefault();
+            if (lastAd != null)
+            {
+                LastAdAuthor.Text = lastAd.Author;
+                LastAdContent.Text = lastAd.Content;
+            }
+            else
+            {
+                LastAdAuthor.Text = "—";
+                LastAdContent.Text = "No ads yet";
+            }
+
+            // Top bounty
+            if (_latestBounty != null)
+            {
+                BountyName.Text = _latestBounty.BountyPlayerName;
+                BountyLevel.Text = $"Lv.{_latestBounty.BountyLevel}";
+                BountyCost.Text = $"{_latestBounty.BountyCost:N0} ذهب";
+                BountyPlace.Text = $"📍 {_latestBounty.BountyPlace}";
+                BountyDesc.Text = _latestBounty.BountyDescription;
+            }
+            else
+            {
+                BountyName.Text = "—";
+                BountyLevel.Text = "";
+                BountyCost.Text = "";
+                BountyPlace.Text = "";
+                BountyDesc.Text = "No bounties available";
+            }
+        }
+
+        // ── Tab Switching ────────────────────────────────────────
+        private void ApplyActiveTab()
+        {
+            UpdateTabColors();
+            List<NewsItem> items = _activeTab switch
+            {
+                "ads" => _playerAds,
+                "system" => _systemAds,
+                "all" => _playerAds.Concat(_systemAds)
+                    .OrderByDescending(n => n.Timestamp).ToList(),
+                _ => new List<NewsItem>()
+            };
+            NewsList.ItemsSource = items;
+        }
+
+        private void UpdateTabColors()
+        {
+            RankTab.BackgroundColor = _activeTab == "rank"
+                ? Color.FromArgb("#3498db") : Color.FromArgb("#2c3e50");
+            JobsTab.BackgroundColor = _activeTab == "jobs"
+                ? Color.FromArgb("#3498db") : Color.FromArgb("#2c3e50");
+            AdsTab.BackgroundColor = _activeTab == "ads"
+                ? Color.FromArgb("#3498db") : Color.FromArgb("#2c3e50");
+            GuardTab.BackgroundColor = _activeTab == "guard"
+                ? Color.FromArgb("#3498db") : Color.FromArgb("#2c3e50");
+        }
+
+        private void OnRankTabClicked(object sender, EventArgs e) =>
+            SetTab("rank");
+        private void OnJobsTabClicked(object sender, EventArgs e) =>
+            SetTab("jobs");
+        private void OnAdsTabClicked(object sender, EventArgs e) =>
+            SetTab("ads");
+        private void OnGuardTabClicked(object sender, EventArgs e) =>
+            SetTab("guard");
+
+        private void SetTab(string tab)
+        {
+            _activeTab = tab;
+            ApplyActiveTab();
+        }
+
+        // ── Publish Ad ───────────────────────────────────────────
+        private async void OnPublishAdClicked(object sender, EventArgs e)
+        {
+            var player = AccountService.GetCurrentPlayer();
+            if (player == null) return;
+
+            if (player.Gold < 20000)
+            {
+                await DisplayAlert("أموال غير كافية",
+                    "تحتاج 20,000 ذهب للنشر", "موافق");
+                return;
+            }
+
+            string message = await DisplayPromptAsync(
+                "نشر إعلان", "أدخل رسالتك (حد أقصى 50 حرفاً):",
+                "نشر", "إلغاء", maxLength: 50, keyboard: Keyboard.Text);
+
+            if (string.IsNullOrWhiteSpace(message)) return;
+
+            var (success, resultMessage) = await NewsService.PublishAdAsync(
+                player, message);
+
+            await DisplayAlert(success ? "تم النشر" : "خطأ",
+                resultMessage, "موافق");
+
+            if (success)
+            {
+                _playerAds.Insert(0, new NewsItem
+                {
+                    Author = player.Username,
+                    Content = message,
+                    Date = DateTime.Now,
+                    Type = NewsType.PlayerAd,
+                    Icon = "📢"
+                });
+                ApplyActiveTab();
+                UpdateFeaturedSections();
+            }
+        }
+
+        // ── Navigation ───────────────────────────────────────────
+        private async void OnBackClicked(object sender, EventArgs e) =>
+            await Navigation.PopAsync();
+
+        private async void OnRefreshClicked(object sender, EventArgs e)
+        {
+            await LoadAllData();
+            await DisplayAlert("تم", "تم تحديث البيانات", "موافق");
+        }
     }
 }

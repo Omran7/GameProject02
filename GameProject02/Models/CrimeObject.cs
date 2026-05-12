@@ -26,6 +26,10 @@ public class CrimeObject
     public long HospitalReleaseTime { get; set; } = 0;
     public string HospitalReason { get; set; } = "جرحت نفسك أثناء جريمة فاشلة";
 
+    // ── نظام الطائرة ─────────────────────────────────────────────────
+    public bool IsInPlane { get; set; } = false;
+    public long FlightReleaseTime { get; set; } = 0;
+
     // ── الصحة (للمستشفى) ─────────────────────────────────────────────────────
     public int HealthCurrent { get; set; } = 100;
     public int HealthMax { get; set; } = 100;
@@ -69,8 +73,14 @@ public class CrimeObject
             HospitalReleaseTime = 0;
             HealthCurrent = HealthMax;
         }
-    }
 
+        // ✅ Clear plane state when flight expired
+        if (IsInPlane && now >= FlightReleaseTime)
+        {
+            IsInPlane = false;
+            FlightReleaseTime = 0;
+        }
+    }
     public static int GetGlobalTaskId(int crimeTypeId, int crimeItemId)
         => crimeTypeId * 100 + crimeItemId;
 }
