@@ -66,7 +66,22 @@ namespace GameProject02.Services
                 if (!root.TryGetProperty("fields", out var fieldsElement))
                     return null;
 
-                return ParsePlayerFromFirestoreFields(fieldsElement, playerId);
+                var player = ParsePlayerFromFirestoreFields(fieldsElement, playerId);
+                if (player == null) return null;
+
+                // ✅ Load the gang if the player has a GangId
+                if (!string.IsNullOrEmpty(player.GangId))
+                {
+                    player.GangObject = await GangDatabaseService.GetGangAsync(player.GangId);
+                    if (player.GangObject == null)
+                    {
+                        // Gang no longer exists – clear the reference
+                        player.GangId = string.Empty;
+                        await SavePlayerAsync(player); // persist the change
+                    }
+                }
+
+                return player;
             }
             catch (Exception ex)
             {
@@ -96,6 +111,7 @@ namespace GameProject02.Services
             fields["medals"] = IntegerValue(p.Medals);
 
             // ── Currencies ──
+            fields["level"] = IntegerValue(p.Level);
             fields["gold"] = IntegerValue(p.Gold);
             fields["diamonds"] = IntegerValue(p.Diamonds);
             fields["checks"] = IntegerValue(p.Checks);
@@ -127,9 +143,10 @@ namespace GameProject02.Services
             fields["nobilityProgress"] = DoubleValue(p.NobilityProgress);
             fields["nobilityText"] = StringValue(p.NobilityText);
 
-            // ── General Stats ──
+            // ── General Stats (including PersonalRespect) ──
             fields["personalContribution"] = IntegerValue(p.PersonalContribution);
             fields["personalLoyalty"] = IntegerValue(p.PersonalLoyalty);
+            fields["personalRespect"] = IntegerValue(p.PersonalRespect);  // ✅ ADDED
             fields["crystalCount"] = IntegerValue(p.CrystalCount);
             fields["crimeAttempts"] = IntegerValue(p.CrimeAttempts);
             fields["shovels"] = IntegerValue(p.Shovels);
@@ -188,7 +205,7 @@ namespace GameProject02.Services
             fields["gym"] = GymObjectToMap(p.Gym);
 
             // ── Gang (store only reference ID) ──
-            fields["gangId"] = StringValue(p.GangObject?.GangId ?? "");
+            fields["gangId"] = StringValue(p.GangObject?.GangId ?? p.GangId ?? "");
 
             // ✅ NOTIFICATIONS (embedded list)
             fields["notifications"] = ArrayValue(
@@ -231,6 +248,7 @@ namespace GameProject02.Services
             p.Medals = fields.GetInt32("medals");
 
             // ── Currencies ──
+            p.Level = fields.GetInt32("level");
             p.Gold = fields.GetInt32("gold");
             p.Diamonds = fields.GetInt32("diamonds");
             p.Checks = fields.GetInt32("checks");
@@ -262,9 +280,10 @@ namespace GameProject02.Services
             p.NobilityProgress = fields.GetDouble("nobilityProgress");
             p.NobilityText = fields.GetString("nobilityText") ?? "";
 
-            // ── General Stats ──
+            // ── General Stats (including PersonalRespect) ──
             p.PersonalContribution = fields.GetInt32("personalContribution");
             p.PersonalLoyalty = fields.GetInt64("personalLoyalty");
+            p.PersonalRespect = fields.GetInt64("personalRespect");  // ✅ ADDED
             p.CrystalCount = fields.GetInt32("crystalCount");
             p.CrimeAttempts = fields.GetInt32("crimeAttempts");
             p.Shovels = fields.GetInt32("shovels");
@@ -329,6 +348,9 @@ namespace GameProject02.Services
                 p.Notifications = ParseNotificationsList(notificationsProp);
             }
 
+            // Load gang ID
+            p.GangId = fields.GetString("gangId") ?? "";
+
             // Recalculate combat stats
             p.Combat.RecalculateStats(p);
 
@@ -349,7 +371,7 @@ namespace GameProject02.Services
         private static object MapValue(Dictionary<string, object> fields) => new { mapValue = new { fields } };
 
         // ═══════════════════════════════════════════════════════════════
-        // MODEL → MAP CONVERTERS
+        // MODEL → MAP CONVERTERS (unchanged from your original)
         // ═══════════════════════════════════════════════════════════════
 
         private static object SkillToMap(Skill s) => MapValue(new Dictionary<string, object> {
@@ -535,7 +557,7 @@ namespace GameProject02.Services
                         ?? new Dictionary<string, object>());
 
         // ═══════════════════════════════════════════════════════════════
-        // DESERIALIZATION PARSERS
+        // DESERIALIZATION PARSERS (unchanged from your original)
         // ═══════════════════════════════════════════════════════════════
 
         private static Skill ParseSkill(JsonElement mapField)
@@ -841,7 +863,7 @@ namespace GameProject02.Services
         }
 
         // ═══════════════════════════════════════════════════════════════
-        // GENERIC DESERIALIZATION HELPERS
+        // GENERIC DESERIALIZATION HELPERS (unchanged)
         // ═══════════════════════════════════════════════════════════════
 
         private static JsonElement? GetMapFieldsNullable(this JsonElement element)

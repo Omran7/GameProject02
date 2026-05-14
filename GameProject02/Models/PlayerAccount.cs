@@ -137,6 +137,15 @@ public class PlayerAccount : INotifyPropertyChanged
     //  إحصائيات عامة
     // ══════════════════════════════════════════════════════════════════
     public long PersonalContribution { get; set; } = 0;
+
+    // ✅ NEW: PersonalRespect (used in gang militia rewards)
+    private long _personalRespect = 0;
+    public long PersonalRespect
+    {
+        get => _personalRespect;
+        set { _personalRespect = value; OnPropertyChanged(); }
+    }
+
     public long PersonalLoyalty
     {
         get => _personalLoyalty;
@@ -158,6 +167,8 @@ public class PlayerAccount : INotifyPropertyChanged
     public int Flights { get; set; } = 0;
     public int HerbsUsed { get; set; } = 0;
     public int ItemsFound { get; set; } = 0;
+
+    public string GangId { get; set; } = string.Empty;
 
     // ══════════════════════════════════════════════════════════════════
     //  مهارات المدرسة
@@ -258,8 +269,9 @@ public class PlayerAccount : INotifyPropertyChanged
             LastCourageRechargeTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()
         };
         ArmingObject = new ArmingObject();
-        Notifications = new List<NotificationItem>(); // ✅ initialize notifications list
+        Notifications = new List<NotificationItem>();
         AvatarPath = Preferences.Get("AvatarPath", "player_avatar.png");
+        GangId = string.Empty;
     }
 }
 

@@ -18,7 +18,7 @@
                 <Label Text="CRIME CITY HUD" FontSize="20" TextColor="#45b7d1" HorizontalOptions="Center" FontAttributes="Bold" Margin="0,10" />
 
                 <!-- Action Buttons -->
-                <Grid ColumnDefinitions="*, *" RowDefinitions="Auto, Auto, Auto, Auto, Auto, Auto, Auto, Auto" ColumnSpacing="15" RowSpacing="15">
+                <Grid ColumnDefinitions="*, *" RowDefinitions="Auto, Auto, Auto, Auto, Auto, Auto, Auto, Auto, Auto" ColumnSpacing="15" RowSpacing="15">
 
                     <Button Grid.Row="0" Grid.Column="0" x:Name="GymButton" Text="💪 النادي" 
                             BackgroundColor="#ff6b6b" TextColor="White" HeightRequest="60" CornerRadius="12" Clicked="OnGymClicked"/>
@@ -67,6 +67,9 @@
 
                     <Button Grid.Row="7" Grid.Column="0" Text="✈️ المطار" 
                             BackgroundColor="#8e44ad" TextColor="White" HeightRequest="60" CornerRadius="12" FontAttributes="Bold" Clicked="OnAirportClicked"/>
+
+                    <Button Grid.Row="8" Grid.Column="1" Text="💬 الشات" 
+                            BackgroundColor="#8e44ad" TextColor="White" HeightRequest="60" CornerRadius="12" FontAttributes="Bold" Clicked="OnChatClicked"/>
                 </Grid>
 
                 <Button Text="👤 الملف الشخصي" 

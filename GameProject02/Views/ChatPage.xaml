@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="GameProject02.Views.ChatPage"
+             Title="💬 المحادثة"
+             BackgroundColor="#1a1a1a">
+
+	<Grid RowDefinitions="Auto,*,Auto" Padding="0">
+
+		<!-- Channel Tabs -->
+		<HorizontalStackLayout Grid.Row="0" x:Name="ChannelTabs"
+                               BackgroundColor="#0a0a0a" Padding="8" Spacing="4">
+			<Button x:Name="WorldwideTab" Text="🌍 العالمية"
+                    BackgroundColor="#3498db" TextColor="White"
+                    Clicked="OnWorldwideTabClicked" FontSize="12" Padding="8,4"/>
+			<Button x:Name="GangTab" Text="👥 العصابة"
+                    BackgroundColor="#2c3e50" TextColor="White"
+                    Clicked="OnGangTabClicked" FontSize="12" Padding="8,4"
+                    IsVisible="False"/>
+			<Button x:Name="PlaceTab" Text="📍 المكان"
+                    BackgroundColor="#2c3e50" TextColor="White"
+                    Clicked="OnPlaceTabClicked" FontSize="12" Padding="8,4"
+                    IsVisible="False"/>
+		</HorizontalStackLayout>
+
+		<!-- Messages List -->
+		<CollectionView Grid.Row="1" x:Name="MessagesList"
+                        ItemsSource="{Binding Messages}"
+                        BackgroundColor="#1a1a1a">
+			<CollectionView.ItemTemplate>
+				<DataTemplate>
+					<Grid Padding="8,4" ColumnDefinitions="Auto,*">
+						<Border Grid.Column="0" StrokeShape="RoundRectangle 20"
+                                BackgroundColor="#2c3e50" WidthRequest="40"
+                                HeightRequest="40" VerticalOptions="Start">
+							<Label Text="👤" FontSize="18"
+                                   HorizontalOptions="Center" VerticalOptions="Center"/>
+						</Border>
+
+						<VerticalStackLayout Grid.Column="1" Margin="8,0,0,0">
+							<HorizontalStackLayout Spacing="6">
+								<Label Text="{Binding PlayerName}"
+                                       TextColor="#f39c12" FontSize="12" FontAttributes="Bold"/>
+								<Label Text="{Binding DisplayTime}"
+                                       TextColor="#888" FontSize="10"/>
+							</HorizontalStackLayout>
+							<Label Text="{Binding Content}"
+                                   TextColor="White" FontSize="13" LineBreakMode="WordWrap"/>
+						</VerticalStackLayout>
+					</Grid>
+				</DataTemplate>
+			</CollectionView.ItemTemplate>
+		</CollectionView>
+
+		<!-- Input Area -->
+		<Grid Grid.Row="2" ColumnDefinitions="*,Auto" Padding="8"
+              BackgroundColor="#0a0a0a">
+			<Entry x:Name="MessageEntry" Placeholder="اكتب رسالتك..."
+                   BackgroundColor="#2d2d2d" TextColor="White"
+                   PlaceholderColor="#888" MaxLength="200"
+                   Completed="OnSendClicked"/>
+			<Button Grid.Column="1" Text="📤"
+                    BackgroundColor="#27ae60" TextColor="White"
+                    Clicked="OnSendClicked" Margin="4,0,0,0"/>
+		</Grid>
+	</Grid>
+</ContentPage>

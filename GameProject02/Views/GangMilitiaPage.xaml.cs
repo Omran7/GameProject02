@@ -3,11 +3,12 @@ using GameProject02.Services;
 using Microsoft.Maui.Controls;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Runtime.CompilerServices;
+using System.Linq;
 
 namespace GameProject02.Views;
 
-// Model for a single Militia Unit
 public class MilitiaUnit : INotifyPropertyChanged
 {
     public int Id { get; set; }
@@ -24,15 +25,13 @@ public class MilitiaUnit : INotifyPropertyChanged
     }
     public double MemberProgress => (double)CurrentMembers / MaxMembers;
     public string MemberCountText => $"{CurrentMembers}/{MaxMembers}";
-    public string JoinButtonText { get; set; } = "انضمام";
     public bool IsJoined { get; set; }
+    public List<string> AdditionalRewards { get; set; } = new();
     public bool HasAdditionalRewards => AdditionalRewards != null && AdditionalRewards.Count > 0;
-    public List<string> AdditionalRewards { get; set; } = new List<string>();
-    public string MembersIdsString { get; set; } = ""; // comma separated list of player IDs
+    public string AdditionalRewardsText => AdditionalRewards != null ? string.Join(" - ", AdditionalRewards) : "";
 
     public event PropertyChangedEventHandler? PropertyChanged;
     protected void OnPropertyChanged([CallerMemberName] string name = "") => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
-    public string AdditionalRewardsText => AdditionalRewards != null ? string.Join(" - ", AdditionalRewards) : "";
 }
 
 public partial class GangMilitiaPage : ContentPage
@@ -45,8 +44,8 @@ public partial class GangMilitiaPage : ContentPage
     {
         InitializeComponent();
         _currentGang = gang;
-        _player = AccountService.GetCurrentPlayer();
-        BindingContext = this;  // هذا السطر مهم جداً
+        _player = AccountService.CurrentPlayer;
+        BindingContext = this;
         LoadUnits();
     }
 
@@ -55,7 +54,6 @@ public partial class GangMilitiaPage : ContentPage
         Units.Clear();
         if (_currentGang == null || _player == null) return;
 
-        // ✅ تحديد الوحدة التي ينتمي إليها اللاعب (إن وجدت)
         int joinedUnitId = -1;
         foreach (var unit in _currentGang.MilitiaMembersByUnit)
         {
@@ -75,7 +73,7 @@ public partial class GangMilitiaPage : ContentPage
             var members = _currentGang.MilitiaMembersByUnit[i];
             int currentCount = members.Count;
             int maxCount = i * 10;
-            bool isJoined = (joinedUnitId == i); // ✅ فقط الوحدة التي ينتمي إليها اللاعب تكون true
+            bool isJoined = (joinedUnitId == i);
 
             var unit = new MilitiaUnit
             {
@@ -86,15 +84,14 @@ public partial class GangMilitiaPage : ContentPage
                 MaxMembers = maxCount,
                 CurrentMembers = currentCount,
                 IsJoined = isJoined,
-                JoinButtonText = "انضمام",
                 AdditionalRewards = GetRewardsForUnit(i)
             };
             Units.Add(unit);
         }
     }
+
     private List<string> GetRewardsForUnit(int unitId)
     {
-        // Simulate additional rewards like old game (Crystal, gold, etc.)
         var rewards = new List<string>();
         if (unitId == 1) rewards.Add("بلورة +1");
         if (unitId == 2) rewards.Add("بلورة +2");
@@ -110,48 +107,59 @@ public partial class GangMilitiaPage : ContentPage
             var unit = Units.FirstOrDefault(u => u.Id == unitId);
             if (unit == null) return;
 
-            // ✅ التحقق: هل اللاعب عضو بالفعل في أي وحدة ميليشيا أخرى؟
             bool isMemberOfAnyUnit = _currentGang.MilitiaMembersByUnit.Any(u => u.Value.Contains(_player.PlayerId));
             bool isMemberOfThisUnit = unit.IsJoined;
 
-            // إذا كان اللاعب عضواً في وحدة أخرى (وليس هذه الوحدة)، نمنعه من الانضمام
             if (isMemberOfAnyUnit && !isMemberOfThisUnit)
             {
                 await DisplayAlert("تنبيه", "أنت بالفعل عضو في ميليشيا أخرى. لا يمكنك الانضمام إلى أكثر من وحدة.", "موافق");
                 return;
             }
-
-            // إذا كان اللاعب عضواً في هذه الوحدة بالفعل، لا نسمح بالمغادرة (حسب آلية اللعبة)
             if (isMemberOfThisUnit)
             {
-                await DisplayAlert("تنبيه", "أنت بالفعل عضو في هذه الميليشيا. لا يمكنك المغادرة يدوياً، سيتم طردك تلقائياً عند اكتمال الوحدة.", "موافق");
+                await DisplayAlert("تنبيه", "أنت بالفعل عضو في هذه الميليشيا.", "موافق");
                 return;
             }
 
-            // محاولة الانضمام
-            var result = GangDatabaseService.JoinMilitia(_player.PlayerId, _currentGang, unitId, unit.CourageReq, unit.RespectReward);
-            if (result.IsAllProcessSuccess)
+            btn.IsEnabled = false;
+            btn.Text = "جاري الانضمام...";
+
+            try
             {
-                // إعادة تحميل بيانات الوحدة (قد تتغير بسبب إعادة التعيين عند الامتلاء)
-                ReloadUnit(unitId);
+                var result = await GangDatabaseService.JoinMilitiaAsync(_player.PlayerId, _currentGang, unitId, unit.CourageReq, unit.RespectReward);
+                if (result.IsAllProcessSuccess)
+                {
+                    // The gang object (_currentGang) is already updated inside JoinMilitiaAsync
+                    // Update the UI for this unit
+                    ReloadUnit(unitId);
+                    // Notify profile page to refresh its UI (without reloading from Firestore)
+                    MessagingCenter.Send(this, "MilitiaJoined");
+                    MessagingCenter.Send(_currentGang, "GangDataUpdated");
 
-                // بناء رسالة المكافآت
-                string rewardMsg = $"✅ انضممت إلى {unit.Name}\n";
-                rewardMsg += $"🎁 حصلت على: {unit.RespectReward} احترام, {unit.RespectReward / 2} ولاء";
-                if (!string.IsNullOrEmpty(result.CrystalId) && result.CrystalId != "0")
-                    rewardMsg += $", {result.CrystalId} بلورة";
-                rewardMsg += $"\n💰 تبرعت العصابة بمكافأة إضافية: {unit.RespectReward * 5} نقد (عند الامتلاء)";
-
-                await DisplayAlert("✅ انضمام ناجح", rewardMsg, "موافق");
+                    string rewardMsg = $"✅ انضممت إلى {unit.Name}\n" +
+                                       $"🎁 حصلت على: {unit.RespectReward} احترام, {unit.RespectReward / 2} ولاء";
+                    if (!string.IsNullOrEmpty(result.CrystalId) && result.CrystalId != "0")
+                        rewardMsg += $", {result.CrystalId}";
+                    await DisplayAlert("✅ انضمام ناجح", rewardMsg, "موافق");
+                }
+                else
+                {
+                    await DisplayAlert("❌ فشل الانضمام", result.ErrorMessage, "موافق");
+                }
             }
-            else
+            catch (Exception ex)
             {
-                await DisplayAlert("❌ فشل الانضمام", result.ErrorMessage, "موافق");
+                Debug.WriteLine($"[MILITIA] Error: {ex}");
+                await DisplayAlert("خطأ", "حدث خطأ غير متوقع", "موافق");
+            }
+            finally
+            {
+                btn.IsEnabled = true;
+                btn.Text = "انضمام";
             }
         }
     }
 
-    // دالة مساعدة لإعادة تحميل بيانات وحدة محددة بعد التغيير
     private void ReloadUnit(int unitId)
     {
         if (_currentGang.MilitiaMembersByUnit.TryGetValue(unitId, out var members))
@@ -161,12 +169,12 @@ public partial class GangMilitiaPage : ContentPage
             {
                 unit.CurrentMembers = members.Count;
                 unit.IsJoined = members.Contains(_player.PlayerId);
-                // تحديث الواجهة (إعادة تعيين العنصر في القائمة)
-                var index = Units.IndexOf(unit);
+                int index = Units.IndexOf(unit);
                 if (index >= 0) Units[index] = unit;
             }
         }
     }
+
     private async void OnBackClicked(object sender, EventArgs e) => await Navigation.PopAsync();
     private async void OnHomeClicked(object sender, EventArgs e) => await Navigation.PopToRootAsync();
 }

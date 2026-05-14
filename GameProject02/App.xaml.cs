@@ -1,12 +1,13 @@
-﻿using GameProject02.Models;
+﻿using GameProject02.Helpers;
+using GameProject02.Models;
 using GameProject02.Services;
 using GameProject02.Views;
-using System.Timers;
+using Microsoft.Maui.ApplicationModel;
+using Microsoft.Maui.Controls;
 using System.Collections.Generic;
 using System.Linq;
-using Microsoft.Maui.Controls;
-using Microsoft.Maui.ApplicationModel;
 using System.Threading.Tasks;
+using System.Timers;
 
 namespace GameProject02;
 
@@ -21,6 +22,9 @@ public partial class App : Application
         MainPage = new NavigationPage(new LoginPage());
 
         StartConfinementTimer();
+
+        // ✅ Start gang membership polling
+        GangMembershipChecker.StartPolling(10);
 
 #if DEBUG
         CreateTestAccounts();
@@ -51,7 +55,6 @@ public partial class App : Application
                     CheckAndNavigateToPrisonIfNeeded();
                 else if (currentPlayer.CrimeObject.IsInHospital)
                     CheckAndNavigateToHospitalIfNeeded();
-                // ✅ NEW: also check for plane confinement
                 else if (currentPlayer.CrimeObject.IsInPlane)
                     CheckAndNavigateToPlaneIfNeeded();
             }
@@ -61,6 +64,7 @@ public partial class App : Application
     protected override void OnSleep()
     {
         _confinementTimer?.Stop();
+        GangMembershipChecker.StopPolling(); // ✅ stop polling when app sleeps
         base.OnSleep();
     }
 
@@ -68,6 +72,7 @@ public partial class App : Application
     {
         base.OnResume();
         _confinementTimer?.Start();
+        GangMembershipChecker.StartPolling(10); // ✅ restart polling
 
         var player = AccountService.GetCurrentPlayer();
         if (player != null)
@@ -77,7 +82,7 @@ public partial class App : Application
 
         CheckAndNavigateToPrisonIfNeeded();
         CheckAndNavigateToHospitalIfNeeded();
-        CheckAndNavigateToPlaneIfNeeded();   // ✅ NEW
+        CheckAndNavigateToPlaneIfNeeded();
     }
 
     // ── Test accounts (debug only) ──────────────────────────────────
@@ -120,6 +125,10 @@ public partial class App : Application
             {
                 var player = AccountService.GetCurrentPlayer();
                 player.Gold = 999999999;
+                player.MainStatesObject.Level = 20;
+                player.MainStatesObject.CurrentExperience = 0;  // reset XP
+                player.MaxXP = (int)player.MainStatesObject.GetXpRequiredForNextLevel();
+                player.CurrentXP = 0;
                 AddTestEstates(player);
 
                 _ = FirebaseService.SavePlayerAsync(player);

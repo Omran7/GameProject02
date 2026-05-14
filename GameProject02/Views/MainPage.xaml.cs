@@ -59,6 +59,14 @@ public partial class MainPage : ContentPage, INotifyPropertyChanged
         _refreshTimer.Start();
 
         CheckPrisonStateAndNavigate();
+
+        // ✅ Subscribe to gang status changes
+        MessagingCenter.Subscribe<object, string>(this, "GangStatusChanged", (_, gangId) =>
+        {
+            // Refresh player data when gang status changes
+            LoadPlayerData();
+            // Optional: you can update the gang button text here if you add a method
+        });
     }
 
     protected override void OnDisappearing()
@@ -66,12 +74,28 @@ public partial class MainPage : ContentPage, INotifyPropertyChanged
         base.OnDisappearing();
         _refreshTimer?.Stop();
         _refreshTimer?.Dispose();
+        MessagingCenter.Unsubscribe<object, string>(this, "GangStatusChanged");
     }
 
     private void LoadPlayerData()
     {
         _player = AccountService.GetCurrentPlayer();
         if (_player == null) return;
+
+        // Ensure gang object is loaded if GangId exists but GangObject is null
+        if (!string.IsNullOrEmpty(_player.GangId) && _player.GangObject == null)
+        {
+            // Try to load the gang object (will be loaded by the poller anyway, but this is a fallback)
+            Task.Run(async () =>
+            {
+                var gang = await GangDatabaseService.GetGangAsync(_player.GangId);
+                if (gang != null)
+                {
+                    _player.GangObject = gang;
+                    AccountService.CurrentPlayer = _player;
+                }
+            });
+        }
 
         XPText = $"{_player.CurrentXP}/{_player.MaxXP}";
         NobilityText = $"{_player.NobilityCurrent}/100";
@@ -82,8 +106,7 @@ public partial class MainPage : ContentPage, INotifyPropertyChanged
     private void UpdateUI()
     {
         if (_player == null) return;
-        // In the new layout, the TopHeaderView handles its own updates, 
-        // but we can trigger it here if needed or just let its timer run.
+        // The TopHeaderView handles its own updates; we can leave this as is
     }
 
     private void ApplyLanguage()
@@ -109,6 +132,12 @@ public partial class MainPage : ContentPage, INotifyPropertyChanged
                 NobilityService.UpdateNobility(_player);
                 XPText = $"{_player.CurrentXP}/{_player.MaxXP}";
                 NobilityText = $"{_player.NobilityCurrent}/100";
+
+                // Refresh gang status in case it changed without a message
+                if (_player.GangObject == null && !string.IsNullOrEmpty(_player.GangId))
+                {
+                    LoadPlayerData();
+                }
             }
             catch (Exception ex)
             {
@@ -147,11 +176,24 @@ public partial class MainPage : ContentPage, INotifyPropertyChanged
     private async void OnNotificationCenterClicked(object sender, EventArgs e) => await Navigation.PushAsync(new NotificationCenterPage());
     private async void OnNewsClicked(object sender, EventArgs e) => await Navigation.PushAsync(new NewsPage());
     private async void OnAirportClicked(object sender, EventArgs e) => await Navigation.PushAsync(new AirportPage());
+    private async void OnChatClicked(object sender, EventArgs e) => await Navigation.PushAsync(new ChatPage());
 
     private async void OnGangClicked(object sender, EventArgs e)
     {
+        // Always use the latest player data from AccountService
         var player = AccountService.GetCurrentPlayer();
         if (player == null) return;
+
+        // If player has GangId but GangObject is null, try to load it now
+        if (!string.IsNullOrEmpty(player.GangId) && player.GangObject == null)
+        {
+            var gang = await GangDatabaseService.GetGangAsync(player.GangId);
+            if (gang != null)
+            {
+                player.GangObject = gang;
+                AccountService.CurrentPlayer = player;
+            }
+        }
 
         bool isInGang = player.GangObject != null && player.GangObject.IsMember(player.PlayerId);
 
@@ -193,12 +235,6 @@ public partial class MainPage : ContentPage, INotifyPropertyChanged
         }
     }
 
-    private async void OnCityMapClicked(object sender, EventArgs e)
-    {
-        await Navigation.PushAsync(new CityMapPage());
-    }
-    private async void OnIdlibCityMapClicked(object sender, EventArgs e)
-    {
-        await Navigation.PushAsync(new CityMapPage());
-    }
+    private async void OnCityMapClicked(object sender, EventArgs e) => await Navigation.PushAsync(new CityMapPage());
+    private async void OnIdlibCityMapClicked(object sender, EventArgs e) => await Navigation.PushAsync(new CityMapPage());
 }

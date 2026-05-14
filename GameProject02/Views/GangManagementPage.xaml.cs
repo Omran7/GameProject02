@@ -1,9 +1,14 @@
 ﻿using GameProject02.Models;
 using GameProject02.Services;
 using Microsoft.Maui.Controls;
+using System;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Linq;
-using Microsoft.Maui.Media;
+using System.Threading.Tasks;
+using Microsoft.Maui.ApplicationModel;
+using Microsoft.Maui.Storage;
+using System.IO;
 
 namespace GameProject02.Views;
 
@@ -17,31 +22,58 @@ public partial class GangManagementPage : ContentPage
     public GangManagementPage()
     {
         InitializeComponent();
-        LoadData();
+        _ = LoadData();
     }
 
-    private void LoadData()
+    private async Task LoadData()
     {
-        _player = AccountService.GetCurrentPlayer();
-        if (_player == null || _player.GangObject == null) return;
-        _gang = _player.GangObject;
-        RefreshContent();
+        try
+        {
+            _player = AccountService.CurrentPlayer;
+            if (_player == null)
+            {
+                await DisplayAlert("خطأ", "الرجاء تسجيل الدخول أولاً", "موافق");
+                await Navigation.PopToRootAsync();
+                return;
+            }
+            if (string.IsNullOrEmpty(_player.GangId))
+            {
+                await DisplayAlert("خطأ", "أنت لست عضواً في أي عصابة", "موافق");
+                await Navigation.PopToRootAsync();
+                return;
+            }
+            _gang = await GangDatabaseService.GetGangAsync(_player.GangId);
+            if (_gang == null)
+            {
+                await DisplayAlert("خطأ", "لم يتم العثور على بيانات العصابة", "موافق");
+                await Navigation.PopToRootAsync();
+                return;
+            }
+            await RefreshContent();
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"[MANAGEMENT] LoadData error: {ex}");
+            await DisplayAlert("خطأ", "فشل تحميل البيانات", "موافق");
+        }
     }
 
     private void OnTabClicked(object sender, EventArgs e)
     {
-        _currentTab = sender == TabMembers ? "members" : sender == TabRequests ? "requests" : "settings";
-        var activeColor = Color.FromArgb("#3498db");
-        var inactiveColor = Color.FromArgb("#2c2c2c");
-        TabMembers.BackgroundColor = _currentTab == "members" ? activeColor : inactiveColor;
-        TabRequests.BackgroundColor = _currentTab == "requests" ? activeColor : inactiveColor;
-        TabSettings.BackgroundColor = _currentTab == "settings" ? activeColor : inactiveColor;
-        RefreshContent();
+        if (sender == TabMembers) _currentTab = "members";
+        else if (sender == TabRequests) _currentTab = "requests";
+        else _currentTab = "settings";
+
+        TabMembers.BackgroundColor = _currentTab == "members" ? Color.FromArgb("#3498db") : Color.FromArgb("#2c2c2c");
+        TabRequests.BackgroundColor = _currentTab == "requests" ? Color.FromArgb("#3498db") : Color.FromArgb("#2c2c2c");
+        TabSettings.BackgroundColor = _currentTab == "settings" ? Color.FromArgb("#3498db") : Color.FromArgb("#2c2c2c");
+        _ = RefreshContent();
     }
 
-    private void RefreshContent()
+    private async Task RefreshContent()
     {
         _items = new ObservableCollection<GangManagementItem>();
+
         if (_currentTab == "members")
         {
             var currentPlayerId = _player.PlayerId;
@@ -54,72 +86,32 @@ public partial class GangManagementPage : ContentPage
                 string targetId = kvp.Key;
                 GangPosition targetPos = kvp.Value;
                 bool isCurrentPlayer = targetId == currentPlayerId;
-
                 string displayName = isCurrentPlayer ? "أنت" : (AccountService.GetPlayerById(targetId)?.Username ?? targetId);
-                var item = new GangManagementItem
-                {
-                    Label1 = displayName,
-                    Label2 = GetPositionName(targetPos),
-                };
+                var item = new GangManagementItem { Label1 = displayName, Label2 = GetPositionName(targetPos) };
 
-                // زر الطرد
                 if (CanKickTarget(currentPos, targetPos, isCurrentPlayer))
                 {
-                    item.Btn1Text = "طرد";
-                    item.Action1 = $"kick:{targetId}";
-                    item.HasBtn1 = true;
+                    item.Btn1Text = "طرد"; item.Action1 = $"kick:{targetId}"; item.HasBtn1 = true;
                 }
-
-                // أزرار الترقية (فقط للقائد ونائب القائد، ولا يمكن ترقية القائد أو النفس)
                 if (!isCurrentPlayer && targetPos != GangPosition.Leader && (isLeader || isCoLeader))
                 {
-                    // ترقية إلى نائب القائد (CoLeader) – فقط القائد
                     if (isLeader && targetPos != GangPosition.CoLeader)
                     {
-                        item.Btn2Text = "نائب قائد";
-                        item.Action2 = $"promoteToCoLeader:{targetId}";
-                        item.HasBtn2 = true;
+                        item.Btn2Text = "نائب قائد"; item.Action2 = $"promoteToCoLeader:{targetId}"; item.HasBtn2 = true;
                     }
-                    // ترقية إلى نائب (Vice) – القائد ونائب القائد
                     if (targetPos != GangPosition.Vice && targetPos != GangPosition.CoLeader)
                     {
-                        item.Btn3Text = "نائب";
-                        item.Action3 = $"promoteToVice:{targetId}";
-                        item.HasBtn3 = true;
+                        item.Btn3Text = "نائب"; item.Action3 = $"promoteToVice:{targetId}"; item.HasBtn3 = true;
                     }
-                    // ترقية إلى حكيم (Elder) – القائد ونائب القائد
                     if (targetPos != GangPosition.Elder && targetPos != GangPosition.Vice && targetPos != GangPosition.CoLeader)
                     {
-                        item.Btn4Text = "حكيم";
-                        item.Action4 = $"promoteToElder:{targetId}";
-                        item.HasBtn4 = true;
+                        item.Btn4Text = "حكيم"; item.Action4 = $"promoteToElder:{targetId}"; item.HasBtn4 = true;
                     }
                 }
-
-                // زر التنزيل (Demote) – فقط للقائد ونائب القائد، ولا يمكن تنزيل القائد أو النفس
-                bool canDemote = false;
-                if (!isCurrentPlayer && targetPos != GangPosition.Leader)
-                {
-                    if (isLeader)
-                        canDemote = true;
-                    else if (isCoLeader && targetPos != GangPosition.CoLeader && targetPos != GangPosition.Leader)
-                        canDemote = true;
-                }
-                if (canDemote)
-                {
-                    item.Btn6Text = "تنزيل رتبة";
-                    item.Action6 = $"demote:{targetId}";
-                    item.HasBtn6 = true;
-                }
-
-                // زر نقل الزعامة (فقط للقائد)
-                if (isLeader && !isCurrentPlayer && targetPos != GangPosition.Leader)
-                {
-                    item.Btn5Text = "نقل الزعامة";
-                    item.Action5 = $"transfer:{targetId}";
-                    item.HasBtn5 = true;
-                }
-
+                bool canDemote = !isCurrentPlayer && targetPos != GangPosition.Leader &&
+                                 (isLeader || (isCoLeader && targetPos != GangPosition.CoLeader && targetPos != GangPosition.Leader));
+                if (canDemote) { item.Btn6Text = "تنزيل رتبة"; item.Action6 = $"demote:{targetId}"; item.HasBtn6 = true; }
+                if (isLeader && !isCurrentPlayer && targetPos != GangPosition.Leader) { item.Btn5Text = "نقل الزعامة"; item.Action5 = $"transfer:{targetId}"; item.HasBtn5 = true; }
                 _items.Add(item);
             }
         }
@@ -128,14 +120,13 @@ public partial class GangManagementPage : ContentPage
             bool canAccept = GangService.CanPerformAction(_gang, _player.PlayerId, GangAction.AcceptJoinRequest);
             if (canAccept)
             {
-                var reqs = GangDatabaseService.GetJoinRequests(_gang.GangId);
+                var reqs = await GangDatabaseService.GetJoinRequestsAsync(_gang.GangId);
                 foreach (var req in reqs)
                 {
-                    string displayName = !string.IsNullOrEmpty(req.PlayerName) ? req.PlayerName : req.PlayerId;
+                    string displayName = string.IsNullOrEmpty(req.PlayerName) ? req.PlayerId : req.PlayerName;
                     _items.Add(new GangManagementItem
                     {
                         Label1 = displayName,
-                        Label2 = "",
                         Btn1Text = "قبول",
                         Action1 = $"accept:{req.PlayerId}",
                         HasBtn1 = true,
@@ -144,159 +135,175 @@ public partial class GangManagementPage : ContentPage
                         HasBtn2 = true
                     });
                 }
-                if (_items.Count == 0)
-                    _items.Add(new GangManagementItem { Label1 = "لا توجد طلبات" });
+                if (_items.Count == 0) _items.Add(new GangManagementItem { Label1 = "لا توجد طلبات" });
             }
-            else
-            {
-                _items.Add(new GangManagementItem { Label1 = "ليس لديك صلاحية لعرض الطلبات" });
-            }
+            else _items.Add(new GangManagementItem { Label1 = "ليس لديك صلاحية لعرض الطلبات" });
         }
         else // settings
         {
             bool canChangeData = GangService.CanPerformAction(_gang, _player.PlayerId, GangAction.ChangeGangData);
             bool canDisband = GangService.CanPerformAction(_gang, _player.PlayerId, GangAction.DisbandGang);
-            if (canChangeData)
-                _items.Add(new GangManagementItem { Label1 = "تغيير الاسم", Btn1Text = "تعديل", Action1 = "change_name", HasBtn1 = true });
-            if (canChangeData)
-                _items.Add(new GangManagementItem { Label1 = "تغيير الرمز", Btn1Text = "تعديل", Action1 = "change_tag", HasBtn1 = true });
-            if (canChangeData)
-                _items.Add(new GangManagementItem { Label1 = "تغيير الصورة", Btn1Text = "اختيار", Action1 = "change_image", HasBtn1 = true });
-            if (canDisband)
-                _items.Add(new GangManagementItem { Label1 = "حل العصابة", Btn1Text = "حذف", Action1 = "dissolve", HasBtn1 = true });
-            if (_items.Count == 0)
-                _items.Add(new GangManagementItem { Label1 = "ليس لديك صلاحيات إدارة" });
+            if (canChangeData) _items.Add(new GangManagementItem { Label1 = "تغيير الاسم", Btn1Text = "تعديل", Action1 = "change_name", HasBtn1 = true });
+            if (canChangeData) _items.Add(new GangManagementItem { Label1 = "تغيير الرمز", Btn1Text = "تعديل", Action1 = "change_tag", HasBtn1 = true });
+            if (canChangeData) _items.Add(new GangManagementItem { Label1 = "تغيير الصورة", Btn1Text = "اختيار", Action1 = "change_image", HasBtn1 = true });
+            if (canDisband) _items.Add(new GangManagementItem { Label1 = "حل العصابة", Btn1Text = "حذف", Action1 = "dissolve", HasBtn1 = true });
+            if (_items.Count == 0) _items.Add(new GangManagementItem { Label1 = "ليس لديك صلاحيات إدارة" });
         }
         ContentList.ItemsSource = _items;
     }
-    // دالة مساعدة للتحقق من إمكانية طرد عضو معين
+
     private bool CanKickTarget(GangPosition currentPos, GangPosition targetPos, bool isCurrentPlayer)
     {
-        if (isCurrentPlayer) return false; // لا يمكن طرد النفس
-        if (targetPos == GangPosition.Leader) return false; // لا يمكن طرد القائد
-
+        if (isCurrentPlayer) return false;
+        if (targetPos == GangPosition.Leader) return false;
         switch (currentPos)
         {
-            case GangPosition.Leader:
-                return true;
-            case GangPosition.CoLeader:
-                return targetPos != GangPosition.CoLeader;
-            case GangPosition.Vice:
-                return targetPos != GangPosition.CoLeader && targetPos != GangPosition.Vice;
-            case GangPosition.Elder:
-                return targetPos == GangPosition.Member || targetPos == GangPosition.Officer;
-            default:
-                return false;
+            case GangPosition.Leader: return true;
+            case GangPosition.CoLeader: return targetPos != GangPosition.CoLeader;
+            case GangPosition.Vice: return targetPos != GangPosition.CoLeader && targetPos != GangPosition.Vice;
+            case GangPosition.Elder: return targetPos == GangPosition.Member || targetPos == GangPosition.Officer;
+            default: return false;
         }
     }
 
-    private string GetPositionName(GangPosition pos)
+    private string GetPositionName(GangPosition pos) => pos switch
     {
-        return pos switch
-        {
-            GangPosition.Leader => "زعيم",
-            GangPosition.CoLeader => "نائب القائد",
-            GangPosition.Vice => "نائب",
-            GangPosition.Elder => "حكيم",
-            GangPosition.Officer => "ضابط",
-            GangPosition.Member => "عضو",
-            _ => "لا شيء"
-        };
-    }
+        GangPosition.Leader => "زعيم",
+        GangPosition.CoLeader => "نائب القائد",
+        GangPosition.Vice => "نائب",
+        GangPosition.Elder => "حكيم",
+        GangPosition.Officer => "ضابط",
+        GangPosition.Member => "عضو",
+        _ => "لا شيء"
+    };
 
     private async void OnActionClicked(object sender, EventArgs e)
     {
         if (sender is Button btn && btn.CommandParameter is string action)
         {
-            // قبول / رفض طلبات الانضمام
-            if (action.StartsWith("accept:") || action.StartsWith("reject:"))
+            // Safety checks
+            if (_gang == null) { await DisplayAlert("خطأ", "بيانات العصابة غير متوفرة", "موافق"); return; }
+            if (_player == null) { await DisplayAlert("خطأ", "يرجى تسجيل الدخول", "موافق"); return; }
+            if (string.IsNullOrEmpty(_gang.GangId)) { await DisplayAlert("خطأ", "معرف العصابة غير صالح", "موافق"); return; }
+
+            // Accept
+            if (action.StartsWith("accept:"))
             {
-                if (!GangService.CanPerformAction(_gang, _player.PlayerId, GangAction.AcceptJoinRequest))
+                var parts = action.Split(':');
+                if (parts.Length < 2) { await DisplayAlert("خطأ", "بيانات الطلب غير صالحة", "موافق"); return; }
+                string playerId = parts[1];
+                if (string.IsNullOrEmpty(playerId)) { await DisplayAlert("خطأ", "معرف اللاعب غير صالح", "موافق"); return; }
+
+                bool confirm = await DisplayAlert("تأكيد", "قبول طلب الانضمام؟", "نعم", "لا");
+                if (!confirm) return;
+
+                try
                 {
-                    await DisplayAlert("⚠️", "ليس لديك صلاحية لقبول أو رفض الطلبات", "موافق");
-                    return;
+                    bool success = await GangDatabaseService.ProcessJoinRequestAsync(_gang.GangId, playerId, true);
+                    if (success)
+                    {
+                        // Reload gang and player data
+                        _gang = await GangDatabaseService.GetGangAsync(_gang.GangId);
+                        if (_gang != null)
+                        {
+                            _player.GangObject = _gang;
+                            AccountService.CurrentPlayer = _player;
+                        }
+                        await RefreshContent();
+                        // Send refresh message
+                        try { MessagingCenter.Send(this, "RefreshGangProfile"); } catch { }
+                        await DisplayAlert("✅ نجاح", "تم قبول العضو", "موافق");
+                    }
+                    else
+                    {
+                        await DisplayAlert("❌ فشل", "حدث خطأ أثناء قبول الطلب", "موافق");
+                    }
                 }
-                var pid = action.Split(':')[1];
-                bool accept = action.StartsWith("accept:");
-                bool success = GangDatabaseService.ProcessJoinRequest(_gang.GangId, pid, accept);
-                await DisplayAlert(success ? "✅ نجاح" : "❌ فشل", success ? "تمت المعالجة" : "فشل المعالجة", "موافق");
+                catch (Exception ex)
+                {
+                    Debug.WriteLine($"[ACCEPT ERROR] {ex}");
+                    await DisplayAlert("خطأ", $"حدث خطأ: {ex.Message}", "موافق");
+                }
             }
-            // طرد عضو
+            // Reject
+            else if (action.StartsWith("reject:"))
+            {
+                var parts = action.Split(':');
+                if (parts.Length < 2) return;
+                string playerId = parts[1];
+                try
+                {
+                    bool success = await GangDatabaseService.ProcessJoinRequestAsync(_gang.GangId, playerId, false);
+                    if (success) await RefreshContent();
+                    await DisplayAlert(success ? "✅ تم الرفض" : "❌ فشل", "", "موافق");
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine($"[REJECT ERROR] {ex}");
+                    await DisplayAlert("خطأ", ex.Message, "موافق");
+                }
+            }
+            // Kick
             else if (action.StartsWith("kick:"))
             {
-                var pid = action.Split(':')[1];
-                var targetPos = _gang.GetPosition(pid);
-                if (!CanKickTarget(_gang.GetPosition(_player.PlayerId), targetPos, false))
-                {
-                    await DisplayAlert("⚠️", "ليس لديك صلاحية لطرد هذا العضو", "موافق");
-                    return;
-                }
-                bool confirm = await DisplayAlert("تأكيد الطرد", "هل أنت متأكد من طرد هذا العضو؟", "نعم", "لا");
+                var parts = action.Split(':');
+                if (parts.Length < 2) return;
+                string pid = parts[1];
+                bool confirm = await DisplayAlert("تأكيد", "هل تريد طرد هذا العضو؟", "نعم", "لا");
                 if (confirm)
                 {
                     GangDatabaseService.UpdateMemberPosition(_gang.GangId, pid, null);
-                    await DisplayAlert("✅ تم الطرد", "تم طرد العضو من العصابة", "موافق");
+                    _gang = await GangDatabaseService.GetGangAsync(_gang.GangId);
+                    await RefreshContent();
+                    try { MessagingCenter.Send(this, "RefreshGangProfile"); } catch { }
                 }
             }
-            // ترقية إلى نائب القائد
+            // Promote to CoLeader
             else if (action.StartsWith("promoteToCoLeader:"))
             {
-                var pid = action.Split(':')[1];
-                if (!GangService.CanPerformAction(_gang, _player.PlayerId, GangAction.PromoteMember))
-                {
-                    await DisplayAlert("⚠️", "ليس لديك صلاحية للترقية", "موافق");
-                    return;
-                }
+                var parts = action.Split(':');
+                if (parts.Length < 2) return;
+                string pid = parts[1];
                 if (GangService.PromoteTo(_gang, pid, GangPosition.CoLeader, _player))
+                {
+                    await SaveGangAndRefresh();
                     await DisplayAlert("نجاح", "تمت الترقية إلى نائب القائد", "موافق");
-                else
-                    await DisplayAlert("فشل", "لا يمكن الترقية", "موافق");
+                }
+                else await DisplayAlert("فشل", "", "موافق");
             }
-            // ترقية إلى نائب
+            // Promote to Vice
             else if (action.StartsWith("promoteToVice:"))
             {
-                var pid = action.Split(':')[1];
-                if (!GangService.CanPerformAction(_gang, _player.PlayerId, GangAction.PromoteMember))
-                {
-                    await DisplayAlert("⚠️", "ليس لديك صلاحية للترقية", "موافق");
-                    return;
-                }
+                var parts = action.Split(':');
+                if (parts.Length < 2) return;
+                string pid = parts[1];
                 if (GangService.PromoteTo(_gang, pid, GangPosition.Vice, _player))
+                {
+                    await SaveGangAndRefresh();
                     await DisplayAlert("نجاح", "تمت الترقية إلى نائب", "موافق");
-                else
-                    await DisplayAlert("فشل", "لا يمكن الترقية", "موافق");
+                }
+                else await DisplayAlert("فشل", "", "موافق");
             }
-            // ترقية إلى حكيم
+            // Promote to Elder
             else if (action.StartsWith("promoteToElder:"))
             {
-                var pid = action.Split(':')[1];
-                if (!GangService.CanPerformAction(_gang, _player.PlayerId, GangAction.PromoteMember))
-                {
-                    await DisplayAlert("⚠️", "ليس لديك صلاحية للترقية", "موافق");
-                    return;
-                }
+                var parts = action.Split(':');
+                if (parts.Length < 2) return;
+                string pid = parts[1];
                 if (GangService.PromoteTo(_gang, pid, GangPosition.Elder, _player))
+                {
+                    await SaveGangAndRefresh();
                     await DisplayAlert("نجاح", "تمت الترقية إلى حكيم", "موافق");
-                else
-                    await DisplayAlert("فشل", "لا يمكن الترقية", "موافق");
+                }
+                else await DisplayAlert("فشل", "", "موافق");
             }
-            // تنزيل رتبة (Demote)
+            // Demote
             else if (action.StartsWith("demote:"))
             {
-                var pid = action.Split(':')[1];
+                var parts = action.Split(':');
+                if (parts.Length < 2) return;
+                string pid = parts[1];
                 var targetPos = _gang.GetPosition(pid);
-                var currentPos = _gang.GetPosition(_player.PlayerId);
-                bool canDemote = false;
-                if (currentPos == GangPosition.Leader)
-                    canDemote = true;
-                else if (currentPos == GangPosition.CoLeader && targetPos != GangPosition.CoLeader && targetPos != GangPosition.Leader)
-                    canDemote = true;
-                if (!canDemote)
-                {
-                    await DisplayAlert("⚠️", "ليس لديك صلاحية لتنزيل هذا العضو", "موافق");
-                    return;
-                }
-                // تحديد الرتبة الجديدة (درجة واحدة للأسفل)
                 GangPosition newPos = targetPos switch
                 {
                     GangPosition.CoLeader => GangPosition.Vice,
@@ -306,98 +313,85 @@ public partial class GangManagementPage : ContentPage
                     _ => GangPosition.Member
                 };
                 if (GangService.PromoteTo(_gang, pid, newPos, _player))
+                {
+                    await SaveGangAndRefresh();
                     await DisplayAlert("نجاح", $"تم تنزيل العضو إلى {GetPositionName(newPos)}", "موافق");
-                else
-                    await DisplayAlert("فشل", "لا يمكن تنزيل هذا العضو", "موافق");
+                }
+                else await DisplayAlert("فشل", "", "موافق");
             }
-            // نقل الزعامة
+            // Transfer leadership
             else if (action.StartsWith("transfer:"))
             {
-                var pid = action.Split(':')[1];
-                if (_gang.GetPosition(_player.PlayerId) != GangPosition.Leader)
-                {
-                    await DisplayAlert("⚠️", "فقط القائد يمكنه نقل الزعامة", "موافق");
-                    return;
-                }
+                var parts = action.Split(':');
+                if (parts.Length < 2) return;
+                string pid = parts[1];
                 bool confirm = await DisplayAlert("نقل الزعامة", "هل أنت متأكد؟ ستصبح عضواً عادياً", "نعم", "لا");
                 if (confirm && GangService.TransferLeadership(_gang, pid, _player))
                 {
+                    await SaveGangAndRefresh();
                     await DisplayAlert("نجاح", "تم نقل الزعامة", "موافق");
                     await Navigation.PopToRootAsync();
                 }
-                else
-                    await DisplayAlert("فشل", "حدث خطأ", "موافق");
+                else await DisplayAlert("فشل", "", "موافق");
             }
-            // تغيير الاسم
+            // Change name
             else if (action == "change_name")
             {
-                if (!GangService.CanPerformAction(_gang, _player.PlayerId, GangAction.ChangeGangData))
-                {
-                    await DisplayAlert("⚠️", "ليس لديك صلاحية لتغيير الاسم", "موافق");
-                    return;
-                }
                 string newName = await DisplayPromptAsync("تغيير الاسم", "أدخل الاسم الجديد (4-15 حرف)", maxLength: 15);
-                if (!string.IsNullOrEmpty(newName))
+                if (!string.IsNullOrEmpty(newName) && GangService.ChangeGangName(_gang, newName, _player))
                 {
-                    if (GangService.ChangeGangName(_gang, newName, _player))
-                        await DisplayAlert("نجاح", "تم تغيير الاسم", "موافق");
-                    else
-                        await DisplayAlert("خطأ", "الاسم غير صالح أو ليس لديك صلاحية", "موافق");
+                    await SaveGangAndRefresh();
+                    await DisplayAlert("نجاح", "تم تغيير الاسم", "موافق");
                 }
+                else await DisplayAlert("خطأ", "الاسم غير صالح", "موافق");
             }
-            // تغيير الرمز
+            // Change tag
             else if (action == "change_tag")
             {
-                if (!GangService.CanPerformAction(_gang, _player.PlayerId, GangAction.ChangeGangData))
-                {
-                    await DisplayAlert("⚠️", "ليس لديك صلاحية لتغيير الرمز", "موافق");
-                    return;
-                }
                 string newTag = await DisplayPromptAsync("تغيير الرمز", "أدخل 3 أحرف", maxLength: 3);
-                if (!string.IsNullOrEmpty(newTag))
+                if (!string.IsNullOrEmpty(newTag) && GangService.ChangeGangTag(_gang, newTag, _player))
                 {
-                    if (GangService.ChangeGangTag(_gang, newTag, _player))
-                        await DisplayAlert("نجاح", "تم تغيير الرمز", "موافق");
-                    else
-                        await DisplayAlert("خطأ", "الرمز غير صالح (3 أحرف فقط)", "موافق");
+                    await SaveGangAndRefresh();
+                    await DisplayAlert("نجاح", "تم تغيير الرمز", "موافق");
                 }
+                else await DisplayAlert("خطأ", "الرمز غير صالح", "موافق");
             }
-            // حل العصابة
-            else if (action == "dissolve")
-            {
-                if (!GangService.CanPerformAction(_gang, _player.PlayerId, GangAction.DisbandGang))
-                {
-                    await DisplayAlert("⚠️", "فقط القائد يمكنه حل العصابة", "موافق");
-                    return;
-                }
-                bool confirm = await DisplayAlert("حل العصابة", "هل أنت متأكد؟ لا يمكن التراجع", "نعم", "لا");
-                if (confirm && GangService.DisbandGang(_gang, _player))
-                {
-                    await DisplayAlert("تم الحل", "تم حل العصابة", "موافق");
-                    await Navigation.PopToRootAsync();
-                }
-            }
-            // تغيير الصورة
+            // Change image (stub)
             else if (action == "change_image")
             {
-                if (!GangService.CanPerformAction(_gang, _player.PlayerId, GangAction.ChangeGangData))
-                {
-                    await DisplayAlert("⚠️", "ليس لديك صلاحية لتغيير الصورة", "موافق");
-                    return;
-                }
                 try
                 {
-                    var result = await MediaPicker.PickPhotoAsync();
+                    // Request permission
+                    if (DeviceInfo.Platform == DevicePlatform.Android)
+                    {
+                        var status = await Permissions.RequestAsync<Permissions.StorageRead>();
+                        if (status != PermissionStatus.Granted)
+                        {
+                            await DisplayAlert("خطأ", "لم يتم منح صلاحية الوصول إلى الصور", "موافق");
+                            return;
+                        }
+                    }
+
+                    var result = await MediaPicker.PickPhotoAsync(new MediaPickerOptions
+                    {
+                        Title = "اختر صورة للعصابة"
+                    });
                     if (result != null)
                     {
-                        string localPath = result.FullPath;
-                        if (GangService.ChangeGangImage(_gang, localPath, _player))
+                        bool success = await GangService.ChangeGangImageAsync(_gang, result.FullPath, _player);
+                        if (success)
                         {
+                            _gang = await GangDatabaseService.GetGangAsync(_gang.GangId);
+                            _player.GangObject = _gang;
+                            AccountService.CurrentPlayer = _player;
+                            await RefreshContent();
+                            MessagingCenter.Send(this, "RefreshGangProfile");
                             await DisplayAlert("نجاح", "تم تغيير صورة العصابة", "موافق");
-                            MessagingCenter.Send(this, "GangImageUpdated");
                         }
                         else
-                            await DisplayAlert("خطأ", "ليس لديك صلاحية", "موافق");
+                        {
+                            await DisplayAlert("فشل", "حدث خطأ أثناء تغيير الصورة. تأكد من أن الصورة صالحة.", "موافق");
+                        }
                     }
                 }
                 catch (Exception ex)
@@ -405,9 +399,28 @@ public partial class GangManagementPage : ContentPage
                     await DisplayAlert("خطأ", $"فشل اختيار الصورة: {ex.Message}", "موافق");
                 }
             }
-            RefreshContent();
+            // Dissolve gang
+            else if (action == "dissolve")
+            {
+                bool confirm = await DisplayAlert("حل العصابة", "هل أنت متأكد؟ لا يمكن التراجع", "نعم", "لا");
+                if (confirm && GangService.DisbandGang(_gang, _player))
+                {
+                    await Navigation.PopToRootAsync();
+                }
+            }
         }
     }
+
+    private async Task SaveGangAndRefresh()
+    {
+        await GangDatabaseService.SaveGangAsync(_gang);
+        _gang = await GangDatabaseService.GetGangAsync(_gang.GangId);
+        _player.GangObject = _gang;
+        AccountService.CurrentPlayer = _player;
+        await RefreshContent();
+        try { MessagingCenter.Send(this, "RefreshGangProfile"); } catch { }
+    }
+
     private async void OnBackClicked(object sender, EventArgs e) => await Navigation.PopAsync();
     private async void OnHomeClicked(object sender, EventArgs e) => await Navigation.PopToRootAsync();
 }

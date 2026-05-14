@@ -12,6 +12,8 @@ namespace GameProject02.Models
 
     public enum NotificationCategory
     {
+        General = 0,
+        Gang = 1,
         Game = 0,
         Social = 1,
         System = 2

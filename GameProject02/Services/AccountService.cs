@@ -1,12 +1,13 @@
-﻿using System;
+﻿using GameProject02.Models;
+using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Net.Http;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
-using GameProject02.Models;
 
 namespace GameProject02.Services
 {
@@ -15,6 +16,22 @@ namespace GameProject02.Services
         private static readonly Dictionary<string, PlayerAccount> _localAccounts = new();
         private static PlayerAccount _currentUser;
         private static readonly List<PlayerAccount> _allPlayers = new();
+
+        public static PlayerAccount CurrentPlayer
+        {
+            get => _currentUser;
+            set
+            {
+                if (value == null)
+                {
+                    Debug.WriteLine("[AccountService] Warning: Setting CurrentPlayer to null");
+                }
+                _currentUser = value;
+            }
+        }
+
+        // ✅ ADDED: Optional method for compatibility with SetCurrentPlayer calls
+        public static void SetCurrentPlayer(PlayerAccount player) => CurrentPlayer = player;
 
         private const string FirestoreBaseUrl = "https://firestore.googleapis.com/v1/projects/gameproject02-4207f/databases/(default)/documents";
         private const string WebApiKey = "AIzaSyCM61YoJzqt9x7lOndV2oBJGeoBtU9U_Uo";
@@ -86,11 +103,9 @@ namespace GameProject02.Services
         }
         public static async Task<bool> LoginAsync(string username, string password)
         {
-            // 1. Attempt to find the player in the local cache
+            // 1. Find playerId from local cache or username mapping
             var localAccount = _localAccounts.Values
                 .FirstOrDefault(x => x.Username.Equals(username, StringComparison.OrdinalIgnoreCase));
-
-            // 2. Determine the playerId (either from local cache or from the username mapping)
             string playerId = localAccount?.PlayerId ?? await GetPlayerIdByUsernameAsync(username);
             if (string.IsNullOrEmpty(playerId))
             {
@@ -98,7 +113,7 @@ namespace GameProject02.Services
                 return false;
             }
 
-            // 3. ALWAYS load the latest data from Firestore
+            // 2. Load fresh player data from Firestore
             var cloudAccount = await FirebaseService.LoadPlayerAsync(playerId);
             if (cloudAccount == null)
             {
@@ -106,17 +121,36 @@ namespace GameProject02.Services
                 return false;
             }
 
-            // 4. Check password (using the cloud data, which is the source of truth)
+            // 3. Verify password
             if (cloudAccount.PasswordHash != HashPassword(password))
             {
                 await ShowAlert("Login Failed", "Incorrect password.");
                 return false;
             }
 
-            // 5. Update the local cache with the fresh cloud data
-            _localAccounts[cloudAccount.PlayerId] = cloudAccount;
+            // 4. ✅ Load the gang if the player has a GangId
+            if (!string.IsNullOrEmpty(cloudAccount.GangId))
+            {
+                try
+                {
+                    cloudAccount.GangObject = await GangDatabaseService.GetGangAsync(cloudAccount.GangId);
+                    if (cloudAccount.GangObject == null)
+                    {
+                        // Gang no longer exists – clear GangId
+                        cloudAccount.GangId = string.Empty;
+                        await FirebaseService.SavePlayerAsync(cloudAccount);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine($"[LOGIN] Failed to load gang: {ex.Message}");
+                    // Continue without gang – player will need to rejoin
+                    cloudAccount.GangObject = null;
+                }
+            }
 
-            // 6. Remove the old cached instance if its PlayerId changed (shouldn't happen, but safety)
+            // 5. Update local caches
+            _localAccounts[cloudAccount.PlayerId] = cloudAccount;
             if (localAccount != null && localAccount.PlayerId != cloudAccount.PlayerId)
                 _localAccounts.Remove(localAccount.PlayerId);
 
@@ -124,9 +158,9 @@ namespace GameProject02.Services
             RegisterPlayer(cloudAccount);
             EnsurePlayerRegistered(cloudAccount);
 
-            // Notifications are already inside the player object – no extra load needed
-
+            // 6. Start regeneration service
             RegenerationService.Start(_currentUser);
+
             return true;
         }
         private static async Task ShowAlert(string title, string message)
@@ -221,6 +255,14 @@ namespace GameProject02.Services
         {
             if (!_allPlayers.Any(p => p.PlayerId == player.PlayerId))
                 _allPlayers.Add(player);
+        }
+
+        public static async Task<PlayerAccount> GetPlayerByIdAsync(string playerId)
+        {
+            var player = _allPlayers.FirstOrDefault(p => p.PlayerId == playerId);
+            if (player != null) return player;
+            // Try load from Firestore
+            return await FirebaseService.LoadPlayerAsync(playerId);
         }
 
         public static List<PlayerAccount> GetAllPlayers() => _allPlayers;

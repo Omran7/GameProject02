@@ -1,60 +1,58 @@
-﻿using GameProject02.Models;
-using GameProject02.Services;
+﻿using GameProject02.Services;
 using Microsoft.Maui.Controls;
 using System;
+using System.Threading.Tasks;
 
-namespace GameProject02.Views;
-
-public partial class GangCreatePage : ContentPage
+namespace GameProject02.Views
 {
-    private PlayerAccount _player;
-
-    public GangCreatePage()
+    public partial class GangCreatePage : ContentPage
     {
-        InitializeComponent();
-        _player = AccountService.GetCurrentPlayer();
-    }
-
-    private void OnTagTextChanged(object sender, TextChangedEventArgs e)
-    {
-        // Auto-format to uppercase letters only
-        TagEntry.Text = new string(e.NewTextValue.ToUpper().Where(char.IsLetter).ToArray());
-    }
-
-    private async void OnCreateClicked(object sender, EventArgs e)
-    {
-        string name = NameEntry.Text?.Trim() ?? "";
-        string tag = TagEntry.Text?.Trim() ?? "";
-
-        // ✅ AUTHENTIC OLD GAME VALIDATION
-        var (isValid, message) = GangService.ValidateGangCreation(_player, name, tag);
-        if (!isValid)
+        public GangCreatePage()
         {
-            StatusLabel.Text = $"❌ {message}";
-            return;
+            InitializeComponent();
         }
 
-        CreateButton.IsEnabled = false;
-        CreateButton.Text = "جاري الإنشاء...";
-
-        try
+        private async void OnCreateGangClicked(object sender, EventArgs e)
         {
-            // ✅ CREATE GANG & ASSIGN TO PLAYER
-            var gang = GangService.CreateGang(_player, name, tag);
+            var player = AccountService.GetCurrentPlayer();
+            if (player == null) return;
 
-            StatusLabel.Text = "✅ تم إنشاء العصابة بنجاح!";
-            await Task.Delay(800);
+            string name = GangNameEntry.Text?.Trim();
+            string tag = GangTagEntry.Text?.Trim();
 
-            // Navigate to gang profile
-            await Navigation.PushAsync(new GangProfilePage());
-        }
-        catch (Exception ex)
-        {
-            StatusLabel.Text = $"❌ خطأ: {ex.Message}";
-            CreateButton.IsEnabled = true;
-            CreateButton.Text = "🏴󠁥󠁮󠁧󠁢󠁳󠁣󠁿 إنشاء العصابة";
+            var (isValid, message) = GangService.ValidateGangCreation(player, name, tag);
+            if (!isValid)
+            {
+                InfoLabel.Text = message;
+                return;
+            }
+
+            CreateButton.IsEnabled = false;
+            LoadingIndicator.IsRunning = true;
+            LoadingIndicator.IsVisible = true;
+
+            try
+            {
+                // ✅ Wait for the gang to be saved to Firestore
+                var gang = await GangService.CreateGangAsync(player, name, tag);
+
+                // Also save the player (gangId updated)
+                _ = FirebaseService.SavePlayerAsync(player);
+
+                await DisplayAlert("تم", $"تم إنشاء العصابة {gang.Name} بنجاح!", "موافق");
+                await Navigation.PopAsync();
+            }
+            catch (Exception ex)
+            {
+                await DisplayAlert("خطأ", "فشل إنشاء العصابة. حاول مرة أخرى.", "موافق");
+                System.Diagnostics.Debug.WriteLine($"[GANG] Create error: {ex.Message}");
+            }
+            finally
+            {
+                CreateButton.IsEnabled = true;
+                LoadingIndicator.IsRunning = false;
+                LoadingIndicator.IsVisible = false;
+            }
         }
     }
-
-    private async void OnBackClicked(object sender, EventArgs e) => await Navigation.PopAsync();
 }
