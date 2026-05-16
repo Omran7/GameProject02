@@ -70,6 +70,8 @@
 
                     <Button Grid.Row="8" Grid.Column="1" Text="💬 الشات" 
                             BackgroundColor="#8e44ad" TextColor="White" HeightRequest="60" CornerRadius="12" FontAttributes="Bold" Clicked="OnChatClicked"/>
+                    <Button Grid.Row="8" Grid.Column="0" Text="💬 الرسائل الخاصة" 
+                            BackgroundColor="#8e44ad" TextColor="White" HeightRequest="60" CornerRadius="12" FontAttributes="Bold" Clicked="OnPrivateChatClicked"/>
                 </Grid>
 
                 <Button Text="👤 الملف الشخصي" 

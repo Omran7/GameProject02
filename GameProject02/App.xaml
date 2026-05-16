@@ -31,6 +31,12 @@
             <!-- ✅ CONVERTERS (MUST BE OUTSIDE MergedDictionaries) -->
             <converters:InverseBoolConverter x:Key="InverseBoolConverter"/>
             <converters:LockedToColorConverter x:Key="LockedToColorConverter"/>
+
+            <!-- ✅ NEW CONVERTERS FOR CHAT -->
+            <converters:BoolToHorizontalOptionsConverter x:Key="BoolToHorizontalOptions"/>
+            <converters:BoolToAlignmentConverter x:Key="BoolToAlignmentConverter"/>
+            <converters:IsCurrentUserToBgConverter x:Key="IsCurrentUserToBg"/>
+            <converters:HasUnreadConverter x:Key="HasUnreadConverter"/>
         </ResourceDictionary>
     </Application.Resources>
 </Application>

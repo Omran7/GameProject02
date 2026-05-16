@@ -177,6 +177,7 @@ public partial class MainPage : ContentPage, INotifyPropertyChanged
     private async void OnNewsClicked(object sender, EventArgs e) => await Navigation.PushAsync(new NewsPage());
     private async void OnAirportClicked(object sender, EventArgs e) => await Navigation.PushAsync(new AirportPage());
     private async void OnChatClicked(object sender, EventArgs e) => await Navigation.PushAsync(new ChatPage());
+    private async void OnPrivateChatClicked(object sender, EventArgs e) => await Navigation.PushAsync(new PrivateChatListPage());
 
     private async void OnGangClicked(object sender, EventArgs e)
     {

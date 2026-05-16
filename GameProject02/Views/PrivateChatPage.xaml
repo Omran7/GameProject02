@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:converters="clr-namespace:GameProject02.Converters"
+             x:Class="GameProject02.Views.PrivateChatPage"
+             Title="{Binding OtherPlayerName}"
+             BackgroundColor="#1a1a1a">
+
+    <ContentPage.Resources>
+        <converters:MessageBackgroundConverter x:Key="MessageBackgroundConverter" />
+        <converters:MessageAlignmentConverter x:Key="MessageAlignmentConverter" />
+    </ContentPage.Resources>
+
+    <Grid RowDefinitions="*,Auto" Padding="0">
+        <CollectionView x:Name="MessagesList" Grid.Row="0" Margin="10"
+                        ItemsSource="{Binding Messages}">
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+                    <Grid Padding="8,4">
+                        <Border Margin="0,2" Padding="12" 
+                                BackgroundColor="{Binding IsCurrentPlayer, Converter={StaticResource MessageBackgroundConverter}}"
+                                HorizontalOptions="{Binding IsCurrentPlayer, Converter={StaticResource MessageAlignmentConverter}}">
+                            <VerticalStackLayout>
+                                <Label Text="{Binding Content}" TextColor="White" FontSize="14"/>
+                                <Label Text="{Binding DisplayTime}" TextColor="#888" FontSize="10" HorizontalOptions="End"/>
+                            </VerticalStackLayout>
+                        </Border>
+                    </Grid>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+
+        <Grid Grid.Row="1" ColumnDefinitions="*,Auto" Padding="8" BackgroundColor="#0a0a0a">
+            <Entry x:Name="MessageEntry" Placeholder="اكتب رسالتك..." 
+                   BackgroundColor="#2d2d2d" TextColor="White" PlaceholderColor="#888"
+                   Completed="OnSendClicked"/>
+            <Button Grid.Column="1" Text="📤" BackgroundColor="#27ae60" 
+                    TextColor="White" Clicked="OnSendClicked" Margin="4,0,0,0"/>
+        </Grid>
+    </Grid>
+</ContentPage>

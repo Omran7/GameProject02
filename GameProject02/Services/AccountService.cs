@@ -30,7 +30,6 @@ namespace GameProject02.Services
             }
         }
 
-        // ✅ ADDED: Optional method for compatibility with SetCurrentPlayer calls
         public static void SetCurrentPlayer(PlayerAccount player) => CurrentPlayer = player;
 
         private const string FirestoreBaseUrl = "https://firestore.googleapis.com/v1/projects/gameproject02-4207f/databases/(default)/documents";
@@ -49,15 +48,12 @@ namespace GameProject02.Services
             if (string.IsNullOrWhiteSpace(username) || username.Length < 3) return false;
             if (string.IsNullOrWhiteSpace(password) || password.Length < 4) return false;
 
-            // ✅ Check local cache (fast)
             if (_localAccounts.Values.Any(x => x.Username.Equals(username, StringComparison.OrdinalIgnoreCase)))
                 return false;
 
-            // ✅ 🔥 NEW: Check the cloud username mapping (prevents overwrite)
             string existingPlayerId = await GetPlayerIdByUsernameAsync(username);
             if (existingPlayerId != null)
             {
-                // Username already exists in the cloud – cannot register again
                 await ShowAlert("Registration Failed", "This username is already taken. Please choose another.");
                 return false;
             }
@@ -89,7 +85,6 @@ namespace GameProject02.Services
             if (!mappingSaved)
                 await ShowAlert("Warning", "Account created, but username lookup may not work on other devices.");
 
-            // Welcome notification
             NotificationService.AddGameNotification(
                 title: "🎉 مرحباً!",
                 message: $"أهلاً بك {username}! ابدأ رحلتك في عالم الجريمة",
@@ -101,9 +96,9 @@ namespace GameProject02.Services
             RegenerationService.Start(_currentUser);
             return true;
         }
+
         public static async Task<bool> LoginAsync(string username, string password)
         {
-            // 1. Find playerId from local cache or username mapping
             var localAccount = _localAccounts.Values
                 .FirstOrDefault(x => x.Username.Equals(username, StringComparison.OrdinalIgnoreCase));
             string playerId = localAccount?.PlayerId ?? await GetPlayerIdByUsernameAsync(username);
@@ -113,7 +108,6 @@ namespace GameProject02.Services
                 return false;
             }
 
-            // 2. Load fresh player data from Firestore
             var cloudAccount = await FirebaseService.LoadPlayerAsync(playerId);
             if (cloudAccount == null)
             {
@@ -121,14 +115,12 @@ namespace GameProject02.Services
                 return false;
             }
 
-            // 3. Verify password
             if (cloudAccount.PasswordHash != HashPassword(password))
             {
                 await ShowAlert("Login Failed", "Incorrect password.");
                 return false;
             }
 
-            // 4. ✅ Load the gang if the player has a GangId
             if (!string.IsNullOrEmpty(cloudAccount.GangId))
             {
                 try
@@ -136,7 +128,6 @@ namespace GameProject02.Services
                     cloudAccount.GangObject = await GangDatabaseService.GetGangAsync(cloudAccount.GangId);
                     if (cloudAccount.GangObject == null)
                     {
-                        // Gang no longer exists – clear GangId
                         cloudAccount.GangId = string.Empty;
                         await FirebaseService.SavePlayerAsync(cloudAccount);
                     }
@@ -144,12 +135,10 @@ namespace GameProject02.Services
                 catch (Exception ex)
                 {
                     System.Diagnostics.Debug.WriteLine($"[LOGIN] Failed to load gang: {ex.Message}");
-                    // Continue without gang – player will need to rejoin
                     cloudAccount.GangObject = null;
                 }
             }
 
-            // 5. Update local caches
             _localAccounts[cloudAccount.PlayerId] = cloudAccount;
             if (localAccount != null && localAccount.PlayerId != cloudAccount.PlayerId)
                 _localAccounts.Remove(localAccount.PlayerId);
@@ -158,11 +147,10 @@ namespace GameProject02.Services
             RegisterPlayer(cloudAccount);
             EnsurePlayerRegistered(cloudAccount);
 
-            // 6. Start regeneration service
             RegenerationService.Start(_currentUser);
-
             return true;
         }
+
         private static async Task ShowAlert(string title, string message)
         {
             await MainThread.InvokeOnMainThreadAsync(async () =>
@@ -179,7 +167,7 @@ namespace GameProject02.Services
             if (player != null)
                 _ = FirebaseService.SavePlayerAsync(player);
 
-            NotificationService.ClearAll();   // harmless cleanup
+            NotificationService.ClearAll();
             _currentUser = null;
         }
 
@@ -197,7 +185,6 @@ namespace GameProject02.Services
             System.Diagnostics.Debug.WriteLine($"[SAVE] Player {player?.Username} state preserved");
         }
 
-        // Legacy training (kept for compatibility)
         public static void TrainAtGym()
         {
             if (_currentUser == null) return;
@@ -217,9 +204,6 @@ namespace GameProject02.Services
             CheckLevelUp();
         }
 
-        // This is ONLY used by the legacy training methods.
-        // For other XP sources (CrimeService, FightClubService, etc.) 
-        // you must manually add a level‑up notification after calling MainStatesObject.LevelUp().
         private static void CheckLevelUp()
         {
             if (_currentUser == null) return;
@@ -232,7 +216,6 @@ namespace GameProject02.Services
                 _currentUser.Gold += _currentUser.Level * 50;
                 _currentUser.Medals++;
 
-                // Level‑up notification (uses the new NotificationService)
                 NotificationService.AddGameNotification(
                     title: $"🎉 المستوى {_currentUser.Level}!",
                     message: $"تهانينا! وصلت للمستوى {_currentUser.Level}\n+{_currentUser.Level * 50} ذهب مكافأة",
@@ -241,8 +224,6 @@ namespace GameProject02.Services
                     actionTarget: "ProfilePage"
                 );
 
-                // Also save the player after the level‑up (the notification itself will trigger a save,
-                // but an extra save ensures the new stats are also persisted immediately)
                 _ = FirebaseService.SavePlayerAsync(_currentUser);
             }
             else
@@ -261,7 +242,6 @@ namespace GameProject02.Services
         {
             var player = _allPlayers.FirstOrDefault(p => p.PlayerId == playerId);
             if (player != null) return player;
-            // Try load from Firestore
             return await FirebaseService.LoadPlayerAsync(playerId);
         }
 
@@ -275,6 +255,143 @@ namespace GameProject02.Services
                 _allPlayers.Add(player);
                 System.Diagnostics.Debug.WriteLine($"[ACCOUNT] Registered player: {player.Username} (ID: {player.PlayerId})");
             }
+        }
+
+        // ─────────────────────────────────────────────────────────────
+        //  NEW: Fetch all players from Firestore (for private chat)
+        // ─────────────────────────────────────────────────────────────
+        public static async Task<List<PlayerAccount>> GetAllPlayersAsync()
+        {
+            try
+            {
+                var url = $"{FirestoreBaseUrl}/players?key={WebApiKey}&pageSize=500";
+                var response = await _httpClient.GetAsync(url);
+                if (!response.IsSuccessStatusCode) return new List<PlayerAccount>();
+                var json = await response.Content.ReadAsStringAsync();
+                return ParsePlayersList(json);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"[AccountService] GetAllPlayers error: {ex.Message}");
+                return new List<PlayerAccount>();
+            }
+        }
+
+        // Helper to parse the list of players from Firestore REST response
+        private static List<PlayerAccount> ParsePlayersList(string json)
+        {
+            var players = new List<PlayerAccount>();
+            try
+            {
+                using var doc = JsonDocument.Parse(json);
+                if (!doc.RootElement.TryGetProperty("documents", out var docs)) return players;
+                foreach (var d in docs.EnumerateArray())
+                {
+                    if (!d.TryGetProperty("name", out var nameProp)) continue;
+                    var playerId = nameProp.GetString()?.Split('/').Last() ?? "";
+                    var fields = d.GetProperty("fields");
+                    var player = ParsePlayerFromFirestoreFields(fields, playerId);
+                    if (player != null) players.Add(player);
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"[AccountService] ParsePlayersList error: {ex.Message}");
+            }
+            return players;
+        }
+
+        // Firestore fields → PlayerAccount (mirrors FirebaseService.ParsePlayerFromFirestoreFields)
+        private static PlayerAccount ParsePlayerFromFirestoreFields(JsonElement fields, string playerId)
+        {
+            var player = new PlayerAccount { PlayerId = playerId };
+
+            // Use helper extensions (same as in FirebaseService)
+            player.Username = GetString(fields, "username") ?? "";
+            player.PasswordHash = GetString(fields, "passwordHash") ?? "";
+            player.AvatarPath = GetString(fields, "avatarPath") ?? player.AvatarPath;
+            player.Gender = GetString(fields, "gender") ?? "ذكر";
+            player.City = GetString(fields, "city") ?? "مدينة العصابات";
+            player.IsVIP = GetBoolean(fields, "isVIP");
+            player.AchievementPoints = GetInt32(fields, "achievementPoints");
+            player.Medals = GetInt32(fields, "medals");
+            player.Level = GetInt32(fields, "level");
+            player.Gold = GetInt32(fields, "gold");
+            player.Diamonds = GetInt32(fields, "diamonds");
+            player.Checks = GetInt32(fields, "checks");
+            player.Energy = GetInt32(fields, "energy");
+            player.MaxEnergy = GetInt32(fields, "maxEnergy");
+            player.Courage = GetInt32(fields, "courage");
+            player.MaxCourage = GetInt32(fields, "maxCourage");
+            player.NobilityCurrent = GetInt32(fields, "nobilityCurrent");
+            player.Health = GetInt32(fields, "health");
+            player.MaxHealth = GetInt32(fields, "maxHealth");
+            player.Strength = GetInt32(fields, "strength");
+            player.Defense = GetInt32(fields, "defense");
+            player.Speed = GetInt32(fields, "speed");
+            player.Dexterity = GetInt32(fields, "dexterity");
+            player.Intelligence = GetInt32(fields, "intelligence");
+            player.CurrentXP = GetInt32(fields, "currentXP");
+            player.MaxXP = GetInt32(fields, "maxXP");
+            player.PersonalContribution = GetInt32(fields, "personalContribution");
+            player.PersonalLoyalty = GetInt64(fields, "personalLoyalty");
+            player.PersonalRespect = GetInt64(fields, "personalRespect");
+            player.CrystalCount = GetInt32(fields, "crystalCount");
+            player.CrimeAttempts = GetInt32(fields, "crimeAttempts");
+            player.Shovels = GetInt32(fields, "shovels");
+            player.HospitalVisits = GetInt32(fields, "hospitalVisits");
+            player.JailTimes = GetInt32(fields, "jailTimes");
+            player.Flights = GetInt32(fields, "flights");
+            player.HerbsUsed = GetInt32(fields, "herbsUsed");
+            player.ItemsFound = GetInt32(fields, "itemsFound");
+            player.GangId = GetString(fields, "gangId") ?? "";
+            player.EstateType = GetString(fields, "estateType") ?? player.EstateType;
+            player.EstateOwner = GetString(fields, "estateOwner") ?? player.EstateOwner;
+            player.EstateHours = GetInt32(fields, "estateHours");
+            player.EstateUpgrades = GetInt32(fields, "estateUpgrades");
+            player.EstateWorkers = GetInt32(fields, "estateWorkers");
+            player.ImageResource = GetString(fields, "imageResource") ?? player.ImageResource;
+
+            return player;
+        }
+
+        // Firestore field extraction helpers (simplified version)
+        private static string GetString(JsonElement fields, string key)
+        {
+            if (fields.TryGetProperty(key, out var prop) && prop.TryGetProperty("stringValue", out var v))
+                return v.GetString();
+            return null;
+        }
+
+        private static int GetInt32(JsonElement fields, string key)
+        {
+            if (fields.TryGetProperty(key, out var prop) && prop.TryGetProperty("integerValue", out var v))
+            {
+                if (v.ValueKind == JsonValueKind.String && int.TryParse(v.GetString(), out int result))
+                    return result;
+                if (v.ValueKind == JsonValueKind.Number)
+                    return v.GetInt32();
+            }
+            return 0;
+        }
+
+        private static long GetInt64(JsonElement fields, string key)
+        {
+            if (fields.TryGetProperty(key, out var prop) && prop.TryGetProperty("integerValue", out var v))
+            {
+                if (v.ValueKind == JsonValueKind.String && long.TryParse(v.GetString(), out long result))
+                    return result;
+                if (v.ValueKind == JsonValueKind.Number)
+                    return v.GetInt64();
+            }
+            return 0;
+        }
+
+        private static bool GetBoolean(JsonElement fields, string key)
+        {
+            if (fields.TryGetProperty(key, out var prop) && prop.TryGetProperty("booleanValue", out var v))
+                return v.GetBoolean();
+            return false;
         }
 
         private static async Task<bool> SaveUsernameMappingAsync(string username, string playerId)

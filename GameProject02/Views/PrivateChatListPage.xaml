@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="GameProject02.Views.PrivateChatListPage"
+             Title="المحادثات الخاصة"
+             BackgroundColor="#121212">
+
+    <Grid RowDefinitions="Auto, *">
+        <!-- Header -->
+        <Border Grid.Row="0" BackgroundColor="#0a0a0a" Padding="15,10" Margin="0,0,0,10">
+            <Label Text="📩 المحادثات الخاصة" 
+                   TextColor="White" 
+                   FontSize="18" 
+                   FontAttributes="Bold" 
+                   HorizontalOptions="Center"/>
+        </Border>
+
+        <!-- Conversations List -->
+        <CollectionView x:Name="ConversationsListView"
+                        Grid.Row="1"
+                        ItemsSource="{Binding Conversations}"
+                        SelectionMode="Single"
+                        SelectionChanged="OnConversationSelected"
+                        Margin="10,0">
+
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+                    <Border BackgroundColor="#1E1E1E" StrokeShape="RoundRectangle 12" Padding="12" Margin="0,5">
+                        <Grid ColumnDefinitions="Auto, *, Auto">
+                            <Label Grid.Column="0" Text="👤" FontSize="28" VerticalOptions="Center" Margin="0,0,12,0"/>
+                            <StackLayout Grid.Column="1" VerticalOptions="Center" Spacing="4">
+                                <Label Text="{Binding OtherUserName}" TextColor="White" FontAttributes="Bold" FontSize="16"/>
+                                <Label Text="{Binding LastMessage}" TextColor="#888888" FontSize="13" LineBreakMode="TailTruncation" MaxLines="1"/>
+                            </StackLayout>
+                            <StackLayout Grid.Column="2" VerticalOptions="Center" HorizontalOptions="End" Spacing="4">
+                                <Label Text="{Binding TimeLabel}" TextColor="#666666" FontSize="11"/>
+                                <!-- Unread badge using Frame (supports CornerRadius) -->
+                                <Frame BackgroundColor="#e74c3c" 
+                                       CornerRadius="10" 
+                                       Padding="6,2" 
+                                       HeightRequest="18"
+                                       IsVisible="{Binding UnreadCount, Converter={StaticResource HasUnreadConverter}}">
+                                    <Label Text="{Binding UnreadCount}" 
+                                           TextColor="White" 
+                                           FontSize="10" 
+                                           FontAttributes="Bold" 
+                                           HorizontalOptions="Center" 
+                                           VerticalOptions="Center"/>
+                                </Frame>
+                            </StackLayout>
+                        </Grid>
+                    </Border>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+
+        <!-- Loading Indicator -->
+        <ActivityIndicator x:Name="LoadingIndicator" 
+                           Grid.Row="1"
+                           IsRunning="False" 
+                           IsVisible="False" 
+                           Color="#FFD700" 
+                           VerticalOptions="Center" 
+                           HorizontalOptions="Center" />
+
+        <!-- Floating Action Button -->
+        <Button Grid.Row="1" 
+                Text="➕" 
+                FontSize="24" 
+                TextColor="White" 
+                BackgroundColor="#3498db" 
+                CornerRadius="30" 
+                WidthRequest="60" 
+                HeightRequest="60" 
+                Margin="0,0,15,15" 
+                HorizontalOptions="End" 
+                VerticalOptions="End" 
+                Clicked="OnNewChatClicked"/>
+    </Grid>
+</ContentPage>
