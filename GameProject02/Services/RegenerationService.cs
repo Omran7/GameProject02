@@ -58,9 +58,15 @@ public static class RegenerationService
     {
         var now = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
 
+        // ✅ SKILL #14: طويل العمر (Speed up regeneration)
+        var longLifeSkill = _player?.Skills.FirstOrDefault(s => s.Id == 14 && s.IsEquipped);
+        double regenMultiplier = 1.0;
+        if (longLifeSkill != null)
+            regenMultiplier = 1.0 + (longLifeSkill.Level * 0.10);
+
         // Energy
         long lastEnergy = Preferences.Get(KeyEnergy, now);
-        int energyTicks = CalcTicks(now, lastEnergy, EnergyIntervalMin);
+        int energyTicks = CalcTicks(now, lastEnergy, EnergyIntervalMin / regenMultiplier);
         if (energyTicks > 0)
         {
             int old = _player.Energy;
@@ -76,7 +82,7 @@ public static class RegenerationService
 
         // Courage
         long lastCourage = Preferences.Get(KeyCourage, now);
-        int courageTicks = CalcTicks(now, lastCourage, CourageIntervalMin);
+        int courageTicks = CalcTicks(now, lastCourage, CourageIntervalMin / regenMultiplier);
         if (courageTicks > 0)
         {
             int old = _player.Courage;
@@ -92,7 +98,7 @@ public static class RegenerationService
 
         // Nobility
         long lastNobility = Preferences.Get(KeyNobility, now);
-        int nobilityTicks = CalcTicks(now, lastNobility, NobilityIntervalMin);
+        int nobilityTicks = CalcTicks(now, lastNobility, NobilityIntervalMin / regenMultiplier);
         if (nobilityTicks > 0)
         {
             int old = _player.NobilityCurrent;
@@ -108,7 +114,7 @@ public static class RegenerationService
 
         // Health
         long lastHealth = Preferences.Get(KeyHealth, now);
-        int healthTicks = CalcTicks(now, lastHealth, HealthIntervalMin);
+        int healthTicks = CalcTicks(now, lastHealth, HealthIntervalMin / regenMultiplier);
         if (healthTicks > 0)
         {
             int gain = (int)(_player.MaxHealth * HealthPercentPerTick * healthTicks);
@@ -122,9 +128,15 @@ public static class RegenerationService
         if (_player == null) return;
         var now = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
 
+        // ✅ SKILL #14: طويل العمر (Speed up regeneration)
+        var longLifeSkill = _player?.Skills.FirstOrDefault(s => s.Id == 14 && s.IsEquipped);
+        double regenMultiplier = 1.0;
+        if (longLifeSkill != null)
+            regenMultiplier = 1.0 + (longLifeSkill.Level * 0.10);
+
         // Energy
         long lastEnergy = Preferences.Get(KeyEnergy, now);
-        if (CalcTicks(now, lastEnergy, EnergyIntervalMin) >= 1 && _player.Energy < _player.MaxEnergy)
+        if (CalcTicks(now, lastEnergy, EnergyIntervalMin / regenMultiplier) >= 1 && _player.Energy < _player.MaxEnergy)
         {
             int old = _player.Energy;
             _player.Energy = Math.Min(_player.MaxEnergy, _player.Energy + EnergyPerTick);
@@ -139,7 +151,7 @@ public static class RegenerationService
 
         // Courage
         long lastCourage = Preferences.Get(KeyCourage, now);
-        if (CalcTicks(now, lastCourage, CourageIntervalMin) >= 1 && _player.Courage < _player.MaxCourage)
+        if (CalcTicks(now, lastCourage, CourageIntervalMin / regenMultiplier) >= 1 && _player.Courage < _player.MaxCourage)
         {
             int old = _player.Courage;
             _player.Courage = Math.Min(_player.MaxCourage, _player.Courage + CouragePerTick);
@@ -154,7 +166,7 @@ public static class RegenerationService
 
         // Nobility
         long lastNobility = Preferences.Get(KeyNobility, now);
-        if (CalcTicks(now, lastNobility, NobilityIntervalMin) >= 1 && _player.NobilityCurrent < 100)
+        if (CalcTicks(now, lastNobility, NobilityIntervalMin / regenMultiplier) >= 1 && _player.NobilityCurrent < 100)
         {
             int old = _player.NobilityCurrent;
             _player.NobilityCurrent = Math.Min(100, _player.NobilityCurrent + NobilityPerTick);
@@ -169,7 +181,7 @@ public static class RegenerationService
 
         // Health
         long lastHealth = Preferences.Get(KeyHealth, now);
-        if (CalcTicks(now, lastHealth, HealthIntervalMin) >= 1 && _player.Health < _player.MaxHealth)
+        if (CalcTicks(now, lastHealth, HealthIntervalMin / regenMultiplier) >= 1 && _player.Health < _player.MaxHealth)
         {
             int gain = (int)(_player.MaxHealth * HealthPercentPerTick);
             _player.Health = Math.Min(_player.MaxHealth, _player.Health + gain);

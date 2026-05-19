@@ -7,7 +7,6 @@ namespace GameProject02.Services;
 
 public static class MarketService
 {
-    // المصدر الوحيد للحقيقة: يحتفظ بجميع العناصر التي تم توليدها
     private static Dictionary<string, MarketItem> _allItemsCache = new();
     private static Random _random = new Random();
     private static int _currentRoseCrystalMinuteOffset = -1;
@@ -17,10 +16,8 @@ public static class MarketService
 
     public static List<MarketItem> GetItemsByCategory(int categoryType, int subCategory = 0)
     {
-        // 1. الحصول على العناصر الأساسية (إذا لم تكن موجودة، يتم إنشاؤها)
         var baseItems = GetOrCreateBaseItems(categoryType, subCategory);
 
-        // 2. نعمل على نسخة من العناصر (حتى لا نعدل الكاش مباشرة أثناء المعالجة)
         var resultItems = baseItems.Select(item => new MarketItem
         {
             ItemId = item.ItemId,
@@ -46,13 +43,11 @@ public static class MarketService
             RestockMinuteOffset = item.RestockMinuteOffset
         }).ToList();
 
-        // 3. معالجة التجديد لكل عنصر في النسخة
         foreach (var item in resultItems)
         {
             ProcessRestock(item);
         }
 
-        // 4. تحديث الكاش بالقيم الجديدة بعد التجديد
         foreach (var item in resultItems)
         {
             if (_allItemsCache.TryGetValue(item.ItemId, out var cachedItem))
@@ -67,12 +62,10 @@ public static class MarketService
 
     private static List<MarketItem> GetOrCreateBaseItems(int categoryType, int subCategory)
     {
-        // نحاول جلب العناصر من الكاش حسب الفئة
         var items = _allItemsCache.Values
             .Where(i => i.CategoryType == categoryType)
             .ToList();
 
-        // إذا كانت الفئة فارغة في الكاش، ننشئها
         if (items.Count == 0)
         {
             items = GenerateBaseItems(categoryType, subCategory);
@@ -147,11 +140,24 @@ public static class MarketService
         return CalculateNextRestockTime(cachedItem.LastRestockTime, minuteOffset);
     }
 
+    // ✅ SKILL #18: ساوم صعب (Reduce market prices)
+    public static long GetItemPriceWithSkill(PlayerAccount player, MarketItem item)
+    {
+        long basePrice = item.PriceGold;
+
+        var bargainSkill = player?.Skills.FirstOrDefault(s => s.Id == 18 && s.IsEquipped);
+        if (bargainSkill != null)
+        {
+            double discount = Math.Max(0.70, 1.0 - (bargainSkill.Level * 0.05));
+            return (int)(basePrice * discount);
+        }
+        return basePrice;
+    }
+
     private static List<MarketItem> GenerateBaseItems(int categoryType, int subCategory)
     {
         var items = new List<MarketItem>();
 
-        // --- جميع العناصر كما هي بدون تغيير (نفس الكود السابق) ---
         switch (categoryType)
         {
             case 0:
@@ -234,7 +240,7 @@ public static class MarketService
         return items;
     }
 
-    public static bool TryPurchaseItem(string itemId, int quantity, out int newStock)
+    public static bool TryPurchaseItem(string itemId, int quantity, out int newStock, PlayerAccount player = null)
     {
         newStock = 0;
         if (!_allItemsCache.TryGetValue(itemId, out var item))

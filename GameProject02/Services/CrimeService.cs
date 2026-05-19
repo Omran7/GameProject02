@@ -65,10 +65,19 @@ public static class CrimeService
             }
         }
 
-        if (player.Courage < crime.CourageCost)
-            return (false, $"ليس لديك ما يكفي من الشجاعة!\nتحتاج {crime.CourageCost} / لديك {player.Courage}.");
+        // ✅ SKILL #13: لا يخاف (Reduce courage cost)
+        int courageCost = crime.CourageCost;
+        var noFearSkill = player.Skills.FirstOrDefault(s => s.Id == 13 && s.IsEquipped);
+        if (noFearSkill != null)
+        {
+            double reduction = Math.Max(0.60, 1.0 - (noFearSkill.Level * 0.06));
+            courageCost = (int)(courageCost * reduction);
+        }
 
-        player.Courage -= crime.CourageCost;
+        if (player.Courage < courageCost)
+            return (false, $"ليس لديك ما يكفي من الشجاعة!\nتحتاج {courageCost} / لديك {player.Courage}.");
+
+        player.Courage -= courageCost;
         player.CrimeObject.TotalCrimesAttempted++;
 
         int currentProgress = player.CrimeObject.TaskProgress.GetValueOrDefault(linearIndex, 0);
@@ -76,8 +85,20 @@ public static class CrimeService
                               ? Math.Clamp((double)currentProgress / crime.RequiredSuccesses, 0, 1)
                               : 1.0;
 
-        int colorBonus = percent >= 1.0 ? 0 : percent >= 0.50 ? -10 : -20;
+        // ✅ FIX: No color penalty for the first crime in each type (crimeItemId == 0)
+        int colorBonus = 0;
+        if (crimeItemId > 0) // not the first crime of this type
+        {
+            colorBonus = percent >= 1.0 ? 0 : percent >= 0.50 ? -10 : -20;
+        }
+
         int baseChance = crime.BaseSuccessChance;
+
+        // ✅ SKILL #4: خطوات الظل (Increase success chance)
+        var shadowStepSkill = player.Skills.FirstOrDefault(s => s.Id == 4 && s.IsEquipped);
+        if (shadowStepSkill != null)
+            baseChance += (int)(shadowStepSkill.Level * 3);
+
         int statBonus = player.Level / 2 + player.Dexterity / 10;
         int successChance = Math.Clamp(Math.Min(95, baseChance + statBonus + colorBonus), 5, 95);
         bool success = random.Next(100) < successChance;
@@ -85,18 +106,44 @@ public static class CrimeService
         if (success)
         {
             int cashReward = random.Next(crime.Reward.CashRewardMin, crime.Reward.CashRewardMax + 1);
+
+            // ✅ SKILL #10: لص محترف (Increase crime gold)
+            var proThiefSkill = player.Skills.FirstOrDefault(s => s.Id == 10 && s.IsEquipped);
+            if (proThiefSkill != null)
+                cashReward = (int)(cashReward * (1.0 + (proThiefSkill.Level * 0.15)));
+
             player.Gold += cashReward;
 
             int xpReward = crime.Reward.ExperienceReward + (crimeTypeId * 10);
-            bool leveledUp = player.MainStatesObject.AddExperience(xpReward);
+
+            // ✅ SKILL #15: خبير (Increase XP gain)
+            var expertSkill = player.Skills.FirstOrDefault(s => s.Id == 15 && s.IsEquipped);
+            if (expertSkill != null)
+                xpReward = (int)(xpReward * (1.0 + (expertSkill.Level * 0.12)));
+
+            // ✅ FIXED: Pass 'player' argument to AddExperience
+            bool leveledUp = player.MainStatesObject.AddExperience(xpReward, player);
             player.CurrentXP = player.MainStatesObject.CurrentExperience;
 
             var receivedItems = new List<string>();
             foreach (var itemReward in crime.Reward.ItemRewards)
             {
-                if (random.Next(100) < itemReward.DropChance)
+                int dropChance = itemReward.DropChance;
+
+                // ✅ SKILL #16: محظوظ (Increase rare drop chance)
+                var luckySkill = player.Skills.FirstOrDefault(s => s.Id == 16 && s.IsEquipped);
+                if (luckySkill != null)
+                    dropChance = Math.Min(100, dropChance + (luckySkill.Level * 8));
+
+                if (random.Next(100) < dropChance)
                 {
                     int itemCount = random.Next(itemReward.MinCount, itemReward.MaxCount + 1);
+
+                    // ✅ SKILL #22: الغنيمة غنيمته (Increase loot quantity)
+                    var lootSkill = player.Skills.FirstOrDefault(s => s.Id == 22 && s.IsEquipped);
+                    if (lootSkill != null)
+                        itemCount = (int)(itemCount * (1 + (lootSkill.Level * 0.2)));
+
                     if (!player.StockObject.ItemsInStock.ContainsKey(itemReward.ItemId))
                         player.StockObject.ItemsInStock[itemReward.ItemId] = new StockItem { Count = 0 };
                     player.StockObject.ItemsInStock[itemReward.ItemId].Count += itemCount;
@@ -123,7 +170,9 @@ public static class CrimeService
             player.CrimeObject.TotalCrimesSuccessful++;
             MissionService.OnCrimeDone(player, crimeTypeId, true);
 
-            // ✅ NOTIFICATION: Crime Success
+            // ✅ Check for medals after successful crime
+            MedalService.CheckAndAwardAll(player);
+
             NotificationService.AddGameNotification(
                 title: "✅ جريمة ناجحة!",
                 message: $"نجحت في {crime.Name}!\n+{cashReward:N0} ذهب، +{xpReward} خبرة",
@@ -151,12 +200,22 @@ public static class CrimeService
                 player.CrimeObject.HospitalReason = $"فشلت في {crime.Name} وجرحت نفسك";
                 player.CrimeObject.TotalHospitalVisits++;
 
+                // ✅ SKILL #8: تعافي سريع (Reduce hospital time)
                 int hospitalMinutes = 2 + (crimeTypeId * 5);
+                var fastRecoverySkill = player.Skills.FirstOrDefault(s => s.Id == 8 && s.IsEquipped);
+                if (fastRecoverySkill != null)
+                {
+                    double multiplier = Math.Max(0.50, 1.0 - (fastRecoverySkill.Level * 0.08));
+                    hospitalMinutes = (int)(hospitalMinutes * multiplier);
+                }
+
                 player.CrimeObject.HospitalReleaseTime =
                     DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() + (long)TimeSpan.FromMinutes(hospitalMinutes).TotalMilliseconds;
                 player.CrimeObject.HealthCurrent = Math.Max(1, player.CrimeObject.HealthCurrent - 50);
 
-                // ✅ NOTIFICATION: Hospital
+                // ✅ Check for medals after hospital admission
+                MedalService.CheckAndAwardAll(player);
+
                 NotificationService.AddGameNotification(
                     title: "🏥 في المستشفى",
                     message: $"فشلت في {crime.Name}\nالعلاج: {hospitalMinutes} دقيقة",
@@ -185,7 +244,9 @@ public static class CrimeService
                 player.CrimeObject.PrisonBailAmount = (crimeTypeId + 1) * 1000 + (player.Level * 500);
                 player.CrimeObject.PrisonReason = $"فشلت في {crime.Name}";
 
-                // ✅ NOTIFICATION: Prison
+                // ✅ Check for medals after prison admission
+                MedalService.CheckAndAwardAll(player);
+
                 NotificationService.AddGameNotification(
                     title: "⛓️ في السجن",
                     message: $"فشلت في {crime.Name}\nالكفالة: {player.CrimeObject.PrisonBailAmount:N0} ذهب",

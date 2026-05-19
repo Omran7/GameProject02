@@ -65,6 +65,9 @@ public class PlayerAccount : INotifyPropertyChanged
     public int Diamonds { get; set; } = 0;
     public long Checks { get; set; } = 0;
 
+    // Currency used specifically to upgrade skills
+    public int Merits { get; set; } = 0;
+
     // ══════════════════════════════════════════════════════════════════
     //  البارات الأربعة — القيم والحدود
     //  التجديد يُدار بالكامل من RegenerationService
@@ -191,6 +194,10 @@ public class PlayerAccount : INotifyPropertyChanged
     public int HappinessMultiplier { get; set; } = 1;
     public int EstateHappinessBonus { get; set; } = 0;
     public int GymEfficiency { get; set; } = 0;
+    public List<int> EarnedMedalIds { get; set; } = new();
+
+    public List<Skill> Skills { get; set; } = new();
+    public int SkillPoints { get; set; } = 0; // Earned from level-ups
 
     // ══════════════════════════════════════════════════════════════════
     //  مهارات
@@ -272,31 +279,8 @@ public class PlayerAccount : INotifyPropertyChanged
         Notifications = new List<NotificationItem>();
         AvatarPath = Preferences.Get("AvatarPath", "player_avatar.png");
         GangId = string.Empty;
-    }
-}
 
-// ══════════════════════════════════════════════════════════════════════
-//  Skill class
-// ══════════════════════════════════════════════════════════════════════
-public class Skill
-{
-    public string Name { get; set; }
-    public int Percentage { get; set; }
-    public int BaseValue { get; set; }
-    public int BonusValue { get; set; }
-
-    public Skill(string name, int percentage, int baseValue, int bonusValue)
-    {
-        Name = name;
-        Percentage = percentage;
-        BaseValue = baseValue;
-        BonusValue = bonusValue;
-    }
-
-    public string GetDescription()
-    {
-        if (BaseValue > 0)
-            return $"({BaseValue}:مجردة + {BonusValue}:مصاحبة)";
-        return $"({BonusValue}:مصاحبة)";
+        Skills = new List<Skill>();
+        SkillPoints = 0;
     }
 }

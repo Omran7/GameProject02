@@ -80,6 +80,8 @@ public partial class MainPage : ContentPage, INotifyPropertyChanged
     private void LoadPlayerData()
     {
         _player = AccountService.GetCurrentPlayer();
+        var player = AccountService.GetCurrentPlayer();
+        if (player != null) MedalService.CheckAndAwardAll(player);
         if (_player == null) return;
 
         // Ensure gang object is loaded if GangId exists but GangObject is null
@@ -177,7 +179,11 @@ public partial class MainPage : ContentPage, INotifyPropertyChanged
     private async void OnNewsClicked(object sender, EventArgs e) => await Navigation.PushAsync(new NewsPage());
     private async void OnAirportClicked(object sender, EventArgs e) => await Navigation.PushAsync(new AirportPage());
     private async void OnChatClicked(object sender, EventArgs e) => await Navigation.PushAsync(new ChatPage());
+    private async void OnSkillsClicked(object sender, EventArgs e) => await Navigation.PushAsync(new SkillsPage());
+    private async void OnTheShopClicked(object sender, EventArgs e) => await Navigation.PushAsync(new TheShopPage());
+    private async void OnLuckyWheelClicked(object sender, EventArgs e) => await Navigation.PushAsync(new LuckyWheelPage());
     private async void OnPrivateChatClicked(object sender, EventArgs e) => await Navigation.PushAsync(new PrivateChatListPage());
+    private async void OnMedalsClicked(object sender, EventArgs e) => await Navigation.PushAsync(new MedalsPage());
 
     private async void OnGangClicked(object sender, EventArgs e)
     {

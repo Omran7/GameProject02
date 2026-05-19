@@ -137,6 +137,7 @@ namespace GameProject02.Services
 
             player.Gold -= dest.TravelCostGold;
             player.Flights++;
+            MedalService.CheckAndAwardAll(player);
 
             // Enter plane state
             player.CrimeObject.IsInPlane = true;

@@ -35,6 +35,7 @@ namespace GameProject02.Views
                 {
                     var player = AccountService.GetCurrentPlayer();
                     player.CrimeObject.CheckConfinementStatus();
+                    MedalService.CheckAndAwardAll(player);
 
                     // ✅ if in plane → present PlanePage modally (cannot go back)
                     if (player.CrimeObject.IsInPlane &&

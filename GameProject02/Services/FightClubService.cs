@@ -183,6 +183,7 @@ namespace GameProject02.Services
                     GameNotificationPriority.High, "🏆", "ProfilePage"
                 );
             }
+            MedalService.CheckAndAwardAll(winner);
         }
     }
 }

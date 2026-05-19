@@ -1,4 +1,5 @@
-﻿using System;
+﻿using GameProject02.Services;
+using System;
 
 namespace GameProject02.Models;
 
@@ -55,23 +56,20 @@ public class MainStatesObject
     }
 
     // ✅ ADD EXPERIENCE (TRIGGERS AUTO LEVEL-UP)
-    public bool AddExperience(long amount)
+    public bool AddExperience(long amount, PlayerAccount player)
     {
         if (amount <= 0) return false;
-
         CurrentExperience += amount;
         bool leveledUp = false;
-
-        // ✅ HANDLE MULTIPLE LEVEL-UPS
         while (CanLevelUp())
         {
             LevelUp();
             leveledUp = true;
         }
-
+        if (leveledUp && player != null)
+            MedalService.CheckAndAwardAll(player);
         return leveledUp;
     }
-
     // ✅ GET LEVEL PROGRESS PERCENTAGE (FOR UI)
     public double GetLevelProgressPercentage()
     {

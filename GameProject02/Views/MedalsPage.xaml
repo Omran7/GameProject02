@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:local="clr-namespace:GameProject02.Views"
+             xmlns:controls="clr-namespace:GameProject02.Controls"
+             x:Class="GameProject02.Views.MedalsPage"
+             ControlTemplate="{StaticResource StickyHeaderTemplate}"
+             BackgroundColor="#1a1a1a"
+             Title="🏅 الميداليات"
+             FlowDirection="RightToLeft"
+             NavigationPage.HasNavigationBar="False">
+
+    <Grid RowDefinitions="Auto,*,Auto" Padding="0">
+        <Image Source="background.png" Aspect="AspectFill" Opacity="1" Grid.RowSpan="3"/>
+
+        <local:GameHeader HeaderTitle="الميداليات" Grid.Row="0"/>
+
+        <ScrollView Grid.Row="1" Margin="5,0,5,0">
+            <CollectionView x:Name="MedalsList" ItemsSource="{Binding Medals}">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <Border Stroke="Transparent" StrokeThickness="0" 
+                                StrokeShape="RoundRectangle 12" 
+                                Padding="0" 
+                                Margin="0,5,0,5">
+                            <Grid>
+                                <Image Source="card_background.png" Aspect="Fill" Opacity="1"/>
+                                <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="10" Padding="15">
+                                    <Image Source="{Binding ImageSource}" WidthRequest="50" HeightRequest="50" Aspect="AspectFit"/>
+                                    <VerticalStackLayout Grid.Column="1" Spacing="2" VerticalOptions="Center">
+                                        <Label Text="{Binding Name}" TextColor="White" FontSize="14" FontAttributes="Bold"/>
+                                        <Label Text="{Binding Description}" TextColor="#bdc3c7" FontSize="12"/>
+                                    </VerticalStackLayout>
+                                    <StackLayout Grid.Column="2" Spacing="2" VerticalOptions="Center">
+                                        <Label Text="{Binding MeritsReward, StringFormat='+{0} استحقاق'}" 
+                                               TextColor="#f39c12" FontSize="12" FontAttributes="Bold"
+                                               IsVisible="{Binding IsEarned, Converter={StaticResource InverseBoolConverter}}"/>
+                                        <Label Text="✅ مكتملة" TextColor="#2ecc71" FontSize="12" FontAttributes="Bold"
+                                               IsVisible="{Binding IsEarned}"/>
+                                    </StackLayout>
+                                </Grid>
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+        </ScrollView>
+
+        <controls:FooterView x:Name="PageFooter" Grid.Row="2"/>
+    </Grid>
+</ContentPage>

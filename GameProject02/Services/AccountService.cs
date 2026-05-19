@@ -216,6 +216,9 @@ namespace GameProject02.Services
                 _currentUser.Gold += _currentUser.Level * 50;
                 _currentUser.Medals++;
 
+                // ✅ GRANT SKILL POINTS ON LEVEL UP (3 points per level)
+                _currentUser.SkillPoints += 3;
+
                 NotificationService.AddGameNotification(
                     title: $"🎉 المستوى {_currentUser.Level}!",
                     message: $"تهانينا! وصلت للمستوى {_currentUser.Level}\n+{_currentUser.Level * 50} ذهب مكافأة",
@@ -230,6 +233,7 @@ namespace GameProject02.Services
             {
                 _currentUser.LevelProgress = (double)_currentUser.CurrentXP / _currentUser.MaxXP;
             }
+            MedalService.CheckAndAwardAll(_currentUser);
         }
 
         public static void RegisterPlayer(PlayerAccount player)
@@ -257,9 +261,6 @@ namespace GameProject02.Services
             }
         }
 
-        // ─────────────────────────────────────────────────────────────
-        //  NEW: Fetch all players from Firestore (for private chat)
-        // ─────────────────────────────────────────────────────────────
         public static async Task<List<PlayerAccount>> GetAllPlayersAsync()
         {
             try
@@ -277,7 +278,6 @@ namespace GameProject02.Services
             }
         }
 
-        // Helper to parse the list of players from Firestore REST response
         private static List<PlayerAccount> ParsePlayersList(string json)
         {
             var players = new List<PlayerAccount>();
@@ -301,12 +301,10 @@ namespace GameProject02.Services
             return players;
         }
 
-        // Firestore fields → PlayerAccount (mirrors FirebaseService.ParsePlayerFromFirestoreFields)
         private static PlayerAccount ParsePlayerFromFirestoreFields(JsonElement fields, string playerId)
         {
             var player = new PlayerAccount { PlayerId = playerId };
 
-            // Use helper extensions (same as in FirebaseService)
             player.Username = GetString(fields, "username") ?? "";
             player.PasswordHash = GetString(fields, "passwordHash") ?? "";
             player.AvatarPath = GetString(fields, "avatarPath") ?? player.AvatarPath;
@@ -355,7 +353,6 @@ namespace GameProject02.Services
             return player;
         }
 
-        // Firestore field extraction helpers (simplified version)
         private static string GetString(JsonElement fields, string key)
         {
             if (fields.TryGetProperty(key, out var prop) && prop.TryGetProperty("stringValue", out var v))
