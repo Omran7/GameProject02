@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="GameProject02.Views.GangMilitiaPage"
+             ControlTemplate="{StaticResource StickyHeaderTemplate}"
+             BackgroundColor="#1a1a1a"
+             Title="🛡️ الميليشيا"
+             FlowDirection="RightToLeft"
+             NavigationPage.HasNavigationBar="False">
+
+    <Grid RowDefinitions="Auto,*,Auto">
+        <!-- Header -->
+        <Border Grid.Row="0" BackgroundColor="#0a0a0a" Stroke="#e74c3c" StrokeThickness="2" Padding="10">
+            <Grid ColumnDefinitions="*,Auto">
+                <Label Text="🛡️ الميليشيا" TextColor="White" FontSize="18" FontAttributes="Bold" HorizontalOptions="Center"/>
+                <Button Grid.Column="1" Text="← رجوع" BackgroundColor="#95a5a6" TextColor="White" CornerRadius="8" WidthRequest="80" Clicked="OnBackClicked"/>
+            </Grid>
+        </Border>
+
+        <!-- List of Militia Units -->
+        <CollectionView x:Name="MilitiaListView" Grid.Row="1" Margin="10" ItemsSource="{Binding Units}">
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+                    <Border BackgroundColor="#2c2c2c" Stroke="#444" StrokeThickness="1" Margin="0,0,0,8" Padding="12" StrokeShape="RoundRectangle 10">
+                        <VerticalStackLayout Spacing="8">
+                            <!-- Header: Name and Image -->
+                            <Grid ColumnDefinitions="Auto,*,Auto">
+                                <Image Source="{Binding ImageSource}" HeightRequest="50" WidthRequest="50" Aspect="AspectFit"/>
+                                <Label Grid.Column="1" Text="{Binding Name}" TextColor="White" FontSize="16" FontAttributes="Bold" VerticalOptions="Center" Margin="10,0,0,0"/>
+                                <Button Grid.Column="2" Text="انضمام" BackgroundColor="#9b59b6" TextColor="White" CornerRadius="8" WidthRequest="90" Clicked="OnJoinMilitiaClicked" CommandParameter="{Binding Id}" IsVisible="{Binding IsJoined, Converter={StaticResource InverseBoolConverter}}"/>
+                                <Label Grid.Column="2" Text="عضو" TextColor="#2ecc71" FontSize="14" VerticalOptions="Center" HorizontalOptions="End" IsVisible="{Binding IsJoined}"/>
+                            </Grid>
+
+                            <!-- Courage required & Respect reward -->
+                            <Grid ColumnDefinitions="Auto,*,Auto,*" ColumnSpacing="10">
+                                <Label Text="الشجاعة المطلوبة:" TextColor="#bdc3c7" FontSize="12"/>
+                                <Label Grid.Column="1" Text="{Binding CourageReq}" TextColor="#e74c3c" FontSize="12" FontAttributes="Bold"/>
+                                <Label Grid.Column="2" Text="مكافأة الاحترام:" TextColor="#bdc3c7" FontSize="12"/>
+                                <Label Grid.Column="3" Text="{Binding RespectReward}" TextColor="#2ecc71" FontSize="12" FontAttributes="Bold"/>
+                            </Grid>
+
+                            <!-- Progress Bar for member count -->
+                            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                                <ProgressBar Progress="{Binding MemberProgress}" BackgroundColor="#555" ProgressColor="#3498db" HeightRequest="8" VerticalOptions="Center"/>
+                                <Label Grid.Column="1" Text="{Binding MemberCountText}" TextColor="White" FontSize="12"/>
+                            </Grid>
+
+                            <!-- Additional rewards (Optional: horizontal list without HorizontalLinearLayout) -->
+                            <Label Text="الجوائز الإضافية:" TextColor="#f39c12" FontSize="12" FontAttributes="Bold" IsVisible="{Binding HasAdditionalRewards}"/>
+                            <ScrollView Orientation="Horizontal" IsVisible="{Binding HasAdditionalRewards}">
+                                <HorizontalStackLayout Spacing="8">
+                                    <Label Text="{Binding AdditionalRewardsText}" TextColor="#bdc3c7" FontSize="11"/>
+                                </HorizontalStackLayout>
+                            </ScrollView>
+                        </VerticalStackLayout>
+                    </Border>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+
+        <!-- Bottom Bar -->
+        <Border Grid.Row="2" BackgroundColor="#0a0a0a" Stroke="#e74c3c" StrokeThickness="2" StrokeShape="RoundRectangle 15,15,0,0" Margin="10,5,10,10" Padding="10">
+            <Button Text="🏠 الرئيسية" BackgroundColor="#3498db" TextColor="White" CornerRadius="12" FontAttributes="Bold" Clicked="OnHomeClicked"/>
+        </Border>
+    </Grid>
+</ContentPage>

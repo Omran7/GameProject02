@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="GameProject02.Views.LuckyWheelPage"
+             Title="🎡 عجلة الحظ"
+             BackgroundColor="#1a1a1a"
+             FlowDirection="RightToLeft">
+
+    <Grid RowDefinitions="Auto, *, Auto">
+        <!-- Header -->
+        <Border Grid.Row="0" BackgroundColor="#0a0a0a" Padding="15,10">
+            <Grid ColumnDefinitions="*,Auto">
+                <Label Text="حاول حظك واربح الاستحقاقات!" TextColor="White" FontAttributes="Bold"/>
+                <Label Grid.Column="1" Text="{Binding PlayerMerits, StringFormat='🎯 {0}'}" TextColor="#f39c12" FontAttributes="Bold"/>
+            </Grid>
+        </Border>
+
+        <!-- Wheel Area -->
+        <Grid Grid.Row="1" RowDefinitions="*,Auto">
+            <Image x:Name="WheelImage" Source="wheel_base.png" Aspect="AspectFit" HorizontalOptions="Center" VerticalOptions="Center" />
+            <Label x:Name="RewardLabel" Text="جاري الدوران..." TextColor="White" FontSize="20" FontAttributes="Bold" 
+                   HorizontalOptions="Center" VerticalOptions="Center" IsVisible="False"/>
+        </Grid>
+
+        <!-- Controls -->
+        <StackLayout Grid.Row="2" Orientation="Horizontal" HorizontalOptions="Center" Spacing="15" Padding="10">
+            <Button Text="🎲 دورة واحدة" BackgroundColor="#3498db" TextColor="White" CornerRadius="10" WidthRequest="120" HeightRequest="45"
+                    Command="{Binding SpinCommand}" CommandParameter="1"/>
+            <Button Text="🎲 10 دورات" BackgroundColor="#2ecc71" TextColor="White" CornerRadius="10" WidthRequest="120" HeightRequest="45"
+                    Command="{Binding SpinCommand}" CommandParameter="10"/>
+        </StackLayout>
+    </Grid>
+</ContentPage>

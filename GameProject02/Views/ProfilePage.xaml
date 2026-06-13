@@ -1,0 +1,306 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="GameProject02.Views.ProfilePage"
+             ControlTemplate="{StaticResource StickyHeaderTemplate}"
+             BackgroundColor="#000000"
+             Title="Profile"
+             NavigationPage.HasNavigationBar="False">
+
+	<Grid>
+		<!-- Background Gradient -->
+		<Grid.Background>
+			<LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+				<GradientStop Color="#111111" Offset="0.0" />
+				<GradientStop Color="#0a0a0a" Offset="1.0" />
+			</LinearGradientBrush>
+		</Grid.Background>
+
+		<!-- Main Content -->
+		<ScrollView>
+			<VerticalStackLayout Spacing="0">
+
+				<!-- Top Header Section -->
+				<Border BackgroundColor="#001a33" Stroke="Transparent" StrokeShape="RoundRectangle 0,0,0,0" HeightRequest="120" Padding="15">
+					<Grid>
+						<Grid.ColumnDefinitions>
+							<ColumnDefinition Width="Auto"/>
+							<ColumnDefinition Width="*"/>
+							<ColumnDefinition Width="Auto"/>
+						</Grid.ColumnDefinitions>
+
+						<!-- Player Avatar & Info -->
+                        <Border Grid.Column="0" Stroke="Transparent" StrokeShape="RoundRectangle 35,35,35,35" WidthRequest="80" HeightRequest="80" BackgroundColor="#1a1a1a">
+                            <ImageButton x:Name="ProfileAvatarImage" Source="dotnet_bot.png" Aspect="AspectFill" HeightRequest="70" WidthRequest="70" Clicked="OnChangeAvatarClicked"/>
+                        </Border>
+
+                        <!-- Resources & Stats -->
+						<Grid Grid.Column="1" ColumnSpacing="8" RowSpacing="5">
+							<Grid.RowDefinitions>
+								<RowDefinition Height="Auto"/>
+								<RowDefinition Height="Auto"/>
+								<RowDefinition Height="Auto"/>
+							</Grid.RowDefinitions>
+							<Grid.ColumnDefinitions>
+								<ColumnDefinition Width="*"/>
+								<ColumnDefinition Width="*"/>
+								<ColumnDefinition Width="*"/>
+								<ColumnDefinition Width="*"/>
+							</Grid.ColumnDefinitions>
+
+							<!-- Row 1: Currencies -->
+							<StackLayout Grid.Row="0" Grid.Column="0" Spacing="2" HorizontalOptions="Center">
+								<Image Source="dotnet_bot.png" HeightRequest="20" HorizontalOptions="Center"/>
+								<Label x:Name="GoldLabel" Text="1005" TextColor="Gold" FontSize="14" HorizontalOptions="Center"/>
+							</StackLayout>
+
+							<StackLayout Grid.Row="0" Grid.Column="1" Spacing="2" HorizontalOptions="Center">
+								<Image Source="dotnet_bot.png" HeightRequest="20" HorizontalOptions="Center"/>
+								<Label x:Name="DiamondsLabel" Text="812,392" TextColor="White" FontSize="14" HorizontalOptions="Center"/>
+							</StackLayout>
+
+							<StackLayout Grid.Row="0" Grid.Column="2" Spacing="2" HorizontalOptions="Center">
+								<Image Source="dotnet_bot.png" HeightRequest="20" HorizontalOptions="Center"/>
+								<Label x:Name="EnergyLabel" Text="5000/130" TextColor="#45b7d1" FontSize="14" HorizontalOptions="Center"/>
+							</StackLayout>
+
+							<StackLayout Grid.Row="0" Grid.Column="3" Spacing="2" HorizontalOptions="Center">
+								<Image Source="dotnet_bot.png" HeightRequest="20" HorizontalOptions="Center"/>
+								<Label x:Name="HealthLabel" Text="29/100" TextColor="#ff6b6b" FontSize="14" HorizontalOptions="Center"/>
+							</StackLayout>
+
+							<!-- Row 2: Level & Progress -->
+							<Label Grid.Row="1" Grid.Column="0" Text="LV 80" x:Name="LevelLabel"
+                                   FontSize="16"
+                                   TextColor="White"
+                                   FontAttributes="Bold"
+                                   HorizontalOptions="Center"/>
+
+							<ProgressBar Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="3"
+                                         x:Name="LevelProgressBar"
+                                         Progress="0.75"
+                                         ProgressColor="#45b7d1"
+                                         HeightRequest="12"
+                                         VerticalOptions="Center"/>
+
+							<!-- Row 3: Additional Stats -->
+							<Label Grid.Row="2" Grid.Column="0" Text="100/100" x:Name="XPLabel"
+                                   TextColor="#45b7d1"
+                                   FontSize="11"
+                                   HorizontalOptions="Center"/>
+
+							<Label Grid.Row="2" Grid.Column="1" Text="67k/67k" x:Name="StrengthLabel2"
+                                   TextColor="#ff6b6b"
+                                   FontSize="11"
+                                   HorizontalOptions="Center"/>
+
+							<Label Grid.Row="2" Grid.Column="2" Text="67%" x:Name="DefenseLabel2"
+                                   TextColor="#45b7d1"
+                                   FontSize="11"
+                                   HorizontalOptions="Center"/>
+
+							<Label Grid.Row="2" Grid.Column="3" Text="67%" x:Name="SpeedLabel2"
+                                   TextColor="#ff6b6b"
+                                   FontSize="11"
+                                   HorizontalOptions="Center"/>
+						</Grid>
+
+						<!-- Notification Icon -->
+						<Image Grid.Column="2" Source="dotnet_bot.png"
+                               HeightRequest="30"
+                               WidthRequest="30"
+                               VerticalOptions="Center"/>
+					</Grid>
+				</Border>
+
+				<!-- Main Content Sections -->
+				<StackLayout Spacing="15" Padding="10,15,10,15">
+
+					<!-- Basic Information Section -->
+					<Border BackgroundColor="#0a1a2a" Stroke="Transparent" StrokeShape="RoundRectangle 10,10,10,10" Padding="12" Margin="0,5,0,0">
+						<Grid ColumnDefinitions="*,*" RowSpacing="8">
+							<StackLayout Grid.Column="0" Spacing="6">
+								<Label x:Name="NameLabel" Text="الاسم : LORD" TextColor="White" FontSize="14"/>
+								<Label x:Name="LevelInfoLabel" Text="اللفل : 80" TextColor="White" FontSize="14"/>
+								<Label x:Name="AgeLabel" Text="العمر : 418 يوم" TextColor="White" FontSize="14"/>
+								<Label x:Name="GenderLabel" Text="الجنس : ذكر" TextColor="White" FontSize="14"/>
+								<Label Text="العمر : 418 يوم" TextColor="White" FontSize="14" IsVisible="False"/>
+								<Label Text="العمر : 418 يوم" TextColor="White" FontSize="14" IsVisible="False"/>
+							</StackLayout>
+
+							<StackLayout Grid.Column="1" Spacing="6">
+								<Label x:Name="MedalsLabel" Text="الميداليات : 258" TextColor="White" FontSize="14"/>
+								<Label x:Name="CityLabel" Text="المدينه : مدينة العصابات" TextColor="White" FontSize="14"/>
+								<Label x:Name="VIPLabel" Text="في أي بي : لست vip" TextColor="White" FontSize="14"/>
+								<Label x:Name="AchievementLabel" Text="تحقيق شخصية : 1100015" TextColor="White" FontSize="14"/>
+								<Label Text="العمر : 418 يوم" TextColor="White" FontSize="14" IsVisible="False"/>
+								<Label Text="العمر : 418 يوم" TextColor="White" FontSize="14" IsVisible="False"/>
+							</StackLayout>
+						</Grid>
+					</Border>
+
+					<!-- Stats Section -->
+					<Border BackgroundColor="#0a1a2a" Stroke="Transparent" StrokeShape="RoundRectangle 10,10,10,10" Padding="12" Margin="0,5,0,0">
+						<StackLayout Spacing="10">
+							<Label Text="احصائيات المعركة" TextColor="#45b7d1" FontSize="16" FontAttributes="Bold" HorizontalOptions="Center"/>
+
+							<Grid ColumnDefinitions="*,*">
+								<StackLayout Grid.Column="0" Spacing="6">
+									<Label x:Name="SpeedStatLabel" Text="السرعة : 755865.83" TextColor="White" FontSize="14"/>
+									<Label x:Name="SkillStatLabel" Text="المهارة : 239.26" TextColor="White" FontSize="14"/>
+								</StackLayout>
+
+								<StackLayout Grid.Column="1" Spacing="6">
+									<Label x:Name="StrengthStatLabel" Text="القوة : 155037.98" TextColor="White" FontSize="14"/>
+									<Label x:Name="DefenseStatLabel" Text="الدفاع : 35285.67" TextColor="White" FontSize="14"/>
+									<Label x:Name="HealthPointsLabel" Text="الصحة : 67,285" TextColor="White" FontSize="14"/>
+								</StackLayout>
+							</Grid>
+						</StackLayout>
+					</Border>
+
+					<!-- Skills Section -->
+					<Border BackgroundColor="#0a1a2a" Stroke="Transparent" StrokeShape="RoundRectangle 10,10,10,10" Padding="12" Margin="0,5,0,0">
+						<StackLayout Spacing="12">
+							<Label Text="مهارات مكتسبة" TextColor="#45b7d1" FontSize="16" FontAttributes="Bold" HorizontalOptions="Center"/>
+
+							<!-- Skill 1 -->
+							<Grid ColumnDefinitions="*,*">
+								<Label x:Name="GreatnessNameLabel" Grid.Column="0" Text="عظمة" TextColor="White" FontSize="14" VerticalOptions="Center"/>
+								<Label x:Name="GreatnessPercentLabel" Grid.Column="1" Text="90% : زادت بمعدل" TextColor="White" FontSize="14" HorizontalOptions="End" VerticalOptions="Center"/>
+							</Grid>
+							<Label x:Name="GreatnessDescLabel" Text="(15:مجردة + 75:مصاحبة)" TextColor="#888888" FontSize="12"/>
+
+							<!-- Skill 2 -->
+							<Grid ColumnDefinitions="*,*">
+								<Label x:Name="KillingDifficultyNameLabel" Grid.Column="0" Text="صعوبة القتل" TextColor="White" FontSize="14" VerticalOptions="Center"/>
+								<Label x:Name="KillingDifficultyPercentLabel" Grid.Column="1" Text="75% : زاد الدفع بمعدل" TextColor="White" FontSize="14" HorizontalOptions="End" VerticalOptions="Center"/>
+							</Grid>
+							<Label x:Name="KillingDifficultyDescLabel" Text="(15:مجردة + 60:مصاحبة)" TextColor="#888888" FontSize="12"/>
+
+							<!-- Skill 3 -->
+							<Grid ColumnDefinitions="*,*">
+								<Label x:Name="FastGhostNameLabel" Grid.Column="0" Text="شبح سريع" TextColor="White" FontSize="14" VerticalOptions="Center"/>
+								<Label x:Name="FastGhostPercentLabel" Grid.Column="1" Text="90% : زادت السرعة بمعدل" TextColor="White" FontSize="14" HorizontalOptions="End" VerticalOptions="Center"/>
+							</Grid>
+							<Label x:Name="FastGhostDescLabel" Text="(15:مجردة + 75:مصاحبة)" TextColor="#888888" FontSize="12"/>
+
+							<!-- Skill 4 -->
+							<Grid ColumnDefinitions="*,*">
+								<Label x:Name="LightMovementNameLabel" Grid.Column="0" Text="خفيف الحركة" TextColor="White" FontSize="14" VerticalOptions="Center"/>
+								<Label x:Name="LightMovementPercentLabel" Grid.Column="1" Text="75% : زادت المهارة بمعدل" TextColor="White" FontSize="14" HorizontalOptions="End" VerticalOptions="Center"/>
+							</Grid>
+							<Label x:Name="LightMovementDescLabel" Text="(75:مصاحبة)" TextColor="#888888" FontSize="12"/>
+						</StackLayout>
+					</Border>
+
+					<!-- Achievements Section -->
+					<Border BackgroundColor="#0a1a2a" Stroke="Transparent" StrokeShape="RoundRectangle 10,10,10,10" Padding="12" Margin="0,5,0,0">
+						<StackLayout Spacing="10">
+							<Label Text="احصائيات عامة" TextColor="#45b7d1" FontSize="16" FontAttributes="Bold" HorizontalOptions="Center"/>
+
+							<Grid ColumnDefinitions="*,*">
+								<StackLayout Grid.Column="0" Spacing="5">
+									<Label x:Name="CrimeAttemptsLabel" Text="21071" TextColor="White" FontSize="14"/>
+									<Label x:Name="ShovelsLabel" Text="11443" TextColor="White" FontSize="14"/>
+									<Label x:Name="HospitalVisitsLabel" Text="2619" TextColor="White" FontSize="14"/>
+									<Label x:Name="JailTimesLabel" Text="542" TextColor="White" FontSize="14"/>
+									<Label x:Name="FlightsLabel" Text="25832" TextColor="White" FontSize="14"/>
+									<Label x:Name="HerbsUsedLabel" Text="915" TextColor="White" FontSize="14"/>
+									<Label x:Name="ItemsFoundLabel" Text="0" TextColor="White" FontSize="14"/>
+								</StackLayout>
+
+								<StackLayout Grid.Column="1" Spacing="5">
+									<Label Text="عدد محاولات الجريمة" TextColor="White" FontSize="14"/>
+									<Label Text="عدد المعاول" TextColor="White" FontSize="14"/>
+									<Label Text="عدد مرات دخول المشفى" TextColor="White" FontSize="14"/>
+									<Label Text="عدد مرات اعتقالك للسجن" TextColor="White" FontSize="14"/>
+									<Label Text="عدد رحلات الطيران" TextColor="White" FontSize="14"/>
+									<Label Text="عدد الاعشاب المستخدمة" TextColor="White" FontSize="14"/>
+									<Label Text="عدد الادوات الي وجدتها" TextColor="White" FontSize="14"/>
+								</StackLayout>
+							</Grid>
+						</StackLayout>
+					</Border>
+
+					
+
+                </StackLayout>
+                <!-- Add this BEFORE the closing </Grid> tag -->
+                <Border Grid.Row="6" BackgroundColor="#1a1a1a" Stroke="Transparent" 
+						StrokeShape="RoundRectangle 10,10,10,10" Padding="15" Margin="10,10,10,10">
+                    <Button Text="🚪 تسجيل الخروج / تبديل الحساب" 
+							BackgroundColor="#e74c3c" 
+							TextColor="White"
+							CornerRadius="12"
+							FontSize="16"
+							FontAttributes="Bold"
+							HeightRequest="50"
+							Clicked="OnSignOutClicked"/>
+                </Border>
+
+                <!-- Bottom Navigation Bar -->
+				<Border HeightRequest="90" BackgroundColor="#001a33" Stroke="Transparent" StrokeShape="RoundRectangle 0,0,0,0" Margin="0,0,0,0">
+					<Grid Padding="0,0,0,0" ColumnDefinitions="*,*,*,*,*">
+
+						<!-- Navigation Icons -->
+						<StackLayout Grid.Column="0" Spacing="2" VerticalOptions="Center">
+							<Image Source="dotnet_bot.png" HeightRequest="25" HorizontalOptions="Center"/>
+							<Label Text="رجوع" TextColor="White" FontSize="11" HorizontalOptions="Center"/>
+						</StackLayout>
+
+						<StackLayout Grid.Column="1" Spacing="2" VerticalOptions="Center">
+							<Image Source="dotnet_bot.png" HeightRequest="25" HorizontalOptions="Center"/>
+							<Label Text="التدريب" TextColor="White" FontSize="11" HorizontalOptions="Center"/>
+						</StackLayout>
+
+						<StackLayout Grid.Column="2" Spacing="2" VerticalOptions="Center">
+							<Image Source="dotnet_bot.png" HeightRequest="25" HorizontalOptions="Center"/>
+							<Label Text="مهارات" TextColor="White" FontSize="11" HorizontalOptions="Center"/>
+						</StackLayout>
+
+						<!-- ✅ REPLACE LAST STACKLAYOUT IN BOTTOM BAR (DOES NOT BREAK ANYTHING) -->
+                        <StackLayout Grid.Column="3" Spacing="2"  VerticalOptions="Center">
+                            <ImageButton Source="dotnet_bot.png" HeightRequest="25" WidthRequest="25" Padding="0,20,0,0" BackgroundColor="Transparent" HorizontalOptions="Center" Clicked="OnArmingClicked"/>
+                            <Label Text="تسلح" Padding="0,0,0,18 " TextColor="White" FontSize="11" HorizontalOptions="Center"/>
+                        </StackLayout>
+                        
+                        <StackLayout Grid.Column="4" Spacing="2" VerticalOptions="Center">
+							<Image Source="dotnet_bot.png" HeightRequest="25" HorizontalOptions="Center"/>
+							<Label Text="ميداليات" TextColor="White" FontSize="11" HorizontalOptions="Center"/>
+						</StackLayout>
+
+                        
+                    </Grid>
+				</Border>
+
+			</VerticalStackLayout>
+		</ScrollView>
+
+		<!-- Back Button -->
+		<Button Text="←"
+                FontSize="24"
+                BackgroundColor="Transparent"
+                TextColor="White"
+                CornerRadius="25"
+                WidthRequest="50"
+                HeightRequest="50"
+                HorizontalOptions="Start"
+                VerticalOptions="Start"
+                Margin="10"
+                Clicked="OnBackClicked"/>
+
+		<!-- Add to the bottom of your page layout -->
+		<Button Text="🌐"
+				BackgroundColor="#2c3e50"
+				TextColor="White"
+				WidthRequest="50"
+				HeightRequest="50"
+				CornerRadius="25"
+				HorizontalOptions="End"
+				VerticalOptions="End"
+				Margin="20"
+				Clicked="OnSwitchLanguageClicked"/>
+	</Grid>
+
+</ContentPage>

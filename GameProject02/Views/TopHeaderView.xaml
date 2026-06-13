@@ -1,0 +1,266 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="GameProject02.Views.TopHeaderView"
+             FlowDirection="LeftToRight">
+
+    <Grid x:Name="RootGrid"
+          RowDefinitions="Auto, Auto"
+          RowSpacing="0">
+
+        <Grid x:Name="TopBarGrid"
+              Grid.Row="0"
+              ColumnDefinitions="*, *, *">
+
+            <Image Grid.ColumnSpan="3"
+                   Source="topbar_bg.png"
+                   Aspect="Fill"/>
+
+            <!-- العمود الأيسر -->
+            <Grid Grid.Column="0"
+                  x:Name="LeftColumn"
+                  Margin="0,10,0,0"
+                  RowDefinitions="Auto, *"
+                  RowSpacing="5">
+
+                <Grid Grid.Row="0"
+                      x:Name="DiamondField"
+                      Margin="25,0,0,0">
+                    <Image Source="field_gold.png" Aspect="Fill"/>
+                    <Image Source="icon_diamond.png"
+                           x:Name="DiamondIcon"
+                           HorizontalOptions="Start"
+                           VerticalOptions="Center"
+                           Margin="0"/>
+                    <Image Source="icon_top_add.png"
+                           x:Name="DiamondSecondaryIcon"
+                           HorizontalOptions="End"
+                           VerticalOptions="Center"
+                           Margin="0"/>
+                    <Label x:Name="DiamondLabel"
+                           Text="0"
+                           FontAttributes="Bold"
+                           TextColor="Gold"
+                           HorizontalOptions="Center"
+                           VerticalOptions="Center"/>
+                </Grid>
+
+                <HorizontalStackLayout Grid.Row="1"
+                                       x:Name="LeftBarsContainer"
+                                       HorizontalOptions="Center"
+                                       Spacing="15"
+                                       Margin="0">
+
+                    <VerticalStackLayout x:Name="CourageBarColumn" Spacing="0" Margin="0">
+                        <Image Source="icon_courage.png" x:Name="CourageIcon" HorizontalOptions="Center" Margin="0"/>
+                        <Label x:Name="CourageText" Text="0/100" TextColor="Green" HorizontalOptions="Center" Margin="0"/>
+                        <Grid x:Name="CourageBarGrid" VerticalOptions="Center" Margin="0">
+                            <Image Source="bar_empty.png" Aspect="Fill" HorizontalOptions="Fill" VerticalOptions="Fill"/>
+                            <Image x:Name="CourageFill" Source="bar_fill_courage.png" Aspect="Fill"
+                                   HorizontalOptions="Start" VerticalOptions="Center" WidthRequest="0"/>
+                        </Grid>
+                        <Label x:Name="CourageNameLabel" Text="شجاعة" TextColor="Green" HorizontalOptions="Center" Margin="0"/>
+                        <Label x:Name="CourageTimer" Text="" TextColor="WhiteSmoke" HorizontalOptions="Center" IsVisible="False"/>
+                    </VerticalStackLayout>
+
+                    <VerticalStackLayout x:Name="EnergyBarColumn" Spacing="0" Margin="0">
+                        <Image Source="icon_energy.png" x:Name="EnergyIcon" HorizontalOptions="Center" Margin="0"/>
+                        <Label x:Name="EnergyText" Text="0/100" TextColor="Blue" HorizontalOptions="Center" Margin="0"/>
+                        <Grid x:Name="EnergyBarGrid" VerticalOptions="Center" Margin="0">
+                            <Image Source="bar_empty.png" Aspect="Fill" HorizontalOptions="Fill" VerticalOptions="Fill"/>
+                            <Image x:Name="EnergyFill" Source="bar_fill_energy.png" Aspect="Fill"
+                                   HorizontalOptions="Start" VerticalOptions="Center" WidthRequest="0"/>
+                        </Grid>
+                        <Label x:Name="EnergyNameLabel" Text="طاقة" TextColor="Blue" HorizontalOptions="Center" Margin="0"/>
+                        <Label x:Name="EnergyTimer" Text="" TextColor="WhiteSmoke" HorizontalOptions="Center" IsVisible="False"/>
+                    </VerticalStackLayout>
+                </HorizontalStackLayout>
+            </Grid>
+
+            <!-- العمود الأوسط -->
+            <Grid Grid.Column="1"
+                  RowDefinitions="Auto, Auto"
+                  RowSpacing="1"
+                  VerticalOptions="Center">
+
+                <Grid Grid.Row="0"
+                      HorizontalOptions="Center"
+                      VerticalOptions="Center"
+                      Padding="0">
+
+                    <Image Source="avatar_frame.png"
+                           x:Name="AvatarFrameImage"
+                           HorizontalOptions="Center"
+                           VerticalOptions="Center"
+                           Aspect="Fill"/>
+
+                    <Frame x:Name="AvatarImageFrame"
+                           CornerRadius="0"
+                           Padding="0"
+                           HasShadow="False"
+                           IsClippedToBounds="True"
+                           BackgroundColor="Transparent"
+                           BorderColor="Transparent"
+                           HorizontalOptions="Center"
+                           VerticalOptions="Center">
+                        <Image x:Name="AvatarImage"
+                               Source="avatar_player.png"
+                               Aspect="AspectFill">
+                            <Image.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="OnAvatarTapped"/>
+                            </Image.GestureRecognizers>
+                        </Image>
+                    </Frame>
+
+                    <Image Source="icon_edit.png"
+                           x:Name="EditAvatarHint"
+                           HorizontalOptions="End"
+                           VerticalOptions="End"
+                           Opacity="0.85">
+                        <Image.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="OnAvatarTapped"/>
+                        </Image.GestureRecognizers>
+                    </Image>
+                </Grid>
+
+                <Grid Grid.Row="1"
+                      x:Name="NameField"
+                      Margin="0">
+                    <Image Source="field_name.png" Aspect="Fill"/>
+                    <Label x:Name="PlayerNameLabel"
+                           Text="PLAYER"
+                           FontAttributes="Bold"
+                           TextColor="WhiteSmoke"
+                           HorizontalOptions="Center"
+                           VerticalOptions="Center"
+                           CharacterSpacing="1"/>
+                </Grid>
+            </Grid>
+
+            <!-- العمود الأيمن -->
+            <Grid Grid.Column="2"
+                  x:Name="RightColumn"
+                  Margin="0,10,0,0"
+                  RowDefinitions="Auto, *"
+                  RowSpacing="5">
+
+                <Grid Grid.Row="0"
+                      x:Name="GoldField"
+                      Margin="0,0,25,0">
+                    <Image Source="field_gold.png" Aspect="Fill"/>
+                    <Image Source="icon_top_add.png"
+                           x:Name="GoldSecondaryIcon"
+                           HorizontalOptions="Start"
+                           VerticalOptions="Center"
+                           Margin="0"/>
+                    <Image Source="icon_gold.png"
+                           x:Name="GoldIcon"
+                           HorizontalOptions="End"
+                           VerticalOptions="Center"
+                           Margin="0"/>
+                    <Label x:Name="GoldLabel"
+                           Text="0"
+                           FontAttributes="Bold"
+                           TextColor="WhiteSmoke"
+                           HorizontalOptions="Center"
+                           VerticalOptions="Center"/>
+                </Grid>
+
+                <HorizontalStackLayout Grid.Row="1"
+                                       x:Name="RightBarsContainer"
+                                       HorizontalOptions="Center"
+                                       Spacing="15"
+                                       Margin="0">
+
+                    <VerticalStackLayout x:Name="NobilityBarColumn" Spacing="0" Margin="0">
+                        <Image Source="icon_nobility.png" x:Name="NobilityIcon" HorizontalOptions="Center" Margin="0"/>
+                        <Label x:Name="NobilityText" Text="0/100" TextColor="Orange" HorizontalOptions="Center" Margin="0"/>
+                        <Grid x:Name="NobilityBarGrid" VerticalOptions="Center" Margin="0">
+                            <Image Source="bar_empty.png" Aspect="Fill" HorizontalOptions="Fill" VerticalOptions="Fill"/>
+                            <Image x:Name="NobilityFill" Source="bar_fill_nobility.png" Aspect="Fill"
+                                   HorizontalOptions="Start" VerticalOptions="Center" WidthRequest="0"/>
+                        </Grid>
+                        <Label x:Name="NobilityNameLabel" Text="شهامة" TextColor="Orange" HorizontalOptions="Center" Margin="0"/>
+                        <Label x:Name="NobilityTimer" Text="" TextColor="WhiteSmoke" HorizontalOptions="Center" IsVisible="False"/>
+                    </VerticalStackLayout>
+
+                    <VerticalStackLayout x:Name="HealthBarColumn" Spacing="0" Margin="0">
+                        <Image Source="icon_health.png" x:Name="HealthIcon" HorizontalOptions="Center" Margin="0"/>
+                        <Label x:Name="HealthText" Text="0/500" TextColor="Red" HorizontalOptions="Center" Margin="0"/>
+                        <Grid x:Name="HealthBarGrid" VerticalOptions="Center" Margin="0">
+                            <Image Source="bar_empty.png" Aspect="Fill" HorizontalOptions="Fill" VerticalOptions="Fill"/>
+                            <Image x:Name="HealthFill" Source="bar_fill_health.png" Aspect="Fill"
+                                   HorizontalOptions="Start" VerticalOptions="Center" WidthRequest="0"/>
+                        </Grid>
+                        <Label x:Name="HealthNameLabel" Text="صحة" TextColor="Red" HorizontalOptions="Center" Margin="0"/>
+                        <Label x:Name="HealthTimer" Text="" TextColor="WhiteSmoke" HorizontalOptions="Center" IsVisible="False"/>
+                    </VerticalStackLayout>
+                </HorizontalStackLayout>
+            </Grid>
+        </Grid>
+
+        <!-- ═══════════ شريط اللفل ═══════════ -->
+        <Grid x:Name="LevelBarGrid"
+              Grid.Row="1"
+              FlowDirection="LeftToRight">
+
+            <Image Source="topbar_exp.png"
+                   Aspect="Fill"
+                   HorizontalOptions="Fill"/>
+
+            <Grid x:Name="XPBarContainer"
+                  VerticalOptions="Center"
+                  HorizontalOptions="Fill"
+                  Margin="0">
+                <Image x:Name="XPFill"
+                       Source="bar_fill_xp.png"
+                       Aspect="Fill"
+                       HorizontalOptions="Start"
+                       VerticalOptions="Center"
+                       WidthRequest="0"/>
+            </Grid>
+
+            <Grid HorizontalOptions="Fill"
+                  VerticalOptions="Fill"
+                  ColumnDefinitions="Auto, *, Auto">
+
+                <!-- اليسار: LVL + أرقام -->
+                <HorizontalStackLayout Grid.Column="0"
+                                       VerticalOptions="Center"
+                                       Margin="15,0,0,0"
+                                       Spacing="0">
+                    <Image Source="icon_lvl.png"
+                           x:Name="LvlTextIcon"
+                           VerticalOptions="Center"
+                           Margin="0,0,5,0"/>
+                    <HorizontalStackLayout x:Name="LevelDigitsContainer"
+                                           VerticalOptions="Center"
+                                           Spacing="0"/>
+                </HorizontalStackLayout>
+
+                <!-- المنتصف: نص XP -->
+                <Label x:Name="XPLabel"
+                       Grid.Column="1"
+                       Text="0/100"
+                       TextColor="White"
+                       HorizontalOptions="Center"
+                       VerticalOptions="Center"/>
+
+                <!-- اليمين: أيقونة MAX + أرقام -->
+                <HorizontalStackLayout Grid.Column="2"
+                                       VerticalOptions="Center"
+                                       Margin="0,0,12,0"
+                                       Spacing="0">
+                    <Image Source="icon_max.png"
+                           x:Name="IconMax"
+                           VerticalOptions="Center"
+                           Margin="0,0,5,0"/>
+                    <HorizontalStackLayout x:Name="MaxDigitsContainer"
+                                           VerticalOptions="Center"
+                                           Spacing="0"/>
+                </HorizontalStackLayout>
+            </Grid>
+        </Grid>
+
+    </Grid>
+</ContentView>

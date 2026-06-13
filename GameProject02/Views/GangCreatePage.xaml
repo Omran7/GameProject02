@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="GameProject02.Views.GangCreatePage"
+             Title="إنشاء عصابة"
+             BackgroundColor="#1a1a1a">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="20" Spacing="15">
+
+            <Label Text="إنشاء عصابة جديدة" TextColor="#f39c12" FontSize="22" 
+                   FontAttributes="Bold" HorizontalOptions="Center"/>
+
+            <Label Text="اسم العصابة (3-15 حرف)" TextColor="White" FontSize="14"/>
+            <Entry x:Name="GangNameEntry" Placeholder="أدخل اسم العصابة"
+                   BackgroundColor="#2d2d2d" TextColor="White" PlaceholderColor="#888"
+                   MaxLength="15"/>
+
+            <Label Text="رمز العصابة (3 أحرف)" TextColor="White" FontSize="14"/>
+            <Entry x:Name="GangTagEntry" Placeholder="XXX"
+                   BackgroundColor="#2d2d2d" TextColor="White" PlaceholderColor="#888"
+                   MaxLength="3" CharacterSpacing="2"/>
+
+            <Label x:Name="InfoLabel" Text="" TextColor="#e74c3c" FontSize="12"/>
+
+            <Button x:Name="CreateButton" Text="إنشاء" BackgroundColor="#27ae60"
+                    TextColor="White" Clicked="OnCreateGangClicked"/>
+
+            <ActivityIndicator x:Name="LoadingIndicator" IsRunning="False" 
+                               IsVisible="False" Color="#f39c12" HorizontalOptions="Center"/>
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

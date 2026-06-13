@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="GameProject02.Views.GangMarketItemTypesPage"
+             ControlTemplate="{StaticResource StickyHeaderTemplate}"
+             BackgroundColor="#1a1a1a"
+             NavigationPage.HasNavigationBar="False"
+             FlowDirection="RightToLeft">
+
+    <Grid RowDefinitions="Auto,*,Auto">
+
+        <Image Grid.RowSpan="3"
+               Source="market_bg.jpg"
+               Aspect="AspectFill"
+               Opacity="1"/>
+
+        <Border Grid.Row="0"
+                BackgroundColor="Transparent"
+                Stroke="#1a1a1a"
+                StrokeShape="RoundRectangle 0,0,20,20"
+                Padding="0">
+            <Grid HeightRequest="30">
+                <Image Source="market_header_bg.jpg" Aspect="Fill" Opacity="1"/>
+                <Label x:Name="CategoryTitleLabel"
+                       TextColor="#C3C9BD"
+                       FontFamily="MCS-ALMAALIM"
+                       HorizontalOptions="Center"
+                       VerticalOptions="Center"
+                       FontSize="16"/>
+            </Grid>
+        </Border>
+
+        <ScrollView Grid.Row="1" VerticalScrollBarVisibility="Never">
+            <Grid x:Name="ItemsGrid" ColumnSpacing="10" RowSpacing="10" Padding="10">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+            </Grid>
+        </ScrollView>
+
+        <Border Grid.Row="2" BackgroundColor="#2c3e50" Stroke="Transparent" Padding="10">
+            <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
+                <Button Text="← رجوع" BackgroundColor="#e74c3c" TextColor="White" CornerRadius="8" Clicked="OnBackClicked"/>
+                <Button Text="🔄 تحديث" BackgroundColor="#3498db" TextColor="White" CornerRadius="8" Clicked="OnRefreshClicked"/>
+            </Grid>
+        </Border>
+    </Grid>
+</ContentPage>

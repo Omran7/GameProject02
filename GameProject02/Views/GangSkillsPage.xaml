@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="GameProject02.Views.GangSkillsPage"
+             ControlTemplate="{StaticResource StickyHeaderTemplate}"
+             BackgroundColor="#1a1a1a"
+             Title="⚡ مهارات العصابة"
+             FlowDirection="RightToLeft"
+             NavigationPage.HasNavigationBar="False">
+
+    <Grid RowDefinitions="Auto,*,Auto">
+        <!-- Header -->
+        <Border Grid.Row="0" BackgroundColor="#0a0a0a" Stroke="#e74c3c" StrokeThickness="2" Padding="10">
+            <Grid ColumnDefinitions="*,Auto">
+                <Label Text="⚡ مهارات العصابة" TextColor="White" FontSize="18" FontAttributes="Bold" HorizontalOptions="Center"/>
+                <Button Grid.Column="1" Text="← رجوع" BackgroundColor="#95a5a6" TextColor="White" CornerRadius="8" WidthRequest="80" Clicked="OnBackClicked"/>
+            </Grid>
+        </Border>
+
+        <!-- Skills List -->
+        <CollectionView x:Name="SkillsListView" Grid.Row="1" Margin="10">
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+                    <Border BackgroundColor="#2c2c2c" Stroke="#444" StrokeThickness="1" Margin="0,0,0,8" Padding="12" StrokeShape="RoundRectangle 10">
+                        <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="10">
+                            <VerticalStackLayout>
+                                <Label Text="{Binding Name}" TextColor="White" FontSize="16" FontAttributes="Bold"/>
+                                <Label Text="{Binding Effect}" TextColor="#bdc3c7" FontSize="12"/>
+                                <Label Text="{Binding Level, StringFormat='المستوى: {0}'}" TextColor="#f39c12" FontSize="12"/>
+                            </VerticalStackLayout>
+                            <VerticalStackLayout Grid.Column="1" HorizontalOptions="End">
+                                <Label Text="{Binding RespectCost, StringFormat='احترام: {0}'}" TextColor="#3498db" FontSize="12"/>
+                                <Label Text="{Binding CashCost, StringFormat='نقد: {0}'}" TextColor="#2ecc71" FontSize="12"/>
+                            </VerticalStackLayout>
+                            <Button Grid.Column="2" Text="ترقية" BackgroundColor="#e67e22" TextColor="White" CornerRadius="8" WidthRequest="80" Clicked="OnUpgradeClicked" CommandParameter="{Binding Id}"/>
+                        </Grid>
+                    </Border>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+
+        <!-- Bottom Bar -->
+        <Border Grid.Row="2" BackgroundColor="#0a0a0a" Stroke="#e74c3c" StrokeThickness="2" StrokeShape="RoundRectangle 15,15,0,0" Margin="10,5,10,10" Padding="10">
+            <Button Text="🏠 الرئيسية" BackgroundColor="#3498db" TextColor="White" CornerRadius="12" FontAttributes="Bold" Clicked="OnHomeClicked"/>
+        </Border>
+    </Grid>
+</ContentPage>

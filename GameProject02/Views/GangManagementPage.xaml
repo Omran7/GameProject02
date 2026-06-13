@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="GameProject02.Views.GangManagementPage"
+             ControlTemplate="{StaticResource StickyHeaderTemplate}"
+             BackgroundColor="#1a1a1a"
+             Title="⚙️ إدارة العصابة"
+             FlowDirection="RightToLeft"
+             NavigationPage.HasNavigationBar="False">
+
+    <Grid RowDefinitions="Auto,Auto,*,Auto">
+        <Border Grid.Row="0" BackgroundColor="#0a0a0a" Stroke="#e74c3c" StrokeThickness="2" Padding="10">
+            <Grid ColumnDefinitions="*,Auto">
+                <Label x:Name="PageTitle" Text="⚙️ الإدارة" TextColor="White" FontSize="18" FontAttributes="Bold" HorizontalOptions="Center"/>
+                <Button Grid.Column="1" Text="← رجوع" BackgroundColor="#95a5a6" TextColor="White" CornerRadius="8" WidthRequest="80" Clicked="OnBackClicked"/>
+            </Grid>
+        </Border>
+
+        <!-- Tabs -->
+        <Grid Grid.Row="1" ColumnDefinitions="*,*,*" Margin="10,5,10,5" ColumnSpacing="5">
+            <Button x:Name="TabMembers" Text="👥 الأعضاء" BackgroundColor="#2c2c2c" TextColor="White" CornerRadius="8" Clicked="OnTabClicked"/>
+            <Button x:Name="TabRequests" Text="📝 الطلبات" BackgroundColor="#3498db" TextColor="White" CornerRadius="8" Grid.Column="1" Clicked="OnTabClicked"/>
+            <Button x:Name="TabSettings" Text="🔧 الإعدادات" BackgroundColor="#2c2c2c" TextColor="White" CornerRadius="8" Grid.Column="2" Clicked="OnTabClicked"/>
+        </Grid>
+
+        <!-- Content Area -->
+        <CollectionView x:Name="ContentList" Grid.Row="2" Margin="10">
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+                    <Border BackgroundColor="#2c2c2c" Stroke="#444" StrokeThickness="1" Margin="0,0,0,8" Padding="10" StrokeShape="RoundRectangle 8">
+                        <Grid ColumnDefinitions="*,Auto,Auto,Auto,Auto,Auto,Auto,Auto" ColumnSpacing="8">
+                            <Label Grid.Column="0" Text="{Binding Label1}" TextColor="White" FontSize="15" VerticalOptions="Center"/>
+                            <Label Grid.Column="1" Text="{Binding Label2}" TextColor="#bdc3c7" FontSize="15" VerticalOptions="Center"/>
+                            <Button Grid.Column="2" Text="{Binding Btn1Text}" BackgroundColor="#2ecc71" TextColor="White" CornerRadius="6" WidthRequest="50" HeightRequest="30" FontSize="9" Clicked="OnActionClicked" CommandParameter="{Binding Action1}" IsVisible="{Binding HasBtn1}"/>
+                            <Button Grid.Column="3" Text="{Binding Btn2Text}" BackgroundColor="#3498db" TextColor="White" CornerRadius="6" WidthRequest="60" HeightRequest="30" FontSize="9" Clicked="OnActionClicked" CommandParameter="{Binding Action2}" IsVisible="{Binding HasBtn2}"/>
+                            <Button Grid.Column="4" Text="{Binding Btn3Text}" BackgroundColor="#9b59b6" TextColor="White" CornerRadius="6" WidthRequest="50" HeightRequest="30" FontSize="9" Clicked="OnActionClicked" CommandParameter="{Binding Action3}" IsVisible="{Binding HasBtn3}"/>
+                            <Button Grid.Column="5" Text="{Binding Btn4Text}" BackgroundColor="#e67e22" TextColor="White" CornerRadius="6" WidthRequest="50" HeightRequest="30" FontSize="9" Clicked="OnActionClicked" CommandParameter="{Binding Action4}" IsVisible="{Binding HasBtn4}"/>
+                            <Button Grid.Column="6" Text="{Binding Btn5Text}" BackgroundColor="#e74c3c" TextColor="White" CornerRadius="6" WidthRequest="70" HeightRequest="30" FontSize="9" Clicked="OnActionClicked" CommandParameter="{Binding Action5}" IsVisible="{Binding HasBtn5}"/>
+                            <Button Grid.Column="7" Text="{Binding Btn6Text}" BackgroundColor="#e67e22" TextColor="White" CornerRadius="6" WidthRequest="70" HeightRequest="30" FontSize="11" Clicked="OnActionClicked" CommandParameter="{Binding Action6}" IsVisible="{Binding HasBtn6}"/>
+                        </Grid>
+                    </Border>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+
+        <Border Grid.Row="3" BackgroundColor="#0a0a0a" Stroke="#e74c3c" StrokeThickness="2" StrokeShape="RoundRectangle 15,15,0,0" Margin="10,5,10,10" Padding="10">
+            <Button Text="🏠 الرئيسية" BackgroundColor="#3498db" TextColor="White" CornerRadius="12" FontAttributes="Bold" Clicked="OnHomeClicked"/>
+        </Border>
+    </Grid>
+</ContentPage>

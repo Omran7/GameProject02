@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="GameProject02.Views.ArmingPage"
+             BackgroundColor="#1a1a1a"
+             Title="⚔️ التسلح"
+             FlowDirection="RightToLeft"
+             NavigationPage.HasNavigationBar="False">
+    
+
+    <Grid RowDefinitions="Auto,*,Auto">
+        <!-- Background -->
+        <Image Grid.RowSpan="3" Source="market_bg.jpg" Aspect="AspectFill" Opacity="0.9"/>
+
+        <!-- Header -->
+        <Border Grid.Row="0" BackgroundColor="#0a0a0a" Stroke="#f39c12" StrokeThickness="2" Padding="5">
+            <Grid ColumnDefinitions="*,Auto,*">
+                <Button Text="← رجوع" BackgroundColor="#95a5a6" TextColor="White" CornerRadius="5" 
+                        WidthRequest="80" Clicked="OnBackClicked"/>
+                <Label Grid.Column="1" Text="⚔️ التسلح" TextColor="White" FontSize="16" 
+                       FontAttributes="Bold" HorizontalOptions="Center" VerticalOptions="Center"/>
+            </Grid>
+        </Border>
+
+        <!-- Arming Slots -->
+        <ScrollView Grid.Row="1" Margin="10,5,10,5">
+            <VerticalStackLayout Spacing="20" Padding="5">
+
+                <!-- Weapon Slot -->
+                <Border Stroke="#f39c12" StrokeThickness="2" StrokeShape="RoundRectangle 15" 
+                        BackgroundColor="#2c2c2c" Padding="15">
+                    <Grid ColumnDefinitions="Auto,*,Auto" RowSpacing="10">
+                        <Image Source="gun_icon.png" HeightRequest="60" WidthRequest="60" 
+                               HorizontalOptions="Center" VerticalOptions="Center"/>
+                        <Label Grid.Column="0" Text="السلاح الرئيسي" Padding="10,0,0,0" TextColor="#f39c12" FontSize="16" 
+                               FontAttributes="Bold" VerticalOptions="Center"/>
+                        <Label Grid.Column="1" Grid.Row="0" Padding="20,0,0,0" x:Name="WeaponNameLabel" Text="غير مجهز" 
+                               TextColor="White" FontSize="14" VerticalOptions="Center"/>
+                        <Label Grid.Column="1" Grid.Row="0" Padding="0,50,0,0" x:Name="WeaponStatsLabel" 
+                               Text="الضرر: 0 | الدقة: 0" TextColor="#bdc3c7" FontSize="12" 
+                               VerticalOptions="Center"/>
+                        <VerticalStackLayout Grid.Column="2" Spacing="8" HorizontalOptions="End">
+                            <Button Text="اختيار" BackgroundColor="#3498db" TextColor="White" 
+                                    CornerRadius="8" FontSize="12" HeightRequest="35" WidthRequest="80" 
+                                    Clicked="OnSelectWeaponClicked"/>
+                            <Button x:Name="RemoveWeaponButton" Text="إزالة" BackgroundColor="#e74c3c" 
+                                    TextColor="White" CornerRadius="8" FontSize="12" HeightRequest="35" 
+                                    WidthRequest="80" IsEnabled="False" Clicked="OnRemoveWeaponClicked"/>
+                        </VerticalStackLayout>
+                    </Grid>
+                </Border>
+
+                <!-- Armor Slot -->
+                <Border Stroke="#3498db" StrokeThickness="2" StrokeShape="RoundRectangle 15" 
+                        BackgroundColor="#2c2c2c" Padding="15">
+                    <Grid ColumnDefinitions="Auto,*,Auto" RowSpacing="10">
+                        <Image Source="armor_icon.png" HeightRequest="60" WidthRequest="60" 
+                               HorizontalOptions="Center" VerticalOptions="Center"/>
+                        <Label Grid.Column="0" Text="الدرع" Padding="20,0,0,0" TextColor="#3498db" FontSize="16" 
+                               FontAttributes="Bold" VerticalOptions="Center"/>
+                        <Label Grid.Column="1" Grid.Row="1" Padding="70,0,0,0" x:Name="ArmorNameLabel" Text="غير مجهز" 
+                               TextColor="White" FontSize="14" VerticalOptions="Center"/>
+                        <Label Grid.Column="1" Grid.Row="2" Padding="30,50,0,0" x:Name="ArmorStatsLabel" 
+                               Text="الدفاع: 0 | التهرب: 0" TextColor="#bdc3c7" FontSize="12" 
+                               VerticalOptions="Center"/>
+                        <VerticalStackLayout Grid.Column="2" Spacing="8" HorizontalOptions="End">
+                            <Button Text="اختيار" BackgroundColor="#3498db" TextColor="White" 
+                                    CornerRadius="8" FontSize="12" HeightRequest="35" WidthRequest="80" 
+                                    Clicked="OnSelectArmorClicked"/>
+                            <Button x:Name="RemoveArmorButton" Text="إزالة" BackgroundColor="#e74c3c" 
+                                    TextColor="White" CornerRadius="8" FontSize="12" HeightRequest="35" 
+                                    WidthRequest="80" IsEnabled="False" Clicked="OnRemoveArmorClicked"/>
+                        </VerticalStackLayout>
+                    </Grid>
+                </Border>
+
+                <!-- Special Equipment Slot -->
+                <Border Stroke="#9b59b6" StrokeThickness="2" StrokeShape="RoundRectangle 15" 
+                        BackgroundColor="#2c2c2c" Padding="15">
+                    <Grid ColumnDefinitions="Auto,*,Auto" RowSpacing="10">
+                        <Image Source="special_icon.png" HeightRequest="60" WidthRequest="60" 
+                               HorizontalOptions="Center" VerticalOptions="Center"/>
+                        <Label Grid.Column="0" Text="المعدات الخاصة" Padding="10,0,0,0" TextColor="#9b59b6" FontSize="16" 
+                               FontAttributes="Bold" VerticalOptions="Center"/>
+                        <Label Grid.Column="1" Grid.Row="1" Padding="20,0,0,0" x:Name="SpecialNameLabel" Text="غير مجهز" 
+                               TextColor="White" FontSize="14" VerticalOptions="Center"/>
+                        <Label Grid.Column="1" Grid.Row="2" Padding="0,50,0,0" Text="التأثير: زيادة السعادة" 
+                               TextColor="#bdc3c7" FontSize="12" VerticalOptions="Center"/>
+                        <VerticalStackLayout Grid.Column="2" Spacing="8" HorizontalOptions="End">
+                            <Button Text="اختيار" BackgroundColor="#3498db" TextColor="White" 
+                                    CornerRadius="8" FontSize="12" HeightRequest="35" WidthRequest="80" 
+                                    Clicked="OnSelectSpecialClicked"/>
+                            <Button x:Name="RemoveSpecialButton" Text="إزالة" BackgroundColor="#e74c3c" 
+                                    TextColor="White" CornerRadius="8" FontSize="12" HeightRequest="35" 
+                                    WidthRequest="80" IsEnabled="False" Clicked="OnRemoveSpecialClicked"/>
+                        </VerticalStackLayout>
+                    </Grid>
+                </Border>
+
+                <!-- Biochemical Slot -->
+                <Border Stroke="#27ae60" StrokeThickness="2" StrokeShape="RoundRectangle 15" 
+                        BackgroundColor="#2c2c2c" Padding="15">
+                    <Grid ColumnDefinitions="Auto,*,Auto" RowSpacing="10">
+                        <Image Source="biochemical_icon.png" HeightRequest="60" WidthRequest="60" 
+                               HorizontalOptions="Center" VerticalOptions="Center"/>
+                        <Label Grid.Column="0" Text="الكيمياء الحيوية" Padding="10,0,0,0" TextColor="#27ae60" FontSize="16" 
+                               FontAttributes="Bold" VerticalOptions="Center"/>
+                        <Label Grid.Column="1" Grid.Row="1" Padding="20,0,0,0" x:Name="BiochemicalNameLabel" Text="غير مجهز" 
+                               TextColor="White" FontSize="14" VerticalOptions="Center"/>
+                        <Label Grid.Column="1" Grid.Row="2" Padding="0,50,0,0" Text="التأثير: زيادة الصحة" 
+                               TextColor="#bdc3c7" FontSize="12" VerticalOptions="Center"/>
+                        <VerticalStackLayout Grid.Column="2" Spacing="8" HorizontalOptions="End">
+                            <Button Text="اختيار" BackgroundColor="#3498db" TextColor="White" 
+                                    CornerRadius="8" FontSize="12" HeightRequest="35" WidthRequest="80" 
+                                    Clicked="OnSelectBiochemicalClicked"/>
+                            <Button x:Name="RemoveBiochemicalButton" Text="إزالة" BackgroundColor="#e74c3c" 
+                                    TextColor="White" CornerRadius="8" FontSize="12" HeightRequest="35" 
+                                    WidthRequest="80" IsEnabled="False" Clicked="OnRemoveBiochemicalClicked"/>
+                        </VerticalStackLayout>
+                    </Grid>
+                </Border>
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <!-- Bottom Bar -->
+        <Border Grid.Row="2" BackgroundColor="#0a0a0a" Stroke="#f39c12" StrokeThickness="2" 
+                StrokeShape="RoundRectangle 15,15,0,0" Margin="10,5,10,10" Padding="10">
+            <Grid ColumnDefinitions="*,*">
+                <Button Text="🏠 الرئيسية" BackgroundColor="#3498db" TextColor="White" 
+                        CornerRadius="12" FontAttributes="Bold" Clicked="OnHomeClicked"/>
+                <Button Text="🔄 تحديث" BackgroundColor="#e67e22" TextColor="White" 
+                        CornerRadius="12" FontAttributes="Bold" Clicked="OnRefreshClicked"/>
+            </Grid>
+        </Border>
+    </Grid>
+</ContentPage>

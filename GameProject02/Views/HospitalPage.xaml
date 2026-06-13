@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:controls="clr-namespace:GameProject02.Controls"
+             xmlns:views="clr-namespace:GameProject02.Views"
+             x:Class="GameProject02.Views.HospitalPage"
+             BackgroundColor="#1a1a1a"
+             FlowDirection="RightToLeft"
+             NavigationPage.HasNavigationBar="False">
+
+    <Grid RowDefinitions="Auto, Auto, *, Auto">
+
+        <views:TopHeaderView Grid.Row="0"/>
+
+        <Image Source="background.png"
+               Aspect="Fill"
+               HorizontalOptions="Fill"
+               VerticalOptions="Fill"
+               Grid.Row="1"
+               Grid.RowSpan="2"
+               IsVisible="{Binding IsFreeMode}"/>
+
+        <Image Source="hospital_inmate_bg.png"
+               Aspect="Fill"
+               HorizontalOptions="Fill"
+               VerticalOptions="Fill"
+               Grid.Row="1"
+               Grid.RowSpan="2"
+               IsVisible="{Binding IsInHospital}"/>
+
+        <views:GameHeader Grid.Row="1"
+                          x:Name="PageHeader"
+                          HeaderTitle="المستشفى"/>
+
+        <Grid Grid.Row="2">
+
+            <!-- الوضع 1: المريض -->
+            <Grid x:Name="InmateModeLayout" IsVisible="{Binding IsInHospital}">
+                <ScrollView>
+                    <VerticalStackLayout Spacing="0" Padding="0">
+
+                        <Border x:Name="InmateInfoCard"
+                                Stroke="Transparent"
+                                StrokeThickness="0"
+                                StrokeShape="RoundRectangle 0,0,0,0"
+                                BackgroundColor="Transparent"
+                                Padding="6"
+                                HorizontalOptions="Center">
+                            <VerticalStackLayout Spacing="0">
+                                <Label Text="سبب دخولك المشفى:"
+                                       TextColor="Black"
+                                       FontAttributes="Bold"/>
+                                <Label x:Name="ReasonLabel"
+                                       TextColor="Red"
+                                       LineBreakMode="WordWrap"/>
+                                <Label Text="الوقت المتبقي للخروج:"
+                                       TextColor="Black"
+                                       FontAttributes="Bold"/>
+                                <Label x:Name="TimeRemainingLabel"
+                                       Text="00:00:00"
+                                       TextColor="#e74c3c"
+                                       FontAttributes="Bold"/>
+                                <Label Text="عدد مرات الدخول:"
+                                       TextColor="Black"
+                                       FontAttributes="Bold"/>
+                                <Label x:Name="VisitCountLabel"
+                                       Text="0"
+                                       TextColor="Red"/>
+                            </VerticalStackLayout>
+                        </Border>
+
+                    </VerticalStackLayout>
+                </ScrollView>
+            </Grid>
+
+            <!-- الوضع 2: الزائر -->
+            <Grid x:Name="VisitorModeLayout" IsVisible="{Binding IsFreeMode}">
+                <ScrollView VerticalOptions="Fill">
+                    <VerticalStackLayout x:Name="PatientsContainer"
+                                         Spacing="0"
+                                         Padding="10,5"
+                                         VerticalOptions="Fill"/>
+                </ScrollView>
+            </Grid>
+        </Grid>
+
+        <controls:FooterView Grid.Row="3"
+                             x:Name="PageFooter"/>
+    </Grid>
+</ContentPage>

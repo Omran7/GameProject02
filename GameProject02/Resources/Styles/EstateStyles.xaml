@@ -1,0 +1,304 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ResourceDictionary xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
+
+    <!-- ========================================== -->
+    <!-- الألوان الموحدة -->
+    <!-- ========================================== -->
+    <Color x:Key="ColorTextDark">#000000</Color>
+    <Color x:Key="ColorTextDarkSoft">#000000</Color>
+    <Color x:Key="ColorHeaderText">#C3C9BD</Color>
+    <Color x:Key="ColorGold">Goldenrod</Color>
+    <Color x:Key="ColorError">#c0392b</Color>
+    <Color x:Key="ColorDivider">#2B1814</Color>
+    <Color x:Key="ColorPopupItem">#A08865</Color>
+
+    <!-- ========================================== -->
+    <!-- أنماط النصوص العامة (التي سترث منها باقي الأنماط) -->
+    <!-- ========================================== -->
+    <Style TargetType="Label" x:Key="HeaderTitle">
+        <Setter Property="FontFamily" Value="Cairo-Black"/>
+        <Setter Property="TextColor" Value="{StaticResource ColorHeaderText}"/>
+        <Setter Property="FontAttributes" Value="Bold"/>
+        <Setter Property="HorizontalOptions" Value="Center"/>
+        <Setter Property="VerticalOptions" Value="Center"/>
+    </Style>
+
+    <Style TargetType="Label" x:Key="CardTitle">
+        <Setter Property="FontFamily" Value="Cairo-Black"/>
+        <Setter Property="TextColor" Value="Goldenrod"/>
+        <Setter Property="FontAttributes" Value="Bold"/>
+        <Setter Property="HorizontalTextAlignment" Value="Center"/>
+        <Setter Property="CharacterSpacing" Value="1"/>
+        <Setter Property="Shadow">
+            <Setter.Value>
+                <Shadow Brush="Black" Offset="0.5,2.9" Radius="1" Opacity="1"/>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style TargetType="Label" x:Key="CardDescription">
+        <Setter Property="FontFamily" Value="Cairo-Black"/>
+        <Setter Property="TextColor" Value="WhiteSmoke"/>
+        <Setter Property="HorizontalTextAlignment" Value="Center"/>
+        <Setter Property="CharacterSpacing" Value="1"/>
+        <Setter Property="Shadow">
+            <Setter.Value>
+                <Shadow Brush="Black" Offset="0,2" Radius="1" Opacity="1"/>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style TargetType="Label" x:Key="ActionButton">
+        <Setter Property="FontFamily" Value="Cairo-Black"/>
+        <Setter Property="TextColor" Value="White"/>
+        <Setter Property="FontAttributes" Value="Bold"/>
+        <Setter Property="HorizontalOptions" Value="Center"/>
+        <Setter Property="VerticalOptions" Value="Center"/>
+        <Setter Property="VerticalTextAlignment" Value="Center"/>
+        <Setter Property="Padding" Value="0"/>
+        <Setter Property="Margin" Value="0"/>
+        <Setter Property="TranslationY" Value="0"/>
+        <Setter Property="TranslationY" Value="-3"/>
+        <Setter Property="Shadow">
+            <Setter.Value>
+                <Shadow Brush="Black" Offset="0,1" Radius="1" Opacity="0.5"/>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+
+    <!-- ========================================== -->
+    <!-- أنماط الصفحة الرئيسية (EstatePage) -->
+    <!-- ========================================== -->
+    <Style TargetType="Border" x:Key="EstateCard">
+        <Setter Property="Stroke" Value="Transparent"/>
+        <Setter Property="StrokeThickness" Value="0"/>
+        <Setter Property="BackgroundColor" Value="Transparent"/>
+        <Setter Property="Padding" Value="0"/>
+        <Setter Property="HorizontalOptions" Value="Fill"/>
+    </Style>
+
+    <Style TargetType="Border" x:Key="EstateImageFrame">
+        <Setter Property="Stroke" Value="Transparent"/>
+        <Setter Property="StrokeThickness" Value="0"/>
+        <Setter Property="StrokeShape" Value="RoundRectangle 0"/>
+        <Setter Property="HorizontalOptions" Value="Center"/>
+        <Setter Property="VerticalOptions" Value="Center"/>
+        <Setter Property="BackgroundColor" Value="Transparent"/>
+    </Style>
+
+    <Style TargetType="Border" x:Key="EstateActionButton">
+        <Setter Property="Stroke" Value="Transparent"/>
+        <Setter Property="StrokeThickness" Value="0"/>
+        <Setter Property="StrokeShape" Value="RoundRectangle 0"/>
+        <Setter Property="BackgroundColor" Value="Transparent"/>
+        <Setter Property="HorizontalOptions" Value="End"/>
+        <Setter Property="VerticalOptions" Value="Center"/>
+    </Style>
+
+    <!-- ========================================== -->
+    <!-- أنماط صفحة شراء عقار جديد (EstateNewPage) -->
+    <!-- ========================================== -->
+    <Style TargetType="Label" x:Key="EstateNew_CardTitle" BasedOn="{StaticResource CardTitle}">
+        <Setter Property="LineBreakMode" Value="WordWrap"/>
+        <Setter Property="MaxLines" Value="2"/>
+    </Style>
+
+    <Style TargetType="Label" x:Key="EstateNew_Statistic" BasedOn="{StaticResource CardDescription}"/>
+
+    <Style TargetType="Label" x:Key="EstateNew_BuyButton" BasedOn="{StaticResource ActionButton}"/>
+
+    <!-- ========================================== -->
+    <!-- أنماط نماذج العرض (RentOut/Sell Pages) -->
+    <!-- ========================================== -->
+    <Style TargetType="Border" x:Key="EstateSelectionCard">
+        <Setter Property="Stroke" Value="Transparent"/>
+        <Setter Property="StrokeThickness" Value="0"/>
+        <Setter Property="BackgroundColor" Value="Transparent"/>
+        <Setter Property="StrokeShape" Value="RoundRectangle 10"/>
+        <Setter Property="Padding" Value="0"/>
+        <Setter Property="HorizontalOptions" Value="Fill"/>
+    </Style>
+
+    <Style TargetType="Border" x:Key="PriceInputCard">
+        <Setter Property="Stroke" Value="Transparent"/>
+        <Setter Property="StrokeThickness" Value="0"/>
+        <Setter Property="BackgroundColor" Value="Transparent"/>
+        <Setter Property="StrokeShape" Value="RoundRectangle 10"/>
+        <Setter Property="Padding" Value="0"/>
+        <Setter Property="HorizontalOptions" Value="Fill"/>
+    </Style>
+
+    <Style TargetType="Label" x:Key="EstateSelectionName" BasedOn="{StaticResource CardTitle}">
+        <Setter Property="HorizontalOptions" Value="Start"/>
+    </Style>
+
+    <Style TargetType="Label" x:Key="EstateSelectionHappiness" BasedOn="{StaticResource CardDescription}"/>
+
+    <Style TargetType="Border" x:Key="SelectEstateButton">
+        <Setter Property="Stroke" Value="Transparent"/>
+        <Setter Property="StrokeThickness" Value="0"/>
+        <Setter Property="StrokeShape" Value="RoundRectangle 0"/>
+        <Setter Property="BackgroundColor" Value="Transparent"/>
+        <Setter Property="Padding" Value="0"/>
+        <Setter Property="HorizontalOptions" Value="Fill"/>
+    </Style>
+
+    <Style TargetType="Label" x:Key="SelectEstateButtonText" BasedOn="{StaticResource ActionButton}">
+        <Setter Property="TextColor" Value="{StaticResource ColorGold}"/>
+    </Style>
+
+    <Style TargetType="Label" x:Key="DropdownArrow">
+        <Setter Property="TextColor" Value="{StaticResource ColorGold}"/>
+        <Setter Property="HorizontalOptions" Value="End"/>
+        <Setter Property="VerticalOptions" Value="Center"/>
+        <Setter Property="Margin" Value="0,0,15,0"/>
+    </Style>
+
+    <Style TargetType="Border" x:Key="PriceInputField">
+        <Setter Property="Stroke" Value="Transparent"/>
+        <Setter Property="StrokeThickness" Value="0"/>
+        <Setter Property="StrokeShape" Value="RoundRectangle 0"/>
+        <Setter Property="Padding" Value="0"/>
+        <Setter Property="BackgroundColor" Value="Transparent"/>
+        <Setter Property="HorizontalOptions" Value="Fill"/>
+    </Style>
+
+    <Style TargetType="Entry" x:Key="PriceEntry">
+        <Setter Property="Keyboard" Value="Numeric"/>
+        <Setter Property="TextColor" Value="{StaticResource ColorTextDark}"/>
+        <Setter Property="PlaceholderColor" Value="#95a5a6"/>
+        <Setter Property="BackgroundColor" Value="Transparent"/>
+        <Setter Property="FontFamily" Value="Cairo-Black"/>
+        <Setter Property="FontAttributes" Value="Bold"/>
+        <Setter Property="MaxLength" Value="9"/>
+        <Setter Property="HorizontalTextAlignment" Value="Center"/>
+        <Setter Property="VerticalTextAlignment" Value="Center"/>
+        <Setter Property="Margin" Value="10,0"/>
+    </Style>
+
+    <Style TargetType="Border" x:Key="TransactionButton">
+        <Setter Property="Stroke" Value="Transparent"/>
+        <Setter Property="StrokeThickness" Value="0"/>
+        <Setter Property="StrokeShape" Value="RoundRectangle 0"/>
+        <Setter Property="Padding" Value="0"/>
+        <Setter Property="BackgroundColor" Value="Transparent"/>
+        <Setter Property="HorizontalOptions" Value="Fill"/>
+    </Style>
+
+    <Style TargetType="Label" x:Key="TransactionButtonText" BasedOn="{StaticResource ActionButton}"/>
+
+    <!-- ========================================== -->
+    <!-- أنماط صفحة عقاراتي الخاصة (EstateOwnPage) -->
+    <!-- ========================================== -->
+    <Style TargetType="Label" x:Key="ErrorMessage">
+        <Setter Property="FontFamily" Value="Cairo-Black"/>
+        <Setter Property="TextColor" Value="{StaticResource ColorError}"/>
+        <Setter Property="HorizontalOptions" Value="Center"/>
+        <Setter Property="VerticalOptions" Value="CenterAndExpand"/>
+        <Setter Property="HorizontalTextAlignment" Value="Center"/>
+    </Style>
+
+    <Style TargetType="Label" x:Key="EmptyMessage">
+        <Setter Property="FontFamily" Value="Cairo-Black"/>
+        <Setter Property="TextColor" Value="{StaticResource ColorTextDark}"/>
+        <Setter Property="HorizontalOptions" Value="Center"/>
+        <Setter Property="VerticalOptions" Value="CenterAndExpand"/>
+        <Setter Property="HorizontalTextAlignment" Value="Center"/>
+        <Setter Property="LineBreakMode" Value="WordWrap"/>
+    </Style>
+
+    <Style TargetType="Label" x:Key="EstateName" BasedOn="{StaticResource CardTitle}">
+        <Setter Property="LineBreakMode" Value="WordWrap"/>
+        <Setter Property="MaxLines" Value="2"/>
+    </Style>
+
+    <Style TargetType="Label" x:Key="EstateStatistic" BasedOn="{StaticResource CardDescription}"/>
+
+    <Style TargetType="Label" x:Key="StatusText" BasedOn="{StaticResource CardDescription}">
+        <Setter Property="TextColor" Value="{StaticResource ColorError}"/>
+        <Setter Property="FontAttributes" Value="Bold"/>
+    </Style>
+
+    <Style TargetType="Label" x:Key="BadgeText" BasedOn="{StaticResource CardDescription}">
+        <Setter Property="TextColor" Value="{StaticResource ColorError}"/>
+        <Setter Property="FontAttributes" Value="Bold"/>
+        <Setter Property="VerticalOptions" Value="Center"/>
+        <Setter Property="VerticalTextAlignment" Value="Center"/>
+        <Setter Property="TranslationY" Value="-1.5"/>
+    </Style>
+    <Style TargetType="Label" x:Key="CardButton" BasedOn="{StaticResource ActionButton}"/>
+
+    <!-- ========================================== -->
+    <!-- أنماط صفحة الترقيات (EstateUpgradePage) -->
+    <!-- ========================================== -->
+    <Style TargetType="Label" x:Key="Upgrade_SectionHeader" BasedOn="{StaticResource CardTitle}"/>
+
+    <Style TargetType="Label" x:Key="Upgrade_ItemName" BasedOn="{StaticResource CardTitle}"/>
+
+    <Style TargetType="Label" x:Key="Upgrade_ItemDescription" BasedOn="{StaticResource CardDescription}">
+        <Setter Property="LineBreakMode" Value="WordWrap"/>
+        <Setter Property="MaxLines" Value="2"/>
+    </Style>
+
+    <Style TargetType="Label" x:Key="Upgrade_GoldenPrice" BasedOn="{StaticResource CardDescription}">
+        <Setter Property="TextColor" Value="WhiteSmoke"/>
+        <Setter Property="FontAttributes" Value="Bold"/>
+    </Style>
+
+    <Style TargetType="Label" x:Key="Upgrade_GoldenValue" BasedOn="{StaticResource CardDescription}">
+        <Setter Property="TextColor" Value="WhiteSmoke"/>
+        <Setter Property="FontAttributes" Value="Bold"/>
+    </Style>
+
+    <Style TargetType="Label" x:Key="Upgrade_StatusBadge" BasedOn="{StaticResource CardDescription}">
+        <Setter Property="TextColor" Value="Goldenrod"/>
+        <Setter Property="FontAttributes" Value="Bold"/>
+    </Style>
+
+    <Style TargetType="Label" x:Key="Upgrade_StatusText" BasedOn="{StaticResource CardDescription}">
+        <Setter Property="FontFamily" Value="Cairo-Blackr"/>
+        <Setter Property="FontAttributes" Value="Bold"/>
+    </Style>
+
+    <Style TargetType="Label" x:Key="Upgrade_ActionButton" BasedOn="{StaticResource ActionButton}"/>
+
+    <Style TargetType="Label" x:Key="Upgrade_SummaryTitle" BasedOn="{StaticResource CardTitle}"/>
+
+    <Style TargetType="Label" x:Key="Upgrade_SummaryValue" BasedOn="{StaticResource CardDescription}">
+        <Setter Property="TextColor" Value="WhiteSmoke"/>
+    </Style>
+
+    <Style TargetType="Label" x:Key="Upgrade_SummaryTotal" BasedOn="{StaticResource CardTitle}">
+        <Setter Property="TextColor" Value="WhiteSmoke"/>
+    </Style>
+
+    <Style TargetType="Label" x:Key="Upgrade_PrimaryWarning">
+        <Setter Property="FontFamily" Value="Cairo-Black"/>
+        <Setter Property="TextColor" Value="White"/>
+        <Setter Property="FontAttributes" Value="Bold"/>
+        <Setter Property="HorizontalOptions" Value="Center"/>
+        <Setter Property="HorizontalTextAlignment" Value="Center"/>
+        <Setter Property="LineBreakMode" Value="WordWrap"/>
+    </Style>
+
+    <Style TargetType="Label" x:Key="Upgrade_NoItems">
+        <Setter Property="FontFamily" Value="Cairo-Regular"/>
+        <Setter Property="TextColor" Value="#bdc3c7"/>
+        <Setter Property="HorizontalOptions" Value="Center"/>
+        <Setter Property="HorizontalTextAlignment" Value="Center"/>
+    </Style>
+
+    <!-- ========================================== -->
+    <!-- أنماط أزرار الفوتر (Footer) -->
+    <!-- ========================================== -->
+    <Style TargetType="Border" x:Key="FooterBackButton">
+        <Setter Property="Stroke" Value="Transparent"/>
+        <Setter Property="StrokeShape" Value="RoundRectangle 12"/>
+        <Setter Property="Padding" Value="0"/>
+        <Setter Property="HorizontalOptions" Value="Fill"/>
+        <Setter Property="BackgroundColor" Value="Transparent"/>
+    </Style>
+
+</ResourceDictionary>

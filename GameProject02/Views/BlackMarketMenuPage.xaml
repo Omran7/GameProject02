@@ -1,0 +1,73 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="GameProject02.Views.BlackMarketMenuPage"
+             ControlTemplate="{StaticResource StickyHeaderTemplate}"
+             BackgroundColor="#1a1a1a"
+             Title="🖤 السوق الأسود"
+             FlowDirection="RightToLeft"
+             NavigationPage.HasNavigationBar="False">
+
+    <Grid RowDefinitions="Auto,*,Auto">
+        <Border Grid.Row="0" BackgroundColor="#0a0a0a" Stroke="#e74c3c" StrokeThickness="2" Padding="10">
+            <Grid ColumnDefinitions="*,Auto,*">
+                <Button Text="← رجوع" BackgroundColor="#95a5a6" TextColor="White" CornerRadius="8" WidthRequest="80" Clicked="OnBackClicked"/>
+                <Label Grid.Column="1" Text="🖤 السوق الأسود" TextColor="White" FontSize="18" FontAttributes="Bold" HorizontalOptions="Center"/>
+            </Grid>
+        </Border>
+
+        <Grid Grid.Row="1" RowDefinitions="auto,auto,auto,auto" Margin="15" RowSpacing="15">
+            <!-- Diamonds -->
+            <Border BackgroundColor="#2c2c2c" Stroke="#3498db" StrokeThickness="2" StrokeShape="RoundRectangle 12" Padding="15">
+                <Grid ColumnDefinitions="*,Auto">
+                    <VerticalStackLayout VerticalOptions="Center">
+                        <Label Text="💎 قسم الألماس" TextColor="White" FontSize="16" FontAttributes="Bold"/>
+                        <Label Text="تحويل الزهور وشظايا القنابل" TextColor="#bdc3c7" FontSize="12"/>
+                    </VerticalStackLayout>
+                    <Button Grid.Column="1" Text="دخول" BackgroundColor="#3498db" TextColor="White" Padding="0,0,0,0" CornerRadius="8" WidthRequest="80" 
+                            Clicked="OnEnterDiamondsClicked"/>
+                </Grid>
+            </Border>
+
+            <!-- Checks -->
+            <Border Grid.Row="1" BackgroundColor="#2c2c2c" Stroke="#f39c12" StrokeThickness="2" StrokeShape="RoundRectangle 12" Padding="15">
+                <Grid ColumnDefinitions="*,Auto">
+                    <VerticalStackLayout VerticalOptions="Center">
+                        <Label Text="💳 قسم الشيكات" TextColor="White" FontSize="16" FontAttributes="Bold"/>
+                        <Label Text="تحويل الكريستال إلى شيكات" TextColor="#bdc3c7" FontSize="12"/>
+                    </VerticalStackLayout>
+                    <Button Grid.Column="1" Text="دخول" BackgroundColor="#f39c12" TextColor="White" CornerRadius="8" WidthRequest="80" 
+                            Clicked="OnEnterChecksClicked" VerticalOptions="Center"/>
+                </Grid>
+            </Border>
+
+            <!-- Tools -->
+            <Border Grid.Row="2" BackgroundColor="#2c2c2c" Stroke="#27ae60" StrokeThickness="2" StrokeShape="RoundRectangle 12" Padding="15">
+                <Grid ColumnDefinitions="*,Auto">
+                    <VerticalStackLayout VerticalOptions="Center">
+                        <Label Text="🛠️ قسم الأدوات" TextColor="White" FontSize="16" FontAttributes="Bold"/>
+                        <Label Text="أدوات المهام والعمليات" TextColor="#bdc3c7" FontSize="12"/>
+                    </VerticalStackLayout>
+                    <Button Grid.Column="1" Text="دخول" BackgroundColor="#27ae60" TextColor="White" CornerRadius="8" WidthRequest="80" 
+                            Clicked="OnEnterToolsClicked" VerticalOptions="Center"/>
+                </Grid>
+            </Border>
+
+            <!-- Food -->
+            <Border Grid.Row="4" BackgroundColor="#2c2c2c" Stroke="#e74c3c" StrokeThickness="2" StrokeShape="RoundRectangle 12" Padding="15">
+                <Grid ColumnDefinitions="*,Auto">
+                    <VerticalStackLayout VerticalOptions="Center">
+                        <Label Text="🍽️ قسم الطعام" TextColor="White" FontSize="16" FontAttributes="Bold"/>
+                        <Label Text="تحويل 5 أطباق فاخرة" TextColor="#bdc3c7" FontSize="12"/>
+                    </VerticalStackLayout>
+                    <Button Grid.Column="1" Text="دخول" BackgroundColor="#e74c3c" TextColor="White" CornerRadius="8" WidthRequest="80" 
+                            Clicked="OnEnterFoodClicked" VerticalOptions="Center"/>
+                </Grid>
+            </Border>
+        </Grid>
+
+        <Border Grid.Row="2" BackgroundColor="#0a0a0a" Stroke="#e74c3c" StrokeThickness="2" StrokeShape="RoundRectangle 15,15,0,0" Margin="10,5,10,10" Padding="10">
+            <Button Text="🏠 الرئيسية" BackgroundColor="#3498db" TextColor="White" CornerRadius="12" FontAttributes="Bold" Clicked="OnHomeClicked"/>
+        </Border>
+    </Grid>
+</ContentPage>

@@ -1,0 +1,164 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:helpers="clr-namespace:GameProject02.Helpers"
+             x:Class="GameProject02.Views.MuseumPage"
+             x:Name="MuseumPageRoot"
+             xmlns:controls="clr-namespace:GameProject02.Controls"
+             ControlTemplate="{StaticResource StickyHeaderTemplate}"
+             BackgroundColor="#1a1a1a"
+             Title="المتحف"
+             Shell.NavBarIsVisible="False"
+             FlowDirection="RightToLeft"
+             NavigationPage.HasNavigationBar="False">
+
+    <Grid RowDefinitions="Auto,Auto,*,Auto">
+
+        <!-- خلفية الصفحة -->
+        <Image Grid.RowSpan="4" Source="background.png" Aspect="Fill" Opacity="1"/>
+
+        <!-- شريط التبويبات العلوي -->
+        <Border Grid.Row="0"
+                BackgroundColor="Transparent"
+                Stroke="Snow"
+                StrokeThickness="0"
+                HeightRequest="{helpers:Static StockUIConstants.TabBarHeight}">
+            <Border.StrokeShape>
+                <RoundRectangle CornerRadius="{helpers:Static StockUIConstants.TabCornerRadius}" />
+            </Border.StrokeShape>
+            <Grid>
+                <Image Source="header_background.jpg" Aspect="AspectFill" Opacity="1"/>
+                <Grid ColumnDefinitions="*,*,*,*" ColumnSpacing="0" Padding="0">
+
+                    <!-- تبويب المخزن -->
+                    <Border x:Name="StockTabButton" Grid.Column="0"
+                            Stroke="Transparent" BackgroundColor="Transparent"
+                            HeightRequest="{helpers:Static StockUIConstants.TabButtonHeight}">
+                        <Grid>
+                            <Image Source="stock_button.png" 
+                                   HeightRequest="{helpers:Static StockUIConstants.TabIconSize}"
+                                   Aspect="Fill" Opacity="1"/>
+                            <Label x:Name="StockTabLabel" Text="المخزن" 
+                                   FontSize="{helpers:Static StockUIConstants.TabFontSize}"
+                                   TextColor="#1a1a1a"
+                                   FontFamily="Cairo-Black"
+                                   FontAttributes="Bold"
+                                   HorizontalOptions="Center" VerticalOptions="Center"/>
+                        </Grid>
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="OnTabClicked"/>
+                        </Border.GestureRecognizers>
+                    </Border>
+
+                    <!-- تبويب الحقيبة -->
+                    <Border x:Name="BagTabButton" Grid.Column="1"
+                            Stroke="Transparent" BackgroundColor="Transparent"
+                            HeightRequest="{helpers:Static StockUIConstants.TabButtonHeight}">
+                        <Grid>
+                            <Image Source="stock_button.png" 
+                                   HeightRequest="{helpers:Static StockUIConstants.TabIconSize}"
+                                   Aspect="Fill" Opacity="1"/>
+                            <Label x:Name="BagTabLabel" Text="الحقيبة" 
+                                   FontSize="{helpers:Static StockUIConstants.TabFontSize}"
+                                   TextColor="#1a1a1a"
+                                   FontFamily="Cairo-Black"
+                                   FontAttributes="Bold"
+                                   HorizontalOptions="Center" VerticalOptions="Center"/>
+                        </Grid>
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="OnTabClicked"/>
+                        </Border.GestureRecognizers>
+                    </Border>
+
+                    <!-- تبويب المتجر -->
+                    <Border x:Name="ShopTabButton" Grid.Column="2"
+                            Stroke="Transparent" BackgroundColor="Transparent"
+                            HeightRequest="{helpers:Static StockUIConstants.TabButtonHeight}">
+                        <Grid>
+                            <Image Source="stock_button.png" 
+                                   HeightRequest="{helpers:Static StockUIConstants.TabIconSize}"
+                                   Aspect="Fill" Opacity="1"/>
+                            <Label x:Name="ShopTabLabel" Text="المتجر" 
+                                   FontSize="{helpers:Static StockUIConstants.TabFontSize}"
+                                   TextColor="#1a1a1a"
+                                   FontFamily="Cairo-Black"
+                                   FontAttributes="Bold"
+                                   HorizontalOptions="Center" VerticalOptions="Center"/>
+                        </Grid>
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="OnTabClicked"/>
+                        </Border.GestureRecognizers>
+                    </Border>
+
+                    <!-- تبويب المتحف (النشط) -->
+                    <Border x:Name="MuseumTabButton" Grid.Column="3"
+                            Stroke="Transparent" BackgroundColor="Transparent"
+                            HeightRequest="{helpers:Static StockUIConstants.TabButtonHeight}">
+                        <Grid>
+                            <Image Source="stock_button.png" 
+                                   HeightRequest="{helpers:Static StockUIConstants.TabIconSize}"
+                                   Aspect="Fill" Opacity="1"/>
+                            <Label x:Name="MuseumTabLabel" Text="المتحف" 
+                                   FontSize="{helpers:Static StockUIConstants.TabFontSize}"
+                                   TextColor="#1a1a1a"
+                                   FontFamily="Cairo-Black"
+                                   FontAttributes="Bold"
+                                   HorizontalOptions="Center" VerticalOptions="Center"/>
+                        </Grid>
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="OnTabClicked"/>
+                        </Border.GestureRecognizers>
+                    </Border>
+                </Grid>
+            </Grid>
+        </Border>
+
+        <!-- القسم العلوي (تمرير أفقي) -->
+        <Border x:Name="TopSectionBorder" Grid.Row="1"
+                Stroke="{helpers:Static StockUIConstants.BorderGold}"
+                StrokeThickness="0"
+                StrokeShape="RoundRectangle 0,0,0,0"
+                BackgroundColor="Transparent"
+                Margin="0,0,0,0">
+            <Grid x:Name="MuseumBackgroundGrid">
+                <Image x:Name="MuseumBackgroundImage"
+                       Aspect="Fill"
+                       Source="stock_museum.png"
+                       Opacity="1"/>
+                <CollectionView x:Name="MuseumItemsScroll"
+                                ItemsSource="{Binding MuseumItems}"
+                                IsVisible="True"
+                                HorizontalScrollBarVisibility="Never">
+                    <CollectionView.ItemsLayout>
+                        <LinearItemsLayout Orientation="Horizontal" ItemSpacing="10"/>
+                    </CollectionView.ItemsLayout>
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate>
+                            <Grid WidthRequest="{Binding Source={x:Reference MuseumPageRoot}, Path=ItemSize}"
+                                  HeightRequest="{Binding Source={x:Reference MuseumPageRoot}, Path=ItemSize}"
+                                  Margin="12">
+                                <Image Source="{Binding ImageResource}" Aspect="AspectFit"/>
+                            </Grid>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+            </Grid>
+        </Border>
+
+        <!-- القسم السفلي (مساحات المتحف) -->
+        <ScrollView Grid.Row="2" Margin="0" VerticalScrollBarVisibility="Never">
+            <CollectionView x:Name="MuseumSpacesGrid" SelectionMode="None">
+                <CollectionView.ItemsLayout>
+                    <GridItemsLayout Orientation="Vertical"
+                                     Span="2"
+                                     HorizontalItemSpacing="0"
+                                     VerticalItemSpacing="0"/>
+                </CollectionView.ItemsLayout>
+            </CollectionView>
+        </ScrollView>
+
+        <!-- الفوتر العام -->
+        <controls:FooterView x:Name="PageFooter" Grid.Row="3" />
+
+    </Grid>
+</ContentPage>

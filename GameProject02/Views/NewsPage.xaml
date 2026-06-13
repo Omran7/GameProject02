@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="GameProject02.Views.NewsPage"
+             Title="📰 City News"
+             BackgroundColor="#1a1a1a">
+
+    <Grid RowDefinitions="Auto,Auto,Auto,*,Auto" Padding="8">
+
+        <!-- ═══════ Server Info Header ═══════ -->
+        <Grid Grid.Row="0" ColumnDefinitions="Auto,*,Auto" BackgroundColor="#0a0a0a"
+              Padding="8" Margin="0,0,0,4">
+            <VerticalStackLayout>
+                <Label x:Name="ServerNumberLabel" Text="Server #1"
+                       TextColor="#f39c12" FontSize="12" FontAttributes="Bold"/>
+                <Label x:Name="ServerTimeLabel" Text="00:00:00"
+                       TextColor="White" FontSize="12"/>
+            </VerticalStackLayout>
+            <Label Grid.Column="1" Text="CRIME CITY NEWS"
+                   TextColor="White" FontSize="18" FontAttributes="Bold"
+                   HorizontalOptions="Center" VerticalOptions="Center"/>
+            <VerticalStackLayout Grid.Column="2" HorizontalOptions="End">
+                <Label x:Name="ServerDateLabel" Text="01-01-2026"
+                       TextColor="#f39c12" FontSize="12" FontAttributes="Bold"
+                       HorizontalOptions="End"/>
+                <Label x:Name="ServerDayLabel" Text="SUNDAY"
+                       TextColor="White" FontSize="12" HorizontalOptions="End"/>
+            </VerticalStackLayout>
+        </Grid>
+
+        <!-- ═══════ Category Tabs ═══════ -->
+        <Grid Grid.Row="1" ColumnDefinitions="*,*,*,*" Margin="0,0,0,4">
+            <Button x:Name="RankTab" Text="🏆 رتب" BackgroundColor="#2c3e50"
+                    TextColor="White" Clicked="OnRankTabClicked"/>
+            <Button x:Name="JobsTab" Text="💼 وظائف" Grid.Column="1"
+                    BackgroundColor="#2c3e50" TextColor="White"
+                    Clicked="OnJobsTabClicked"/>
+            <Button x:Name="AdsTab" Text="📢 إعلانات" Grid.Column="2"
+                    BackgroundColor="#3498db" TextColor="White"
+                    Clicked="OnAdsTabClicked"/>
+            <Button x:Name="GuardTab" Text="🛡️ حراسة" Grid.Column="3"
+                    BackgroundColor="#2c3e50" TextColor="White"
+                    Clicked="OnGuardTabClicked"/>
+        </Grid>
+
+        <!-- ═══════ Featured Sections ═══════ -->
+        <Grid Grid.Row="2" RowDefinitions="Auto,Auto" Margin="0,0,0,4">
+
+            <!-- Last Ad -->
+            <Border Grid.Row="0" BackgroundColor="#2d2d2d" Stroke="#f39c12"
+                    StrokeThickness="1" Padding="8" Margin="0,0,0,4">
+                <Grid RowDefinitions="Auto,Auto">
+                    <Label Text="📢 أحدث إعلان" TextColor="#f39c12" FontSize="12"
+                           FontAttributes="Bold" Grid.Row="0"/>
+                    <VerticalStackLayout Grid.Row="1" x:Name="LastAdContainer">
+                        <Label x:Name="LastAdAuthor" Text="—" TextColor="White"
+                               FontSize="11" FontAttributes="Bold"/>
+                        <Label x:Name="LastAdContent" Text="No ads yet"
+                               TextColor="#cccccc" FontSize="11"/>
+                    </VerticalStackLayout>
+                </Grid>
+            </Border>
+
+            <!-- Top Bounty -->
+            <Border Grid.Row="1" BackgroundColor="#2d2d2d" Stroke="#e74c3c"
+                    StrokeThickness="1" Padding="8">
+                <Grid RowDefinitions="Auto,Auto,Auto,Auto">
+                    <Label Text="🎯 أعلى مكافأة" TextColor="#e74c3c" FontSize="12"
+                           FontAttributes="Bold" Grid.Row="0"/>
+                    <HorizontalStackLayout Grid.Row="1" Spacing="8">
+                        <Label x:Name="BountyName" Text="—" TextColor="White"
+                               FontSize="12" FontAttributes="Bold"/>
+                        <Label x:Name="BountyLevel" Text="" TextColor="#3498db"
+                               FontSize="11"/>
+                        <Label x:Name="BountyCost" Text="" TextColor="#2ecc71"
+                               FontSize="11" FontAttributes="Bold"/>
+                    </HorizontalStackLayout>
+                    <Label x:Name="BountyPlace" Text="" TextColor="#cccccc"
+                           FontSize="11" Grid.Row="2"/>
+                    <Label x:Name="BountyDesc" Text="" TextColor="#888888"
+                           FontSize="10" Grid.Row="3"/>
+                </Grid>
+            </Border>
+        </Grid>
+
+        <!-- ═══════ News List ═══════ -->
+        <CollectionView Grid.Row="3" x:Name="NewsList" Margin="0">
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+                    <Border BackgroundColor="#2d2d2d" StrokeThickness="0"
+                            Margin="0,2" Padding="8">
+                        <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto">
+                            <Label Text="{Binding Icon}" FontSize="20"
+                                   VerticalOptions="Center" Margin="0,0,8,0"/>
+                            <Label Grid.Column="1" Text="{Binding Title}"
+                                   TextColor="White" FontSize="12"
+                                   FontAttributes="Bold"/>
+                            <Label Grid.Row="1" Grid.Column="1"
+                                   Text="{Binding Content}" TextColor="#cccccc"
+                                   FontSize="11" LineBreakMode="WordWrap"/>
+                        </Grid>
+                    </Border>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+
+        <!-- ═══════ Bottom Bar ═══════ -->
+        <Grid Grid.Row="4" ColumnDefinitions="*,Auto,Auto" Padding="0,4,0,0">
+            <Button Text="🔙 رجوع" BackgroundColor="#2c3e50" TextColor="White"
+                    Clicked="OnBackClicked" HorizontalOptions="Start"/>
+            <Button Grid.Column="1" Text="📢 نشر إعلان" BackgroundColor="#27ae60"
+                    TextColor="White" Clicked="OnPublishAdClicked" Margin="4,0"/>
+            <Button Grid.Column="2" Text="🔄 تحديث" BackgroundColor="#3498db"
+                    TextColor="White" Clicked="OnRefreshClicked" Margin="4,0"/>
+        </Grid>
+    </Grid>
+</ContentPage>

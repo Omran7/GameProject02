@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="GameProject02.Views.TheShopPage"
+             Title="🛒 المتجر"
+             BackgroundColor="#1a1a1a"
+             FlowDirection="RightToLeft">
+	<Grid RowDefinitions="Auto, *, Auto">
+		<Border Grid.Row="0" BackgroundColor="#0a0a0a" Padding="15,10">
+			<Grid ColumnDefinitions="*,*,*">
+				<Label Text="💎 الماس" TextColor="#00bfff" FontAttributes="Bold" HorizontalOptions="Center"/>
+				<Label Grid.Column="1" Text="{Binding PlayerDiamonds}" TextColor="White" FontAttributes="Bold" HorizontalOptions="Center"/>
+				<Label Grid.Column="2" Text="🎯 الاستحقاقات" TextColor="#f39c12" FontAttributes="Bold" HorizontalOptions="Center"/>
+				<Label Grid.Column="3" Text="{Binding PlayerMerits}" TextColor="White" FontAttributes="Bold" HorizontalOptions="Center"/>
+			</Grid>
+		</Border>
+		<CollectionView Grid.Row="1" x:Name="ShopList" ItemsSource="{Binding ShopItems}" SelectionMode="None" Margin="10">
+			<CollectionView.ItemsLayout>
+				<LinearItemsLayout Orientation="Vertical" ItemSpacing="10"/>
+			</CollectionView.ItemsLayout>
+			<CollectionView.ItemTemplate>
+				<DataTemplate>
+					<Border BackgroundColor="#252525" StrokeShape="RoundRectangle 12" Padding="12">
+						<Grid ColumnDefinitions="Auto,*,Auto" RowDefinitions="Auto,Auto">
+							<Image Grid.RowSpan="2" Source="{Binding ImageResource}" WidthRequest="50" HeightRequest="50" Margin="0,0,10,0"/>
+							<Label Text="{Binding Name}" TextColor="White" FontAttributes="Bold" FontSize="15"/>
+							<Label Grid.Row="1" Text="{Binding Description}" TextColor="#aaaaaa" FontSize="12"/>
+							<Button Grid.Column="2" Grid.RowSpan="2" Text="{Binding CostDiamonds, StringFormat='💎 {0:N0}'}"
+                                    BackgroundColor="#27ae60" TextColor="White" CornerRadius="10" WidthRequest="80" HeightRequest="40" VerticalOptions="Center"
+                                    Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.BuyCommand}"
+                                    CommandParameter="{Binding .}"/>
+						</Grid>
+					</Border>
+				</DataTemplate>
+			</CollectionView.ItemTemplate>
+		</CollectionView>
+		<Border Grid.Row="2" BackgroundColor="#0a0a0a" Padding="10" Margin="10,0,10,10">
+			<Button Text="🎡 عجلة الحظ" BackgroundColor="#e67e22" TextColor="White" CornerRadius="10" HeightRequest="48"
+                    Command="{Binding OpenWheelCommand}"/>
+		</Border>
+	</Grid>
+</ContentPage>

@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="GameProject02.Views.LoginPage"
+             BackgroundColor="#2c3e50">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="30" Spacing="15" VerticalOptions="Center">
+
+            <Label Text="تسجيل الدخول"
+                   FontSize="32"
+                   FontAttributes="Bold"
+                   HorizontalOptions="Center"
+                   TextColor="White" />
+
+            <Entry x:Name="UsernameEntry"
+                   Placeholder="اسم المستخدم"
+                   BackgroundColor="#34495e"
+                   TextColor="White"
+                   PlaceholderColor="#bdc3c7" />
+
+            <Entry x:Name="PasswordEntry"
+                   Placeholder="كلمة المرور"
+                   IsPassword="True"
+                   BackgroundColor="#34495e"
+                   TextColor="White"
+                   PlaceholderColor="#bdc3c7" />
+
+            <Button x:Name="LoginButton"
+                    Text="دخول"
+                    BackgroundColor="#27ae60"
+                    TextColor="White"
+                    Clicked="OnLoginClicked" />
+
+            <ActivityIndicator x:Name="LoadingIndicator"
+                               IsRunning="False"
+                               IsVisible="False"
+                               Color="White"
+                               HorizontalOptions="Center" />
+
+            <Label x:Name="ErrorMessage"
+                   Text=""
+                   TextColor="#e74c3c"
+                   HorizontalOptions="Center"
+                   IsVisible="False" />
+
+            <Button Text="تسجيل حساب جديد"
+                    BackgroundColor="Transparent"
+                    TextColor="#3498db"
+                    Clicked="OnRegisterClicked" />
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

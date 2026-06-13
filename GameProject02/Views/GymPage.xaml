@@ -1,0 +1,165 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="GameProject02.Views.GymPage"
+             ControlTemplate="{StaticResource StickyHeaderTemplate}"
+             BackgroundColor="#1e1e1e"
+             Title="Gym"
+             NavigationPage.HasNavigationBar="False">
+
+    <Grid RowDefinitions="Auto,Auto,*,Auto">
+
+        <!-- Header with Energy Display -->
+        <Border Grid.Row="0" BackgroundColor="#2a2a2a" Stroke="Transparent" 
+                StrokeShape="RoundRectangle 0,0,0,0" Padding="15">
+            <StackLayout Orientation="Horizontal" Spacing="15">
+                <Border Stroke="Transparent" StrokeShape="RoundRectangle 20,20,20,20" 
+                        WidthRequest="40" HeightRequest="40" BackgroundColor="#3a3a3a">
+                    <Image Source="dotnet_bot.png" HeightRequest="36" WidthRequest="36" Aspect="AspectFill"/>
+                </Border>
+                <StackLayout VerticalOptions="Center">
+                    <Label Text="💪 CITY GYM" TextColor="#ff6b6b" FontSize="20" FontAttributes="Bold"/>
+                    <Label x:Name="EnergyLabel" Text="الطاقة: 100/100" TextColor="#4ecdc4" FontSize="14"/>
+                </StackLayout>
+            </StackLayout>
+        </Border>
+
+        <!-- Stat Distribution Section (2x2 GRID LAYOUT) -->
+        <ScrollView Grid.Row="1" Margin="10,5,10,5">
+            <Border BackgroundColor="#252525" Stroke="Transparent" 
+                    StrokeShape="RoundRectangle 10,10,10,10" Padding="15">
+                <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto" RowSpacing="15" ColumnSpacing="10">
+
+                    <!-- ROW 1: Strength + Defense -->
+                    <StackLayout Grid.Row="0" Grid.Column="0" Spacing="8">
+                        <Grid ColumnDefinitions="Auto,*,Auto,60">
+                            <Label Text="💪" FontSize="22" TextColor="#ff6b6b" VerticalOptions="Center"/>
+                            <StackLayout Grid.Column="1" Spacing="2">
+                                <Label Text="القوة" TextColor="White" FontSize="15" FontAttributes="Bold"/>
+                                <Label x:Name="StrengthValueLabel" Text="0" TextColor="#ff6b6b" FontSize="13"/>
+                            </StackLayout>
+                            <Label x:Name="StrengthStatLabel" Grid.Column="2" Text="10.0" TextColor="White" FontSize="15" VerticalOptions="Center" HorizontalOptions="End"/>
+                            <StackLayout Grid.Column="3" Spacing="2">
+                                <Entry x:Name="StrengthEntry" Text="0" Keyboard="Numeric" 
+                                       TextColor="White" BackgroundColor="#333333" 
+                                       HorizontalTextAlignment="Center" FontSize="13" WidthRequest="55"/>
+                                <Label Text="طاقة" TextColor="#888888" FontSize="10" HorizontalOptions="Center"/>
+                            </StackLayout>
+                        </Grid>
+                        <Slider x:Name="StrengthSlider" Minimum="0" Maximum="100" Value="0" 
+                                MinimumTrackColor="#ff6b6b" MaximumTrackColor="#555555" 
+                                ThumbColor="#ff6b6b" ValueChanged="OnSliderChanged"/>
+                        <Grid ColumnDefinitions="Auto,*,Auto">
+                            <Label Text="0" TextColor="#888888" FontSize="10"/>
+                            <Label Grid.Column="2" x:Name="StrengthMaxLabel" Text="100" TextColor="#888888" FontSize="10" HorizontalOptions="End"/>
+                        </Grid>
+                    </StackLayout>
+
+                    <StackLayout Grid.Row="0" Grid.Column="1" Spacing="8">
+                        <Grid ColumnDefinitions="Auto,*,Auto,60">
+                            <Label Text="🛡️" FontSize="22" TextColor="#45b7d1" VerticalOptions="Center"/>
+                            <StackLayout Grid.Column="1" Spacing="2">
+                                <Label Text="الدفاع" TextColor="White" FontSize="15" FontAttributes="Bold"/>
+                                <Label x:Name="DefenseValueLabel" Text="0" TextColor="#45b7d1" FontSize="13"/>
+                            </StackLayout>
+                            <Label x:Name="DefenseStatLabel" Grid.Column="2" Text="10.0" TextColor="White" FontSize="15" VerticalOptions="Center" HorizontalOptions="End"/>
+                            <StackLayout Grid.Column="3" Spacing="2">
+                                <Entry x:Name="DefenseEntry" Text="0" Keyboard="Numeric" 
+                                       TextColor="White" BackgroundColor="#333333" 
+                                       HorizontalTextAlignment="Center" FontSize="13" WidthRequest="55"/>
+                                <Label Text="طاقة" TextColor="#888888" FontSize="10" HorizontalOptions="Center"/>
+                            </StackLayout>
+                        </Grid>
+                        <Slider x:Name="DefenseSlider" Minimum="0" Maximum="100" Value="0" 
+                                MinimumTrackColor="#45b7d1" MaximumTrackColor="#555555" 
+                                ThumbColor="#45b7d1" ValueChanged="OnSliderChanged"/>
+                        <Grid ColumnDefinitions="Auto,*,Auto">
+                            <Label Text="0" TextColor="#888888" FontSize="10"/>
+                            <Label Grid.Column="2" x:Name="DefenseMaxLabel" Text="100" TextColor="#888888" FontSize="10" HorizontalOptions="End"/>
+                        </Grid>
+                    </StackLayout>
+
+                    <!-- ROW 2: Speed + Dexterity -->
+                    <StackLayout Grid.Row="1" Grid.Column="0" Spacing="8">
+                        <Grid ColumnDefinitions="Auto,*,Auto,60">
+                            <Label Text="🏃" FontSize="22" TextColor="#4ecdc4" VerticalOptions="Center"/>
+                            <StackLayout Grid.Column="1" Spacing="2">
+                                <Label Text="السرعة" TextColor="White" FontSize="15" FontAttributes="Bold"/>
+                                <Label x:Name="SpeedValueLabel" Text="0" TextColor="#4ecdc4" FontSize="13"/>
+                            </StackLayout>
+                            <Label x:Name="SpeedStatLabel" Grid.Column="2" Text="10.0" TextColor="White" FontSize="15" VerticalOptions="Center" HorizontalOptions="End"/>
+                            <StackLayout Grid.Column="3" Spacing="2">
+                                <Entry x:Name="SpeedEntry" Text="0" Keyboard="Numeric" 
+                                       TextColor="White" BackgroundColor="#333333" 
+                                       HorizontalTextAlignment="Center" FontSize="13" WidthRequest="55"/>
+                                <Label Text="طاقة" TextColor="#888888" FontSize="10" HorizontalOptions="Center"/>
+                            </StackLayout>
+                        </Grid>
+                        <Slider x:Name="SpeedSlider" Minimum="0" Maximum="100" Value="0" 
+                                MinimumTrackColor="#4ecdc4" MaximumTrackColor="#555555" 
+                                ThumbColor="#4ecdc4" ValueChanged="OnSliderChanged"/>
+                        <Grid ColumnDefinitions="Auto,*,Auto">
+                            <Label Text="0" TextColor="#888888" FontSize="10"/>
+                            <Label Grid.Column="2" x:Name="SpeedMaxLabel" Text="100" TextColor="#888888" FontSize="10" HorizontalOptions="End"/>
+                        </Grid>
+                    </StackLayout>
+
+                    <StackLayout Grid.Row="1" Grid.Column="1" Spacing="8">
+                        <Grid ColumnDefinitions="Auto,*,Auto,60">
+                            <Label Text="🤸" FontSize="22" TextColor="#feca57" VerticalOptions="Center"/>
+                            <StackLayout Grid.Column="1" Spacing="2">
+                                <Label Text="المهارة" TextColor="White" FontSize="15" FontAttributes="Bold"/>
+                                <Label x:Name="DexterityValueLabel" Text="0" TextColor="#feca57" FontSize="13"/>
+                            </StackLayout>
+                            <Label x:Name="DexterityStatLabel" Grid.Column="2" Text="10.0" TextColor="White" FontSize="15" VerticalOptions="Center" HorizontalOptions="End"/>
+                            <StackLayout Grid.Column="3" Spacing="2">
+                                <Entry x:Name="DexterityEntry" Text="0" Keyboard="Numeric" 
+                                       TextColor="White" BackgroundColor="#333333" 
+                                       HorizontalTextAlignment="Center" FontSize="13" WidthRequest="55"/>
+                                <Label Text="طاقة" TextColor="#888888" FontSize="10" HorizontalOptions="Center"/>
+                            </StackLayout>
+                        </Grid>
+                        <Slider x:Name="DexteritySlider" Minimum="0" Maximum="100" Value="0" 
+                                MinimumTrackColor="#feca57" MaximumTrackColor="#555555" 
+                                ThumbColor="#feca57" ValueChanged="OnSliderChanged"/>
+                        <Grid ColumnDefinitions="Auto,*,Auto">
+                            <Label Text="0" TextColor="#888888" FontSize="10"/>
+                            <Label Grid.Column="2" x:Name="DexterityMaxLabel" Text="100" TextColor="#888888" FontSize="10" HorizontalOptions="End"/>
+                        </Grid>
+                    </StackLayout>
+
+                    <!-- Total Energy Display (centered below grid) -->
+                    <StackLayout Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" 
+                                 Spacing="5" HorizontalOptions="Center" Margin="0,125,0,0">
+                        <Label x:Name="TotalEnergyWarning" Text="" 
+                               TextColor="#e74c3c" FontSize="13" HorizontalOptions="Center" 
+                               IsVisible="False" FontAttributes="Bold"/>
+                        <Label x:Name="TotalEnergyLabel" Text="المجموع: 0 طاقة" 
+                               TextColor="#4ecdc4" FontSize="15" HorizontalOptions="Center" 
+                               FontAttributes="Bold"/>
+                    </StackLayout>
+
+                </Grid>
+            </Border>
+        </ScrollView>
+
+        <!-- Lessons List -->
+        <ScrollView Grid.Row="2" Margin="10,5,10,5">
+            <StackLayout x:Name="LessonsContainer" Spacing="10">
+                <!-- Lessons will be added dynamically -->
+            </StackLayout>
+        </ScrollView>
+
+        <!-- Action Buttons -->
+        <Grid Grid.Row="3" ColumnDefinitions="*,*" Padding="10">
+            <Button x:Name="TrainButton" Text="💪 تدرب" 
+                    BackgroundColor="#ff6b6b" TextColor="White" 
+                    CornerRadius="12" Clicked="OnTrainClicked"/>
+            <Button x:Name="ProfileButton" Text="👤 الملف الشخصي" Grid.Column="1"
+                    BackgroundColor="#45b7d1" TextColor="White" 
+                    CornerRadius="12" Clicked="OnProfileClicked"/>
+        </Grid>
+
+    </Grid>
+
+</ContentPage>

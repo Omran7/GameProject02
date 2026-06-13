@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="GameProject02.Views.AirportPage"
+             Title="✈️ المطار"
+             BackgroundColor="#1a1a1a">
+
+    <Grid RowDefinitions="Auto,Auto,*,Auto" Padding="8">
+
+        <!-- Title (current city name) -->
+        <Border Grid.Row="0" BackgroundColor="#0a0a0a" Stroke="#f39c12"
+                StrokeThickness="1" Padding="8">
+            <Label x:Name="TitleLabel" Text="المطار"
+                   TextColor="#f39c12" FontSize="18" FontAttributes="Bold"
+                   HorizontalOptions="Center"/>
+        </Border>
+
+        <!-- Destinations List -->
+        <Label Grid.Row="1" Text="الوجهات المتاحة" TextColor="White"
+               FontSize="14" FontAttributes="Bold" Margin="0,4"/>
+        <CollectionView Grid.Row="2" x:Name="DestinationsList"
+                        SelectionMode="None">
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+                    <Border BackgroundColor="#2d2d2d" StrokeThickness="0"
+                            Margin="0,2" Padding="10">
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="OnDestinationTapped"/>
+                        </Border.GestureRecognizers>
+                        <Grid ColumnDefinitions="*,Auto,Auto" RowDefinitions="Auto,Auto">
+                            <Label Text="{Binding CityName}" TextColor="White"
+                                   FontSize="14" FontAttributes="Bold"/>
+                            <Label Grid.Column="1" Text="⏱️" TextColor="#cccccc"
+                                   FontSize="12" VerticalOptions="Center"/>
+                            <Label Grid.Column="2"
+                                   Text="{Binding TravelTimeSeconds, StringFormat='{0} ثانية'}"
+                                   TextColor="#cccccc" FontSize="12"
+                                   VerticalOptions="Center"/>
+                            <Label Grid.Row="1" Grid.ColumnSpan="3"
+                                   Text="{Binding TravelCostGold, StringFormat='💰 {0} ذهب'}"
+                                   TextColor="#2ecc71" FontSize="12"
+                                   FontAttributes="Bold"/>
+                        </Grid>
+                    </Border>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+
+        <!-- Bottom Bar -->
+        <Grid Grid.Row="3" ColumnDefinitions="*,Auto">
+            <Button Text="🔙 رجوع" BackgroundColor="#2c3e50" TextColor="White"
+                    Clicked="OnBackClicked" HorizontalOptions="Start"/>
+            <Button Grid.Column="1" Text="🗺️ الخريطة" BackgroundColor="#3498db"
+                    TextColor="White" Clicked="OnMapClicked" Margin="4,0"/>
+        </Grid>
+    </Grid>
+</ContentPage>

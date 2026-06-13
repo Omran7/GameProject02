@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:models="clr-namespace:GameProject02.Models"
+             x:Class="GameProject02.Views.SkillsPage"
+             Title="🎯 المهارات"
+             BackgroundColor="#1a1a1a">
+
+    <Grid RowDefinitions="Auto, *, Auto">
+        <!-- Header -->
+        <Border Grid.Row="0" BackgroundColor="#0a0a0a" Padding="15" Margin="0,0,0,10">
+            <Grid ColumnDefinitions="*, Auto">
+                <Label Text="📊 نقاط المهارات" TextColor="White" FontSize="16"/>
+                <Label Grid.Column="1" Text="{Binding PlayerSkillPoints}" TextColor="#f39c12" FontAttributes="Bold" FontSize="18"/>
+            </Grid>
+        </Border>
+
+        <!-- Skills List -->
+        <CollectionView x:Name="SkillsList" Grid.Row="1" ItemsSource="{Binding Skills}" SelectionMode="None" Margin="10,0">
+            <CollectionView.ItemsLayout>
+                <LinearItemsLayout Orientation="Vertical" ItemSpacing="8"/>
+            </CollectionView.ItemsLayout>
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+                    <Border BackgroundColor="#252525" StrokeShape="RoundRectangle 12" Padding="12">
+                        <Grid ColumnDefinitions="*, Auto" RowDefinitions="Auto, Auto">
+                            <Label Text="{Binding Name}" TextColor="White" FontAttributes="Bold" FontSize="15"/>
+                            <Label Grid.Column="1" Text="{Binding LevelString}" TextColor="#3498db" FontSize="14"/>
+
+                            <Label Grid.Row="1" Text="{Binding Description}" TextColor="#aaaaaa" FontSize="12" Margin="0,4,0,0"/>
+                            <HorizontalStackLayout Grid.Row="1" Grid.Column="1" Spacing="8" HorizontalOptions="End">
+                                <Button Text="⬆️" BackgroundColor="#2ecc71" WidthRequest="36" HeightRequest="36" CornerRadius="18"
+                                        Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.UpgradeCommand}"
+                                        CommandParameter="{Binding .}"/>
+                                <Button Text="{Binding EquipText}" BackgroundColor="{Binding EquipBg}" WidthRequest="36" HeightRequest="36" CornerRadius="18"
+                                        Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.EquipCommand}"
+                                        CommandParameter="{Binding .}"/>
+                            </HorizontalStackLayout>
+                        </Grid>
+                    </Border>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+
+        <!-- Bottom Bar -->
+        <Border Grid.Row="2" BackgroundColor="#0a0a0a" Padding="10" Margin="10,10,10,0">
+            <Button Text="💾 حفظ وتطبيق المهارات" BackgroundColor="#e67e22" TextColor="White" CornerRadius="10" HeightRequest="48"
+                    Command="{Binding SaveCommand}"/>
+        </Border>
+    </Grid>
+</ContentPage>

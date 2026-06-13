@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="GameProject02.Controls.FooterView"
+             FlowDirection="RightToLeft"
+             x:Name="This">
+
+    <Grid x:Name="RootGrid" RowDefinitions="*">
+        <!-- خلفية الفوتر العامة -->
+        <Image Source="footer_background.png" Aspect="Fill" />
+
+        <!-- حاوية المحتوى المرن -->
+        <ContentView x:Name="ContentContainer" 
+                     VerticalOptions="Center" 
+                     HorizontalOptions="Fill" />
+    </Grid>
+</ContentView>

@@ -1,0 +1,146 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="GameProject02.Views.FightClubPage"
+             BackgroundColor="#1a1a1a"
+             Title="نادي القتال"
+             FlowDirection="RightToLeft"
+             NavigationPage.HasNavigationBar="False">
+
+    <Grid RowDefinitions="Auto,*,Auto">
+
+        <!-- Background -->
+        <Image Grid.RowSpan="3"
+               Source="market_bg.jpg"
+               Aspect="AspectFill"
+               Opacity="0.9"/>
+
+        <!-- Header -->
+        <Border Grid.Row="0"
+                BackgroundColor="#0a0a0a"
+                Stroke="#f39c12"
+                StrokeThickness="2"
+                StrokeShape="RoundRectangle 0,0,0,0"
+                Padding="5">
+            <Grid ColumnDefinitions="*,Auto,*">
+                <Button x:Name="BackButton"
+                        Text="← رجوع"
+                        BackgroundColor="#95a5a6"
+                        TextColor="White"
+                        CornerRadius="5"
+                        FontAttributes="Bold"
+                        WidthRequest="80"
+                        Clicked="OnBackClicked"/>
+
+                <StackLayout Grid.Column="1" Spacing="2" VerticalOptions="Center">
+                    <Label Text="⚔️ نادي القتال"
+                           TextColor="White"
+                           FontSize="16"
+                           FontAttributes="Bold"
+                           HorizontalOptions="Center"/>
+                </StackLayout>
+
+                <Button x:Name="RefreshButton"
+                        Text="🔄 تحديث"
+                        BackgroundColor="#3498db"
+                        TextColor="White"
+                        CornerRadius="5"
+                        FontAttributes="Bold"
+                        WidthRequest="90"
+                        Clicked="OnRefreshClicked"/>
+            </Grid>
+        </Border>
+
+        <!-- Players List -->
+        <CollectionView x:Name="PlayersCollectionView"
+                        Grid.Row="1"
+                        Margin="10"
+                        ItemsSource="{Binding Players}"
+                        EmptyView="لا يوجد لاعبون متاحون للقتال حالياً">
+            <CollectionView.ItemsLayout>
+                <GridItemsLayout Orientation="Vertical"
+                                 Span="1"
+                                 HorizontalItemSpacing="8"
+                                 VerticalItemSpacing="8"/>
+            </CollectionView.ItemsLayout>
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+                    <Border BackgroundColor="#1a1a1a"
+            StrokeThickness="0"
+            Padding="8"
+            Margin="0,0,0,8">
+
+                        <Grid ColumnDefinitions="Auto, *, 90" ColumnSpacing="8">
+
+                            <Grid Grid.Column="0" HeightRequest="54" WidthRequest="54" VerticalOptions="Start">
+                                <Border StrokeThickness="1" Stroke="#333" BackgroundColor="#000" Padding="3">
+                                    <Image Source="{Binding ImageResource}" Aspect="AspectFill" />
+                                </Border>
+
+                                <Image Source="online_dote_icon.png" 
+                       HeightRequest="12" WidthRequest="12"
+                       HorizontalOptions="End" VerticalOptions="Start"
+                       Margin="0,2,2,0"
+                       IsVisible="{Binding IsOnline}" />
+                            </Grid>
+
+                            <Border Grid.Column="1" 
+                    BackgroundColor="#2c2c2c" 
+                    StrokeThickness="0"
+                    Padding="4,2,4,2">
+                                <Grid RowDefinitions="Auto, Auto, Auto" ColumnDefinitions="18, *" RowSpacing="2" ColumnSpacing="4">
+
+                                    <Image Grid.Row="0" Grid.Column="0" Source="gender_icon.png" HeightRequest="18" />
+                                    <Label Grid.Row="0" Grid.Column="1" Text="{Binding Username}" TextColor="White" FontSize="12" FontAttributes="Bold" VerticalOptions="Center" />
+
+                                    <Image Grid.Row="1" Grid.Column="0" Source="level_icon.png" HeightRequest="14" />
+                                    <Label Grid.Row="1" Grid.Column="1" Text="{Binding Level, StringFormat='{0}'}" TextColor="White" FontSize="12" FontAttributes="Bold" VerticalOptions="Center" />
+
+                                    <Image Grid.Row="2" Grid.Column="0" Source="health_icon.png" HeightRequest="18" />
+                                    <Label Grid.Row="2" Grid.Column="1" Text="{Binding HealthCurrent, StringFormat='{0} / {1}'}" TextColor="White" FontSize="12" FontAttributes="Bold" VerticalOptions="Center" />
+                                </Grid>
+                            </Border>
+
+                            <Grid Grid.Column="2" VerticalOptions="Fill">
+                                <Image Source="button_red.png" Aspect="Fill" />
+                                <Button Text="قتال"
+                        TextColor="White"
+                        FontSize="16"
+                        FontAttributes="Bold"
+                        BackgroundColor="Transparent"
+                        Clicked="OnFightClicked"
+                        CommandParameter="{Binding .}" />
+                            </Grid>
+
+                        </Grid>
+                    </Border>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+
+        <!-- Bottom Bar -->
+        <Border Grid.Row="2"
+                BackgroundColor="#0a0a0a"
+                Stroke="#f39c12"
+                StrokeThickness="2"
+                StrokeShape="RoundRectangle 15,15,0,0"
+                Margin="10,5,10,10"
+                Padding="10">
+            <Grid ColumnDefinitions="*,*">
+                <Button Text="🏠 الرئيسية"
+                        BackgroundColor="#3498db"
+                        TextColor="White"
+                        CornerRadius="12"
+                        FontAttributes="Bold"
+                        Clicked="OnHomeClicked"/>
+
+                <Button Text="🔄 تحديث"
+                        BackgroundColor="#e67e22"
+                        TextColor="White"
+                        CornerRadius="12"
+                        FontAttributes="Bold"
+                        Clicked="OnRefreshClicked"/>
+            </Grid>
+        </Border>
+    </Grid>
+</ContentPage>

@@ -1,0 +1,132 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:local="clr-namespace:GameProject02.Views"
+             xmlns:controls="clr-namespace:GameProject02.Controls"
+             x:Class="GameProject02.Views.EstatePage"
+             ControlTemplate="{StaticResource StickyHeaderTemplate}"
+             FlowDirection="RightToLeft"
+             Title="العقارات"
+             NavigationPage.HasNavigationBar="False">
+
+    <Grid RowDefinitions="Auto,*,Auto" Padding="0">
+
+        <Image Source="background.png" Aspect="AspectFill" Opacity="1" Grid.RowSpan="3"/>
+
+        <!-- الهيدر مع صورتين ونص -->
+        <local:GameHeader Grid.Row="0"
+                          HeaderTitle="مكتب موظف العقارات"
+                          RightImage="header_right.png"
+                          LeftImage="header_left.png"/>
+
+        <ScrollView Grid.Row="1" Margin="5,0,5,0">
+            <VerticalStackLayout Spacing="2">
+
+                <!-- بطاقة: عقارات خاصة -->
+                <Border Style="{StaticResource EstateCard}" x:Name="MyEstatesCard">
+                    <Grid>
+                        <Image Source="card_background.png" Aspect="Fill" Opacity="1"/>
+                        <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="10" Padding="16,0" VerticalOptions="Center">
+                            <Border Grid.Column="0" Style="{StaticResource EstateImageFrame}" x:Name="MyEstatesImageFrame">
+                                <Image Source="estate_icon_own.png" Aspect="Fill" VerticalOptions="Center" HorizontalOptions="Center"/>
+                            </Border>
+                            <StackLayout Grid.Column="1" Spacing="10" VerticalOptions="Center" HorizontalOptions="Center">
+                                <Label x:Name="MyEstatesTitle" Text="عقارات خاصة" Style="{StaticResource CardTitle}"/>
+                                <Label x:Name="MyEstatesDesc" Text="هنا العقارات التي تمتلكها بحسابك" Style="{StaticResource CardDescription}"/>
+                            </StackLayout>
+                            <Border Grid.Column="2" Style="{StaticResource EstateActionButton}" x:Name="MyEstatesButton">
+                                <Grid>
+                                    <Image Source="button_background.png" Aspect="Fill" VerticalOptions="Fill" HorizontalOptions="Fill"/>
+                                    <Label x:Name="MyEstatesButtonLabel" Text="دخول" Style="{StaticResource ActionButton}"/>
+                                </Grid>
+                                <Border.GestureRecognizers>
+                                    <TapGestureRecognizer Tapped="OnMyEstatesClicked"/>
+                                </Border.GestureRecognizers>
+                            </Border>
+                        </Grid>
+                    </Grid>
+                </Border>
+
+                <!-- بطاقة: شراء عقارات -->
+                <Border Style="{StaticResource EstateCard}" x:Name="NewEstatesCard">
+                    <Grid>
+                        <Image Source="card_background.png" Aspect="Fill" Opacity="1"/>
+                        <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="10" Padding="16,0" VerticalOptions="Center">
+                            <Border Grid.Column="0" Style="{StaticResource EstateImageFrame}" x:Name="NewEstatesImageFrame">
+                                <Image Source="estate_icon_buy.png" Aspect="Fill"/>
+                            </Border>
+                            <StackLayout Grid.Column="1" Spacing="10" VerticalOptions="Center" HorizontalOptions="Center">
+                                <Label x:Name="NewEstatesTitle" Text="شراء عقارات" Style="{StaticResource CardTitle}"/>
+                                <Label x:Name="NewEstatesDesc" Text="هنا يمكنك شراء عقارات جديدة لحسابك" Style="{StaticResource CardDescription}"/>
+                            </StackLayout>
+                            <Border Grid.Column="2" Style="{StaticResource EstateActionButton}" x:Name="NewEstatesButton">
+                                <Grid>
+                                    <Image Source="button_background.png" Aspect="Fill"/>
+                                    <Label x:Name="NewEstatesButtonLabel" Text="دخول" Style="{StaticResource ActionButton}"/>
+                                </Grid>
+                                <Border.GestureRecognizers>
+                                    <TapGestureRecognizer Tapped="OnNewEstatesClicked"/>
+                                </Border.GestureRecognizers>
+                            </Border>
+                        </Grid>
+                    </Grid>
+                </Border>
+
+                <!-- بطاقة: بيع وشراء -->
+                <Border Style="{StaticResource EstateCard}" x:Name="UsedEstatesCard">
+                    <Grid>
+                        <Image Source="card_background.png" Aspect="Fill" Opacity="1"/>
+                        <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="10" Padding="16,0" VerticalOptions="Center">
+                            <Border Grid.Column="0" Style="{StaticResource EstateImageFrame}" x:Name="UsedEstatesImageFrame">
+                                <Image Source="estate_icon_sell.png" Aspect="Fill"/>
+                            </Border>
+                            <StackLayout Grid.Column="1" Spacing="10" VerticalOptions="Center" HorizontalOptions="Center">
+                                <Label x:Name="UsedEstatesTitle" Text="بيع وشراء" Style="{StaticResource CardTitle}"/>
+                                <Label x:Name="UsedEstatesDesc" Text="هنا بيع وشراء العقارات المستعملة" Style="{StaticResource CardDescription}"/>
+                            </StackLayout>
+                            <Border Grid.Column="2" Style="{StaticResource EstateActionButton}" x:Name="UsedEstatesButton">
+                                <Grid>
+                                    <Image Source="button_background.png" Aspect="Fill"/>
+                                    <Label x:Name="UsedEstatesButtonLabel" Text="دخول" Style="{StaticResource ActionButton}"/>
+                                </Grid>
+                                <Border.GestureRecognizers>
+                                    <TapGestureRecognizer Tapped="OnUsedEstatesClicked"/>
+                                </Border.GestureRecognizers>
+                            </Border>
+                        </Grid>
+                    </Grid>
+                </Border>
+
+                <!-- بطاقة: تأجير واستئجار -->
+                <Border Style="{StaticResource EstateCard}" x:Name="RentEstatesCard">
+                    <Grid>
+                        <Image Source="card_background.png" Aspect="Fill" Opacity="1"/>
+                        <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="10" Padding="16,0" VerticalOptions="Center">
+                            <Border Grid.Column="0" Style="{StaticResource EstateImageFrame}" x:Name="RentEstatesImageFrame">
+                                <Image Source="estate_icon_rent.png" Aspect="Fill"/>
+                            </Border>
+                            <StackLayout Grid.Column="1" Spacing="10" VerticalOptions="Center" HorizontalOptions="Center">
+                                <Label x:Name="RentEstatesTitle" Text="تأجير واستئجار" Style="{StaticResource CardTitle}"/>
+                                <Label x:Name="RentEstatesDesc" Text="هنا يمكنك استئجار وتأجير العقارات" Style="{StaticResource CardDescription}"/>
+                            </StackLayout>
+                            <Border Grid.Column="2" Style="{StaticResource EstateActionButton}" x:Name="RentEstatesButton">
+                                <Grid>
+                                    <Image Source="button_background.png" Aspect="Fill"/>
+                                    <Label x:Name="RentEstatesButtonLabel" Text="دخول" Style="{StaticResource ActionButton}"/>
+                                </Grid>
+                                <Border.GestureRecognizers>
+                                    <TapGestureRecognizer Tapped="OnRentEstatesClicked"/>
+                                </Border.GestureRecognizers>
+                            </Border>
+                        </Grid>
+                    </Grid>
+                </Border>
+
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <!-- الفوتر العام -->
+        <controls:FooterView x:Name="PageFooter" Grid.Row="2"/>
+
+    </Grid>
+</ContentPage>

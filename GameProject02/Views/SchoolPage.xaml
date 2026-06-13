@@ -1,0 +1,158 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:local="clr-namespace:GameProject02.Views"
+             xmlns:controls="clr-namespace:GameProject02.Controls"
+             x:Class="GameProject02.Views.SchoolPage"
+             ControlTemplate="{StaticResource StickyHeaderTemplate}"
+             NavigationPage.HasNavigationBar="False"
+             Title="School"
+             FlowDirection="RightToLeft">
+
+    <Grid RowDefinitions="Auto,*,Auto" Padding="0">
+        <Image Source="background.png" Aspect="AspectFill" Opacity="1" Grid.RowSpan="3"/>
+
+        <!-- هيدر موحد -->
+        <local:GameHeader HeaderTitle="المدرسة" Grid.Row="0"/>
+
+        <ScrollView Grid.Row="1" Margin="5,0,5,0">
+            <VerticalStackLayout Spacing="2">
+
+                <!-- ========== بطاقة قانون ========== -->
+                <Border Style="{StaticResource EstateCard}">
+                    <Grid>
+                        <Image Source="card_background.png" Aspect="Fill" Opacity="1"/>
+                        <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="10" Padding="16,0" VerticalOptions="Center">
+                            <Border Grid.Column="0" x:Name="LawImageFrame" Style="{StaticResource EstateImageFrame}">
+                                <Image Source="school_law_icon.png" Aspect="Fill" VerticalOptions="Center" HorizontalOptions="Center"/>
+                            </Border>
+                            <StackLayout Grid.Column="1" Spacing="5" VerticalOptions="Center" HorizontalOptions="Center">
+                                <Label x:Name="LawTitle" Text="قانون" Style="{StaticResource CardTitle}"/>
+                                <Label x:Name="LawDesc" Text="" Style="{StaticResource CardDescription}"/>
+                                <HorizontalStackLayout x:Name="LawStarsContainer" Spacing="2" HorizontalOptions="Center"/>
+                            </StackLayout>
+                            <Border Grid.Column="2" x:Name="LawActionButton" Style="{StaticResource EstateActionButton}">
+                                <Grid>
+                                    <Image Source="button_background.png" Aspect="Fill" VerticalOptions="Fill" HorizontalOptions="Fill"/>
+                                    <Label x:Name="LawButtonLabel" Text="دخول" Style="{StaticResource ActionButton}"/>
+                                </Grid>
+                                <Border.GestureRecognizers>
+                                    <TapGestureRecognizer Tapped="OnLawClicked"/>
+                                </Border.GestureRecognizers>
+                            </Border>
+                        </Grid>
+                    </Grid>
+                </Border>
+
+                <!-- ========== بطاقة علوم عسكرية ========== -->
+                <Border Style="{StaticResource EstateCard}">
+                    <Grid>
+                        <Image Source="card_background.png" Aspect="Fill" Opacity="1"/>
+                        <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="10" Padding="16,0" VerticalOptions="Center">
+                            <Border Grid.Column="0" x:Name="MilitaryImageFrame" Style="{StaticResource EstateImageFrame}">
+                                <Image Source="school_military_icon.png" Aspect="Fill" VerticalOptions="Center" HorizontalOptions="Center"/>
+                            </Border>
+                            <StackLayout Grid.Column="1" Spacing="5" VerticalOptions="Center" HorizontalOptions="Center">
+                                <Label x:Name="MilitaryTitle" Text="علوم عسكرية" Style="{StaticResource CardTitle}"/>
+                                <Label x:Name="MilitaryDesc" Text="" Style="{StaticResource CardDescription}"/>
+                                <HorizontalStackLayout x:Name="MilitaryStarsContainer" Spacing="2" HorizontalOptions="Center"/>
+                            </StackLayout>
+                            <Border Grid.Column="2" x:Name="MilitaryActionButton" Style="{StaticResource EstateActionButton}">
+                                <Grid>
+                                    <Image Source="button_background.png" Aspect="Fill" VerticalOptions="Fill" HorizontalOptions="Fill"/>
+                                    <Label x:Name="MilitaryButtonLabel" Text="دخول" Style="{StaticResource ActionButton}"/>
+                                </Grid>
+                                <Border.GestureRecognizers>
+                                    <TapGestureRecognizer Tapped="OnMilitaryClicked"/>
+                                </Border.GestureRecognizers>
+                            </Border>
+                        </Grid>
+                    </Grid>
+                </Border>
+
+                <!-- ========== بطاقة تاريخ ========== -->
+                <Border Style="{StaticResource EstateCard}">
+                    <Grid>
+                        <Image Source="card_background.png" Aspect="Fill" Opacity="1"/>
+                        <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="10" Padding="16,0" VerticalOptions="Center">
+                            <Border Grid.Column="0" x:Name="HistoryImageFrame" Style="{StaticResource EstateImageFrame}">
+                                <Image Source="school_history_icon.png" Aspect="Fill" VerticalOptions="Center" HorizontalOptions="Center"/>
+                            </Border>
+                            <StackLayout Grid.Column="1" Spacing="5" VerticalOptions="Center" HorizontalOptions="Center">
+                                <Label x:Name="HistoryTitle" Text="تاريخ" Style="{StaticResource CardTitle}"/>
+                                <Label x:Name="HistoryDesc" Text="" Style="{StaticResource CardDescription}"/>
+                                <HorizontalStackLayout x:Name="HistoryStarsContainer" Spacing="2" HorizontalOptions="Center"/>
+                            </StackLayout>
+                            <Border Grid.Column="2" x:Name="HistoryActionButton" Style="{StaticResource EstateActionButton}">
+                                <Grid>
+                                    <Image Source="button_background.png" Aspect="Fill" VerticalOptions="Fill" HorizontalOptions="Fill"/>
+                                    <Label x:Name="HistoryButtonLabel" Text="دخول" Style="{StaticResource ActionButton}"/>
+                                </Grid>
+                                <Border.GestureRecognizers>
+                                    <TapGestureRecognizer Tapped="OnHistoryClicked"/>
+                                </Border.GestureRecognizers>
+                            </Border>
+                        </Grid>
+                    </Grid>
+                </Border>
+
+                <!-- ========== بطاقة علوم ========== -->
+                <Border Style="{StaticResource EstateCard}">
+                    <Grid>
+                        <Image Source="card_background.png" Aspect="Fill" Opacity="1"/>
+                        <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="10" Padding="16,0" VerticalOptions="Center">
+                            <Border Grid.Column="0" x:Name="ScienceImageFrame" Style="{StaticResource EstateImageFrame}">
+                                <Image Source="school_science_icon.png" Aspect="Fill" VerticalOptions="Center" HorizontalOptions="Center"/>
+                            </Border>
+                            <StackLayout Grid.Column="1" Spacing="5" VerticalOptions="Center" HorizontalOptions="Center">
+                                <Label x:Name="ScienceTitle" Text="علوم" Style="{StaticResource CardTitle}"/>
+                                <Label x:Name="ScienceDesc" Text="" Style="{StaticResource CardDescription}"/>
+                                <HorizontalStackLayout x:Name="ScienceStarsContainer" Spacing="2" HorizontalOptions="Center"/>
+                            </StackLayout>
+                            <Border Grid.Column="2" x:Name="ScienceActionButton" Style="{StaticResource EstateActionButton}">
+                                <Grid>
+                                    <Image Source="button_background.png" Aspect="Fill" VerticalOptions="Fill" HorizontalOptions="Fill"/>
+                                    <Label x:Name="ScienceButtonLabel" Text="دخول" Style="{StaticResource ActionButton}"/>
+                                </Grid>
+                                <Border.GestureRecognizers>
+                                    <TapGestureRecognizer Tapped="OnScienceClicked"/>
+                                </Border.GestureRecognizers>
+                            </Border>
+                        </Grid>
+                    </Grid>
+                </Border>
+
+                <!-- ========== بطاقة لياقة بدنية ========== -->
+                <Border Style="{StaticResource EstateCard}">
+                    <Grid>
+                        <Image Source="card_background.png" Aspect="Fill" Opacity="1"/>
+                        <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="10" Padding="16,0" VerticalOptions="Center">
+                            <Border Grid.Column="0" x:Name="GymImageFrame" Style="{StaticResource EstateImageFrame}">
+                                <Image Source="school_gym_icon.png" Aspect="Fill" VerticalOptions="Center" HorizontalOptions="Center"/>
+                            </Border>
+                            <StackLayout Grid.Column="1" Spacing="5" VerticalOptions="Center" HorizontalOptions="Center">
+                                <Label x:Name="GymTitle" Text="لياقة بدنية" Style="{StaticResource CardTitle}"/>
+                                <Label x:Name="GymDesc" Text="" Style="{StaticResource CardDescription}"/>
+                                <HorizontalStackLayout x:Name="GymStarsContainer" Spacing="2" HorizontalOptions="Center"/>
+                            </StackLayout>
+                            <Border Grid.Column="2" x:Name="GymActionButton" Style="{StaticResource EstateActionButton}">
+                                <Grid>
+                                    <Image Source="button_background.png" Aspect="Fill" VerticalOptions="Fill" HorizontalOptions="Fill"/>
+                                    <Label x:Name="GymButtonLabel" Text="دخول" Style="{StaticResource ActionButton}"/>
+                                </Grid>
+                                <Border.GestureRecognizers>
+                                    <TapGestureRecognizer Tapped="OnGymClicked"/>
+                                </Border.GestureRecognizers>
+                            </Border>
+                        </Grid>
+                    </Grid>
+                </Border>
+
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <!-- الفوتر العام -->
+        <controls:FooterView x:Name="PageFooter" Grid.Row="2" />
+
+    </Grid>
+</ContentPage>
