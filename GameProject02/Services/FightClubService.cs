@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace GameProject02.Services
 {
@@ -9,11 +10,13 @@ namespace GameProject02.Services
     {
         private static Random _random = new Random();
 
-        public static List<FightClubPlayer> GetEligibleOpponents(PlayerAccount currentPlayer)
+        // ✅ MODIFIED: Async method to fetch opponents from Firestore
+        public static async Task<List<FightClubPlayer>> GetEligibleOpponentsAsync(PlayerAccount currentPlayer)
         {
             if (currentPlayer == null) return new List<FightClubPlayer>();
 
-            var allPlayers = AccountService.GetAllPlayers();
+            // ✅ Fetch all players from Firestore (not just local cache)
+            var allPlayers = await AccountService.GetAllPlayersAsync();
 
             // Build the raw list, then deduplicate by Username (keep highest level)
             return allPlayers
@@ -37,6 +40,43 @@ namespace GameProject02.Services
                     Dexterity = p.Dexterity
                 })
                 .GroupBy(p => p.Username)                 // remove duplicate usernames
+                .Select(g => g.OrderByDescending(p => p.Level).First())
+                .OrderByDescending(p => p.Level)
+                .ToList();
+        }
+
+        // Keep the synchronous method for backward compatibility (optional)
+        // but mark as obsolete or comment out. We'll keep it for now.
+        // To avoid confusion, you can remove it or keep it as a wrapper.
+        public static List<FightClubPlayer> GetEligibleOpponents(PlayerAccount currentPlayer)
+        {
+            // ⚠️ This sync method only returns locally cached players.
+            // Use GetEligibleOpponentsAsync instead.
+            if (currentPlayer == null) return new List<FightClubPlayer>();
+
+            var allPlayers = AccountService.GetAllPlayers(); // local cache only
+
+            return allPlayers
+                .Where(p =>
+                    p.PlayerId != currentPlayer.PlayerId &&
+                    !p.CrimeObject.IsInHospital &&
+                    !p.CrimeObject.IsInPrison &&
+                    !p.CrimeObject.IsInPlane &&
+                    p.City == currentPlayer.City)
+                .Select(p => new FightClubPlayer
+                {
+                    PlayerId = p.PlayerId,
+                    Username = p.Username,
+                    ImageResource = p.ImageResource,
+                    Level = p.Level,
+                    HealthCurrent = p.Health,
+                    HealthMax = p.MaxHealth,
+                    Strength = p.Strength,
+                    Defense = p.Defense,
+                    Speed = p.Speed,
+                    Dexterity = p.Dexterity
+                })
+                .GroupBy(p => p.Username)
                 .Select(g => g.OrderByDescending(p => p.Level).First())
                 .OrderByDescending(p => p.Level)
                 .ToList();
@@ -82,7 +122,6 @@ namespace GameProject02.Services
                 attacker.Gold += steal;
                 defender.Gold -= steal;
 
-                // ✅ Notification: Steal
                 NotificationService.AddGameNotification(
                     "💰 سرقة!",
                     $"سرقت {steal} ذهب من {defender.Username}",
@@ -155,7 +194,6 @@ namespace GameProject02.Services
             loser.Health = 1;
             loser.CrimeObject.HealthCurrent = 1;
 
-            // ✅ Notification: Sent to hospital
             NotificationService.AddGameNotification(
                 "🏥 هُزمت في القتال!",
                 $"أرسلت إلى المستشفى لمدة {minutes} دقيقة بعد هزيمتك أمام {winner.Username}",
@@ -183,6 +221,8 @@ namespace GameProject02.Services
                     GameNotificationPriority.High, "🏆", "ProfilePage"
                 );
             }
+
+            // Check for medals (e.g., fight wins)
             MedalService.CheckAndAwardAll(winner);
         }
     }

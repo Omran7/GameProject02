@@ -1,11 +1,12 @@
-﻿using GameProject02.Services;
+﻿using GameProject02.Helpers;
 using GameProject02.Models;
+using GameProject02.Services;
+using Microsoft.Maui.ApplicationModel;
 using Microsoft.Maui.Controls;
 using Microsoft.Maui.Storage;
 using System;
 using System.IO;
 using System.Linq;
-using Microsoft.Maui.ApplicationModel;
 
 namespace GameProject02.Views;
 
@@ -166,9 +167,15 @@ public partial class ProfilePage : ContentPage
     // NEW: Change avatar method
     private async void OnChangeAvatarClicked(object sender, EventArgs e)
     {
+        var player = AccountService.GetCurrentPlayer();
+        if (player == null) return;
+
+        // ✅ Check if banned from changing profile picture
+        if (await BanHelper.CheckAndShowBanAlert(player, "profile"))
+            return;
+
         try
         {
-            // Request permission for Android
             if (DeviceInfo.Current.Platform == DevicePlatform.Android)
             {
                 PermissionStatus status;
@@ -184,11 +191,9 @@ public partial class ProfilePage : ContentPage
                 }
             }
 
-            // Pick image using MediaPicker (simpler and more reliable)
             var result = await MediaPicker.PickPhotoAsync();
             if (result == null) return;
 
-            // Copy to app's local storage
             var destinationPath = Path.Combine(FileSystem.AppDataDirectory, $"{_player.PlayerId}_avatar.png");
             using (var srcStream = await result.OpenReadAsync())
             using (var destStream = File.Create(destinationPath))
@@ -196,12 +201,8 @@ public partial class ProfilePage : ContentPage
                 await srcStream.CopyToAsync(destStream);
             }
 
-            // Update player's avatar path (this triggers the AvatarChanged event)
             _player.AvatarPath = destinationPath;
-
-            // Refresh the profile page UI
             LoadPlayerData();
-
             await DisplayAlert("تم", "تم تغيير الصورة بنجاح", "حسنا");
         }
         catch (Exception ex)

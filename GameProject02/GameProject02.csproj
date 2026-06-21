@@ -207,6 +207,21 @@
 		<MauiXaml Update="Resources\Styles\EstateStyles.xaml">
 			<Generator>MSBuild:Compile</Generator>
 		</MauiXaml>
+		<MauiXaml Update="Views\AdminAnnouncementPage.xaml">
+		  <Generator>MSBuild:Compile</Generator>
+		</MauiXaml>
+		<MauiXaml Update="Views\AdminBanPlayerPage.xaml">
+		  <Generator>MSBuild:Compile</Generator>
+		</MauiXaml>
+		<MauiXaml Update="Views\AdminManagementPage.xaml">
+		  <Generator>MSBuild:Compile</Generator>
+		</MauiXaml>
+		<MauiXaml Update="Views\AdminPanelPage.xaml">
+		  <Generator>MSBuild:Compile</Generator>
+		</MauiXaml>
+		<MauiXaml Update="Views\AdminRequestsPage.xaml">
+		  <Generator>MSBuild:Compile</Generator>
+		</MauiXaml>
 		<MauiXaml Update="Views\AirportPage.xaml">
 		  <Generator>MSBuild:Compile</Generator>
 		</MauiXaml>
@@ -269,6 +284,9 @@
 		</MauiXaml>
 		<MauiXaml Update="Views\MainPage.xaml">
 			<Generator>MSBuild:Compile</Generator>
+		</MauiXaml>
+		<MauiXaml Update="Views\ManagerReportPage.xaml">
+		  <Generator>MSBuild:Compile</Generator>
 		</MauiXaml>
 		<MauiXaml Update="Views\MapPage.xaml">
 		  <Generator>MSBuild:Compile</Generator>

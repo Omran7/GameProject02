@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="GameProject02.Views.AdminRequestsPage"
+             Title="📋 طلبات الإدارة"
+             BackgroundColor="#1a1a1a"
+             FlowDirection="RightToLeft">
+
+    <Grid RowDefinitions="Auto, *">
+        <Label Grid.Row="0" Text="الطلبات المعلقة" TextColor="White" FontAttributes="Bold" Padding="15,10" FontSize="18" BackgroundColor="#0a0a0a"/>
+
+        <CollectionView Grid.Row="1" x:Name="RequestsList" SelectionMode="None" Margin="10">
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+                    <Border BackgroundColor="#252525" StrokeShape="RoundRectangle 10" Padding="15" Margin="0,5">
+                        <StackLayout Spacing="8">
+                            <!-- Header: Type, Requester, Time -->
+                            <Grid ColumnDefinitions="*,*,Auto">
+                                <Label Text="{Binding RequestTypeDisplay}" TextColor="#f39c12" FontAttributes="Bold"/>
+                                <Label Grid.Column="1" Text="{Binding PlayerName, StringFormat='من: {0}'}" TextColor="#3498db"/>
+                                <Label Grid.Column="2" Text="{Binding Timestamp, StringFormat='{0:dd/MM/yyyy HH:mm}'}" TextColor="#aaaaaa" HorizontalOptions="End"/>
+                            </Grid>
+
+                            <!-- Reason -->
+                            <Label Text="{Binding Reason}" TextColor="White"/>
+
+                            <!-- Ban request specific: target player -->
+                            <Grid ColumnDefinitions="*,Auto" IsVisible="{Binding IsBanRequest}">
+                                <Label Text="{Binding TargetPlayerName, StringFormat='🎯 المستهدف: {0}'}" TextColor="#e74c3c"/>
+                                <Button Grid.Column="1" Text="عرض الصورة" BackgroundColor="#9b59b6" TextColor="White" CornerRadius="5" WidthRequest="100" 
+                                        Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.ViewImageCommand}"
+                                        CommandParameter="{Binding .}"/>
+                            </Grid>
+
+                            <!-- Admin Promotion specific -->
+                            <Label Text="طلب ترقية إلى مشرف" IsVisible="{Binding IsPromotion}" TextColor="#2ecc71"/>
+
+                            <!-- Action buttons -->
+                            <HorizontalStackLayout Spacing="10" HorizontalOptions="End">
+                                <Button Text="❌ رفض" BackgroundColor="#e74c3c" TextColor="White" WidthRequest="80" CornerRadius="5"
+                                        Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.RejectCommand}"
+                                        CommandParameter="{Binding .}"/>
+                                <Button Text="✅ قبول" BackgroundColor="#2ecc71" TextColor="White" WidthRequest="80" CornerRadius="5"
+                                        Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.ApproveCommand}"
+                                        CommandParameter="{Binding .}"/>
+                            </HorizontalStackLayout>
+                        </StackLayout>
+                    </Border>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+            <CollectionView.EmptyView>
+                <Label Text="لا توجد طلبات معلقة حالياً" TextColor="#888888" HorizontalOptions="Center" VerticalOptions="Center"/>
+            </CollectionView.EmptyView>
+        </CollectionView>
+    </Grid>
+</ContentPage>

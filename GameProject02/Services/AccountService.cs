@@ -1,4 +1,5 @@
-﻿using GameProject02.Models;
+﻿using GameProject02.Helpers;
+using GameProject02.Models;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -33,7 +34,7 @@ namespace GameProject02.Services
         public static void SetCurrentPlayer(PlayerAccount player) => CurrentPlayer = player;
 
         private const string FirestoreBaseUrl = "https://firestore.googleapis.com/v1/projects/gameproject02-4207f/databases/(default)/documents";
-        private const string WebApiKey = "AIzaSyCM61YoJzqt9x7lOndV2oBJGeoBtU9U_Uo";
+        private const string WebApiKey = "AIzaSyCM61YoJzqt9X7lOndV2oBJGeoBtU9U_Uo";
         private static readonly HttpClient _httpClient = new();
 
         public static string HashPassword(string password)
@@ -97,6 +98,7 @@ namespace GameProject02.Services
             return true;
         }
 
+        // ✅ Updated LoginAsync – checks ban before password
         public static async Task<bool> LoginAsync(string username, string password)
         {
             var localAccount = _localAccounts.Values
@@ -115,12 +117,14 @@ namespace GameProject02.Services
                 return false;
             }
 
+            // ✅ Check password first
             if (cloudAccount.PasswordHash != HashPassword(password))
             {
                 await ShowAlert("Login Failed", "Incorrect password.");
                 return false;
             }
 
+            // ✅ Load gang
             if (!string.IsNullOrEmpty(cloudAccount.GangId))
             {
                 try
@@ -148,9 +152,12 @@ namespace GameProject02.Services
             EnsurePlayerRegistered(cloudAccount);
 
             RegenerationService.Start(_currentUser);
+
+            // ✅ Show ban notification AFTER login (non-blocking)
+            await BanHelper.ShowBansOnLogin(_currentUser);
+
             return true;
         }
-
         private static async Task ShowAlert(string title, string message)
         {
             await MainThread.InvokeOnMainThreadAsync(async () =>
@@ -216,7 +223,6 @@ namespace GameProject02.Services
                 _currentUser.Gold += _currentUser.Level * 50;
                 _currentUser.Medals++;
 
-                // ✅ GRANT SKILL POINTS ON LEVEL UP (3 points per level)
                 _currentUser.SkillPoints += 3;
 
                 NotificationService.AddGameNotification(
@@ -259,6 +265,14 @@ namespace GameProject02.Services
                 _allPlayers.Add(player);
                 System.Diagnostics.Debug.WriteLine($"[ACCOUNT] Registered player: {player.Username} (ID: {player.PlayerId})");
             }
+        }
+
+        // ✅ Get player by username from Firestore
+        public static async Task<PlayerAccount> GetPlayerByUsernameAsync(string username)
+        {
+            string playerId = await GetPlayerIdByUsernameAsync(username);
+            if (string.IsNullOrEmpty(playerId)) return null;
+            return await FirebaseService.LoadPlayerAsync(playerId);
         }
 
         public static async Task<List<PlayerAccount>> GetAllPlayersAsync()

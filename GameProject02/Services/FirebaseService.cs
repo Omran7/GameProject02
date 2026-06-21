@@ -88,6 +88,7 @@ namespace GameProject02.Services
         {
             var fields = new Dictionary<string, object>();
 
+            // Identity & Meta
             fields["playerId"] = StringValue(p.PlayerId);
             fields["username"] = StringValue(p.Username);
             fields["passwordHash"] = StringValue(p.PasswordHash);
@@ -99,10 +100,41 @@ namespace GameProject02.Services
             fields["achievementPoints"] = IntegerValue(p.AchievementPoints);
             fields["medals"] = IntegerValue(p.Medals);
             fields["merits"] = IntegerValue(p.Merits);
-            fields["skills"] = ArrayValue(p.Skills.Select(s => MapValue(new Dictionary<string, object> {
-                                            { "id", IntegerValue(s.Id) }, { "level", IntegerValue(s.Level) }, { "isEquipped", BooleanValue(s.IsEquipped) }
-                                                    })).ToArray());
 
+            // ✅ ADMIN FIELDS
+            fields["isAdmin"] = BooleanValue(p.IsAdmin);
+            fields["isTemporaryAdmin"] = BooleanValue(p.IsTemporaryAdmin);
+            fields["isBannedFromChat"] = BooleanValue(p.IsBannedFromChat);
+            fields["isBannedFromChatFromSystem"] = BooleanValue(p.IsBannedFromChatFromSystem);
+            fields["isBannedFromChangeProfilePic"] = BooleanValue(p.IsBannedFromChangeProfilePic);
+            fields["isBannedFromChangeProfilePicFromSystem"] = BooleanValue(p.IsBannedFromChangeProfilePicFromSystem);
+            fields["isBannedFromNews"] = BooleanValue(p.IsBannedFromNews);
+            fields["isBannedFromNewsFromSystem"] = BooleanValue(p.IsBannedFromNewsFromSystem);
+            fields["isBannedFromPrivateMessages"] = BooleanValue(p.IsBannedFromPrivateMessages);
+            fields["hasAdminRequestNotReviewed"] = BooleanValue(p.HasAdminRequestNotReviewed);
+            fields["adminRequestReason"] = StringValue(p.AdminRequestReason);
+            fields["isManager"] = BooleanValue(p.IsManager);
+
+            // ✅ FIX: Only add timestamp fields if they have a value
+            if (p.AdminRequestTimestamp.HasValue)
+                fields["adminRequestTimestamp"] = TimestampValue(p.AdminRequestTimestamp.Value);
+
+            if (p.AdminExpiryDate.HasValue)
+                fields["adminExpiryDate"] = TimestampValue(p.AdminExpiryDate.Value);
+
+            // Skills
+            fields["skills"] = ArrayValue(
+                p.Skills?.Select(s => MapValue(new Dictionary<string, object>
+                {
+                    { "id", IntegerValue(s.Id) },
+                    { "level", IntegerValue(s.Level) },
+                    { "isEquipped", BooleanValue(s.IsEquipped) },
+                    { "name", StringValue(s.Name) }
+                })).ToArray() ?? Array.Empty<object>()
+            );
+            fields["skillPoints"] = IntegerValue(p.SkillPoints);
+
+            // Currencies & Stats
             fields["level"] = IntegerValue(p.Level);
             fields["gold"] = IntegerValue(p.Gold);
             fields["diamonds"] = IntegerValue(p.Diamonds);
@@ -162,18 +194,7 @@ namespace GameProject02.Services
             fields["estateHappinessBonus"] = IntegerValue(p.EstateHappinessBonus);
             fields["gymEfficiency"] = IntegerValue(p.GymEfficiency);
 
-            // ✅ SKILLS: Save skill list to Firestore
-            fields["skills"] = ArrayValue(
-                p.Skills?.Select(s => MapValue(new Dictionary<string, object>
-                {
-                    { "id", IntegerValue(s.Id) },
-                    { "level", IntegerValue(s.Level) },
-                    { "cards", IntegerValue(s.Cards) },
-                    { "isEquipped", BooleanValue(s.IsEquipped) }
-                })).ToArray() ?? Array.Empty<object>()
-            );
-            fields["skillPoints"] = IntegerValue(p.SkillPoints);
-
+            // Estate Summary
             fields["estateType"] = StringValue(p.EstateType);
             fields["estateOwner"] = StringValue(p.EstateOwner);
             fields["estateHours"] = IntegerValue(p.EstateHours);
@@ -181,6 +202,7 @@ namespace GameProject02.Services
             fields["estateWorkers"] = IntegerValue(p.EstateWorkers);
             fields["imageResource"] = StringValue(p.ImageResource);
 
+            // Nested Game Objects
             fields["crimeObject"] = CrimeObjectToMap(p.CrimeObject);
             fields["combat"] = CombatObjectToMap(p.Combat);
             fields["armingObject"] = ArmingObjectToMap(p.ArmingObject);
@@ -194,8 +216,8 @@ namespace GameProject02.Services
             fields["school"] = SchoolObjectToMap(p.School);
             fields["gym"] = GymObjectToMap(p.Gym);
 
+            // Gang & Notifications
             fields["gangId"] = StringValue(p.GangObject?.GangId ?? p.GangId ?? "");
-
             fields["notifications"] = ArrayValue(
                 p.Notifications?.Select(n => MapValue(new Dictionary<string, object>
                 {
@@ -215,11 +237,12 @@ namespace GameProject02.Services
             return fields;
         }
 
-        private static PlayerAccount ParsePlayerFromFirestoreFields(JsonElement fields, string playerId)
+        public static PlayerAccount ParsePlayerFromFirestoreFields(JsonElement fields, string playerId)
         {
             var p = new PlayerAccount();
             p.PlayerId = playerId;
 
+            // Identity & Meta
             p.Username = fields.GetString("username") ?? "";
             p.PasswordHash = fields.GetString("passwordHash") ?? "";
             p.CreatedAt = fields.GetTimestamp("createdAt");
@@ -230,9 +253,29 @@ namespace GameProject02.Services
             p.AchievementPoints = fields.GetInt32("achievementPoints");
             p.Medals = fields.GetInt32("medals");
             p.Merits = fields.GetInt32("merits");
-            if (fields.TryGetProperty("skills", out var skillsProp))
-                p.Skills = SkillService.ParseSkillsFromFirestore(skillsProp);
 
+            // ✅ ADMIN FIELDS
+            p.IsAdmin = fields.GetBoolean("isAdmin");
+            p.IsTemporaryAdmin = fields.GetBoolean("isTemporaryAdmin");
+            p.IsBannedFromChat = fields.GetBoolean("isBannedFromChat");
+            p.IsBannedFromChatFromSystem = fields.GetBoolean("isBannedFromChatFromSystem");
+            p.IsBannedFromChangeProfilePic = fields.GetBoolean("isBannedFromChangeProfilePic");
+            p.IsBannedFromChangeProfilePicFromSystem = fields.GetBoolean("isBannedFromChangeProfilePicFromSystem");
+            p.IsBannedFromNews = fields.GetBoolean("isBannedFromNews");
+            p.IsBannedFromNewsFromSystem = fields.GetBoolean("isBannedFromNewsFromSystem");
+            p.IsBannedFromPrivateMessages = fields.GetBoolean("isBannedFromPrivateMessages");
+            p.HasAdminRequestNotReviewed = fields.GetBoolean("hasAdminRequestNotReviewed");
+            p.AdminRequestReason = fields.GetString("adminRequestReason") ?? "";
+            p.AdminRequestTimestamp = fields.TryGetProperty("adminRequestTimestamp", out var art) ? art.GetTimestamp("timestampValue") : null;
+            p.AdminExpiryDate = fields.TryGetProperty("adminExpiryDate", out var aed) ? aed.GetTimestamp("timestampValue") : null;
+            p.IsManager = fields.GetBoolean("isManager");
+
+            // Skills
+            if (fields.TryGetProperty("skills", out var skillsProp))
+                p.Skills = ParseSkillsList(skillsProp);
+            p.SkillPoints = fields.GetInt32("skillPoints");
+
+            // Currencies & Stats
             p.Level = fields.GetInt32("level");
             p.Gold = fields.GetInt32("gold");
             p.Diamonds = fields.GetInt32("diamonds");
@@ -291,8 +334,8 @@ namespace GameProject02.Services
             p.HappinessMultiplier = fields.GetInt32("happinessMultiplier");
             p.EstateHappinessBonus = fields.GetInt32("estateHappinessBonus");
             p.GymEfficiency = fields.GetInt32("gymEfficiency");
-            p.SkillPoints = fields.GetInt32("skillPoints");
 
+            // Estate Summary
             p.EstateType = fields.GetString("estateType") ?? p.EstateType;
             p.EstateOwner = fields.GetString("estateOwner") ?? p.EstateOwner;
             p.EstateHours = fields.GetInt32("estateHours");
@@ -300,6 +343,7 @@ namespace GameProject02.Services
             p.EstateWorkers = fields.GetInt32("estateWorkers");
             p.ImageResource = fields.GetString("imageResource") ?? p.ImageResource;
 
+            // Nested Game Objects - ✅ ALL PARSING METHODS INCLUDED
             if (fields.TryGetProperty("crimeObject", out var crimeObjProp)) p.CrimeObject = ParseCrimeObject(crimeObjProp);
             if (fields.TryGetProperty("combat", out var combatProp)) p.Combat = ParseCombatObject(combatProp);
             if (fields.TryGetProperty("armingObject", out var armingProp)) p.ArmingObject = ParseArmingObject(armingProp);
@@ -314,19 +358,20 @@ namespace GameProject02.Services
             p.PrimaryResidenceEstateId = fields.GetInt32("primaryResidenceEstateId");
             p.PrimaryResidenceEstateInstanceId = fields.GetString("primaryResidenceEstateInstanceId") ?? "";
 
+            // Notifications
             if (fields.TryGetProperty("notifications", out var notificationsProp))
             {
                 p.Notifications = ParseNotificationsList(notificationsProp);
             }
 
             p.GangId = fields.GetString("gangId") ?? "";
-
             p.Combat.RecalculateStats(p);
 
             return p;
         }
 
-        // ✅ Parse skills array from Firestore
+        // ✅ ALL PARSING METHODS INCLUDED BELOW
+
         private static List<Skill> ParseSkillsList(JsonElement prop)
         {
             var list = new List<Skill>();
@@ -342,216 +387,13 @@ namespace GameProject02.Services
                         {
                             Id = fields.Value.GetInt32("id"),
                             Level = fields.Value.GetInt32("level"),
-                            Cards = fields.Value.GetInt32("cards"),
-                            IsEquipped = fields.Value.GetBoolean("isEquipped")
+                            IsEquipped = fields.Value.GetBoolean("isEquipped"),
+                            Name = fields.Value.GetString("name") ?? ""
                         });
                     }
                 }
             }
             return list;
-        }
-
-        private static object StringValue(string s) => new { stringValue = s ?? "" };
-        private static object IntegerValue(int n) => new { integerValue = n };
-        private static object IntegerValue(long n) => new { integerValue = n };
-        private static object DoubleValue(double d) => new { doubleValue = d };
-        private static object BooleanValue(bool b) => new { booleanValue = b };
-        private static object TimestampValue(DateTime dt) => new { timestampValue = dt.ToString("o") };
-        private static object ArrayValue(object[] items) => new { arrayValue = new { values = items } };
-        private static object MapValue(Dictionary<string, object> fields) => new { mapValue = new { fields } };
-
-        private static object SkillToMap(Skill s) => MapValue(new Dictionary<string, object> {
-            { "name", StringValue(s.Name) },
-            { "percentage", IntegerValue(s.Percentage) },
-            { "baseValue", IntegerValue(s.BaseValue) },
-            { "bonusValue", IntegerValue(s.BonusValue) }
-        });
-
-        private static object CrimeObjectToMap(CrimeObject c) => MapValue(new Dictionary<string, object> {
-            { "isInPlane", BooleanValue(c.IsInPlane) },
-            { "flightReleaseTime", IntegerValue(c.FlightReleaseTime) },
-            { "currentCrimeType", IntegerValue(c.CurrentCrimeType) },
-            { "isInPrison", BooleanValue(c.IsInPrison) },
-            { "prisonReleaseTime", IntegerValue(c.PrisonReleaseTime) },
-            { "prisonBailAmount", IntegerValue(c.PrisonBailAmount) },
-            { "prisonReason", StringValue(c.PrisonReason) },
-            { "isInHospital", BooleanValue(c.IsInHospital) },
-            { "hospitalReleaseTime", IntegerValue(c.HospitalReleaseTime) },
-            { "hospitalReason", StringValue(c.HospitalReason) },
-            { "healthCurrent", IntegerValue(c.HealthCurrent) },
-            { "healthMax", IntegerValue(c.HealthMax) },
-            { "totalCrimesAttempted", IntegerValue(c.TotalCrimesAttempted) },
-            { "totalCrimesSuccessful", IntegerValue(c.TotalCrimesSuccessful) },
-            { "totalCrimesFailed", IntegerValue(c.TotalCrimesFailed) },
-            { "totalPrisonVisits", IntegerValue(c.TotalPrisonVisits) },
-            { "totalHospitalVisits", IntegerValue(c.TotalHospitalVisits) },
-            { "currentMissionId", IntegerValue(c.CurrentMissionId) },
-            { "currentTaskIndex", FromIntDict(c.CurrentTaskIndex) },
-            { "currentTaskExecutionCount", FromIntDict(c.CurrentTaskExecutionCount) },
-            { "taskProgress", FromIntDict(c.TaskProgress) },
-            { "missionProgress", FromIntDict(c.MissionProgress) },
-            { "maxCourage", IntegerValue(c.MaxCourage) },
-            { "lastCourageRechargeTime", IntegerValue(c.LastCourageRechargeTime) }
-        });
-
-        private static object CombatObjectToMap(CombatObject c) => MapValue(new Dictionary<string, object> {
-            { "totalHealth", IntegerValue(c.TotalHealth) },
-            { "currentHealth", IntegerValue(c.CurrentHealth) },
-            { "attackPower", IntegerValue(c.AttackPower) },
-            { "defensePower", IntegerValue(c.DefensePower) },
-            { "speed", IntegerValue(c.Speed) },
-            { "criticalChance", IntegerValue(c.CriticalChance) },
-            { "isInCombat", BooleanValue(c.IsInCombat) },
-            { "battlesFought", IntegerValue(c.BattlesFought) },
-            { "battlesWon", IntegerValue(c.BattlesWon) }
-        });
-
-        private static object ArmingObjectToMap(ArmingObject a) => MapValue(new Dictionary<string, object> {
-            { "weaponId", StringValue(a.WeaponId) },
-            { "weaponLevel", IntegerValue(a.WeaponLevel) },
-            { "armorId", StringValue(a.ArmorId) },
-            { "armorLevel", IntegerValue(a.ArmorLevel) },
-            { "specialEquipmentId", StringValue(a.SpecialEquipmentId) },
-            { "specialEquipmentLevel", IntegerValue(a.SpecialEquipmentLevel) },
-            { "bioChemicalId", StringValue(a.BioChemicalId) },
-            { "bioChemicalLevel", IntegerValue(a.BioChemicalLevel) }
-        });
-
-        private static object StockObjectToMap(StockObject s) => MapValue(new Dictionary<string, object> {
-            { "stockSpace", IntegerValue(s.StockSpace) },
-            { "stockFreeSpace", IntegerValue(s.StockFreeSpace) },
-            { "bagSpace", IntegerValue(s.BagSpace) },
-            { "bagFreeSpace", IntegerValue(s.BagFreeSpace) },
-            { "shopSpaces", IntegerValue(s.ShopSpaces) },
-            { "maxShopSpaces", IntegerValue(s.MaxShopSpaces) },
-            { "lockerSpace", IntegerValue(s.LockerSpace) },
-            { "stallSpace", IntegerValue(s.StallSpace) },
-            { "museumSpace", IntegerValue(s.MuseumSpace) },
-            { "itemsInStock", StockItemsToMap(s.ItemsInStock) },
-            { "lockedItemIds", ArrayValue(s.LockedItemIds?.Select(id => StringValue(id)).ToArray() ?? Array.Empty<object>()) }
-        });
-
-        private static object StockItemsToMap(Dictionary<string, StockItem> items)
-        {
-            var fields = new Dictionary<string, object>();
-            if (items != null)
-            {
-                foreach (var kvp in items)
-                {
-                    fields[kvp.Key] = StockItemToMap(kvp.Value);
-                }
-            }
-            return MapValue(fields);
-        }
-
-        private static object StockItemToMap(StockItem item) => MapValue(new Dictionary<string, object> {
-            { "itemId", StringValue(item.ItemId) },
-            { "name", StringValue(item.Name) },
-            { "description", StringValue(item.Description) },
-            { "imageResource", StringValue(item.ImageResource) },
-            { "categoryId", IntegerValue(item.CategoryId) },
-            { "count", IntegerValue(item.Count) },
-            { "originalPrice", IntegerValue(item.OriginalPrice) },
-            { "usedInArming", BooleanValue(item.UsedInArming) },
-            { "isLocked", BooleanValue(item.IsLocked) },
-            { "countInBag", IntegerValue(item.CountInBag) },
-            { "damage", IntegerValue(item.Damage) },
-            { "accuracy", IntegerValue(item.Accuracy) },
-            { "defense", IntegerValue(item.Defense) },
-            { "evasion", IntegerValue(item.Evasion) },
-            { "isWeapon", BooleanValue(item.IsWeapon) },
-            { "isGun", BooleanValue(item.IsGun) },
-            { "gunType", IntegerValue(item.GunType) }
-        });
-
-        private static object MuseumObjectToMap(MuseumObject m) => MapValue(new Dictionary<string, object> {
-            { "museumSpaces", IntegerValue(m.MuseumSpaces) },
-            { "maxMuseumSpaces", IntegerValue(m.MaxMuseumSpaces) },
-            { "backgroundId", IntegerValue(m.BackgroundId) },
-            { "unlockedBackgrounds", ArrayValue(m.UnlockedBackgrounds?.Select(b => IntegerValue(b)).ToArray() ?? Array.Empty<object>()) },
-            { "items", ArrayValue(m.Items?.Select(MuseumItemToMap).ToArray() ?? Array.Empty<object>()) }
-        });
-
-        private static object MuseumItemToMap(MuseumItem i) => MapValue(new Dictionary<string, object> {
-            { "itemId", StringValue(i.ItemId) },
-            { "itemName", StringValue(i.ItemName) },
-            { "imageResource", StringValue(i.ImageResource) },
-            { "quantity", IntegerValue(i.Quantity) },
-            { "originalPrice", IntegerValue(i.OriginalPrice) },
-            { "damage", IntegerValue(i.Damage) },
-            { "accuracy", IntegerValue(i.Accuracy) },
-            { "defense", IntegerValue(i.Defense) },
-            { "evasion", IntegerValue(i.Evasion) },
-            { "isWeapon", BooleanValue(i.IsWeapon) },
-            { "isGun", BooleanValue(i.IsGun) },
-            { "gunType", IntegerValue(i.GunType) }
-        });
-
-        private static object EstateObjectToMap(EstateObject e) => MapValue(new Dictionary<string, object> {
-            { "id", IntegerValue(e.Id) },
-            { "instanceId", StringValue(e.InstanceId) },
-            { "estateOwnerId", StringValue(e.EstateOwnerId) },
-            { "isUsed", BooleanValue(e.IsUsed) },
-            { "isSpouseUsed", BooleanValue(e.IsSpouseUsed) },
-            { "isForSale", BooleanValue(e.IsForSale) },
-            { "isForRent", BooleanValue(e.IsForRent) },
-            { "isRentedEstate", BooleanValue(e.IsRentedEstate) },
-            { "isRentedOut", BooleanValue(e.IsRentedOut) },
-            { "rentEndTime", IntegerValue(e.RentEndTime) },
-            { "rentedToPlayerId", StringValue(e.RentedToPlayerId) },
-            { "rentedToPlayerName", StringValue(e.RentedToPlayerName) },
-            { "estateImageUrl", StringValue(e.EstateImageUrl) },
-            { "lastTaxPaidTime", IntegerValue(e.LastTaxPaidTime) },
-            { "purchasedUpgrades", ArrayValue(e.PurchasedUpgrades?.Select(u => StringValue(u)).ToArray() ?? Array.Empty<object>()) },
-            { "activeContracts", ArrayValue(e.ActiveContracts?.Select(c => StringValue(c)).ToArray() ?? Array.Empty<object>()) },
-            { "contractStartTimes", FromStringLongDict(e.ContractStartTimes) },
-            { "fixedModifications", ArrayValue(e.FixedModifications?.Select(b => BooleanValue(b)).ToArray() ?? Array.Empty<object>()) },
-            { "servantContractStartTimes", ArrayValue(e.ServantContractStartTimes?.Select(t => IntegerValue(t)).ToArray() ?? Array.Empty<object>()) }
-        });
-
-        private static object WorkObjectToMap(WorkObject w) => MapValue(new Dictionary<string, object> {
-            { "workType", IntegerValue(w.WorkType) },
-            { "jobLevel", IntegerValue(w.JobLevel) },
-            { "jobStartTimeMilli", IntegerValue(w.JobStartTimeMilli) },
-            { "jobGotSalaryTimeMilli", IntegerValue(w.JobGotSalaryTimeMilli) }
-        });
-
-        private static object SchoolObjectToMap(SchoolObject s) => MapValue(new Dictionary<string, object> {
-            { "lawLessons", ArrayValue(s.LawLessons?.Select(i => IntegerValue(i)).ToArray() ?? Array.Empty<object>()) },
-            { "militaryLessons", ArrayValue(s.MilitaryLessons?.Select(i => IntegerValue(i)).ToArray() ?? Array.Empty<object>()) },
-            { "historyLessons", ArrayValue(s.HistoryLessons?.Select(i => IntegerValue(i)).ToArray() ?? Array.Empty<object>()) },
-            { "scienceLessons", ArrayValue(s.ScienceLessons?.Select(i => IntegerValue(i)).ToArray() ?? Array.Empty<object>()) },
-            { "gymLessons", ArrayValue(s.GymLessons?.Select(i => IntegerValue(i)).ToArray() ?? Array.Empty<object>()) },
-            { "isStudying", BooleanValue(s.IsStudying) },
-            { "startStudyingTimeInMilli", IntegerValue(s.StartStudyingTimeInMilli) },
-            { "currentCategory", IntegerValue(s.CurrentCategory) },
-            { "currentLesson", IntegerValue(s.CurrentLesson) }
-        });
-
-        private static object GymObjectToMap(GymObject g) => MapValue(new Dictionary<string, object> {
-            { "selectedLesson", IntegerValue(g.SelectedLesson) },
-            { "lessonProgress", ArrayValue(g.LessonProgress?.Select(p => IntegerValue(p)).ToArray() ?? Array.Empty<object>()) },
-            { "lessonUnlocked", ArrayValue(g.LessonUnlocked?.Select(u => BooleanValue(u)).ToArray() ?? Array.Empty<object>()) }
-        });
-
-        private static object FromIntDict(Dictionary<int, int> dict) =>
-            MapValue(dict?.ToDictionary(kvp => kvp.Key.ToString(), kvp => IntegerValue(kvp.Value))
-                        ?? new Dictionary<string, object>());
-
-        private static object FromStringLongDict(Dictionary<string, long> dict) =>
-            MapValue(dict?.ToDictionary(kvp => kvp.Key, kvp => IntegerValue(kvp.Value))
-                        ?? new Dictionary<string, object>());
-
-        private static Skill ParseSkill(JsonElement mapField)
-        {
-            var fields = mapField.GetMapFieldsNullable();
-            if (fields == null) return new Skill("", 0, 0, 0);
-            return new Skill(
-                fields.Value.GetString("name") ?? "",
-                fields.Value.GetInt32("percentage"),
-                fields.Value.GetInt32("baseValue"),
-                fields.Value.GetInt32("bonusValue")
-            );
         }
 
         private static CrimeObject ParseCrimeObject(JsonElement mapField)
@@ -843,6 +685,261 @@ namespace GameProject02.Services
             return list;
         }
 
+        // Helper methods for Firestore value creation
+        private static object StringValue(string s) => new { stringValue = s ?? "" };
+        private static object IntegerValue(int n) => new { integerValue = n };
+        private static object IntegerValue(long n) => new { integerValue = n };
+        private static object DoubleValue(double d) => new { doubleValue = d };
+        private static object BooleanValue(bool b) => new { booleanValue = b };
+        private static object TimestampValue(DateTime dt) => new { timestampValue = dt.ToString("o") };
+        private static object ArrayValue(object[] items) => new { arrayValue = new { values = items } };
+        private static object MapValue(Dictionary<string, object> fields) => new { mapValue = new { fields } };
+
+        private static object CrimeObjectToMap(CrimeObject c) => MapValue(new Dictionary<string, object> {
+            { "isInPlane", BooleanValue(c.IsInPlane) },
+            { "flightReleaseTime", IntegerValue(c.FlightReleaseTime) },
+            { "currentCrimeType", IntegerValue(c.CurrentCrimeType) },
+            { "isInPrison", BooleanValue(c.IsInPrison) },
+            { "prisonReleaseTime", IntegerValue(c.PrisonReleaseTime) },
+            { "prisonBailAmount", IntegerValue(c.PrisonBailAmount) },
+            { "prisonReason", StringValue(c.PrisonReason) },
+            { "isInHospital", BooleanValue(c.IsInHospital) },
+            { "hospitalReleaseTime", IntegerValue(c.HospitalReleaseTime) },
+            { "hospitalReason", StringValue(c.HospitalReason) },
+            { "healthCurrent", IntegerValue(c.HealthCurrent) },
+            { "healthMax", IntegerValue(c.HealthMax) },
+            { "totalCrimesAttempted", IntegerValue(c.TotalCrimesAttempted) },
+            { "totalCrimesSuccessful", IntegerValue(c.TotalCrimesSuccessful) },
+            { "totalCrimesFailed", IntegerValue(c.TotalCrimesFailed) },
+            { "totalPrisonVisits", IntegerValue(c.TotalPrisonVisits) },
+            { "totalHospitalVisits", IntegerValue(c.TotalHospitalVisits) },
+            { "currentMissionId", IntegerValue(c.CurrentMissionId) },
+            { "currentTaskIndex", FromIntDict(c.CurrentTaskIndex) },
+            { "currentTaskExecutionCount", FromIntDict(c.CurrentTaskExecutionCount) },
+            { "taskProgress", FromIntDict(c.TaskProgress) },
+            { "missionProgress", FromIntDict(c.MissionProgress) },
+            { "maxCourage", IntegerValue(c.MaxCourage) },
+            { "lastCourageRechargeTime", IntegerValue(c.LastCourageRechargeTime) }
+        });
+
+        private static object CombatObjectToMap(CombatObject c) => MapValue(new Dictionary<string, object> {
+            { "totalHealth", IntegerValue(c.TotalHealth) },
+            { "currentHealth", IntegerValue(c.CurrentHealth) },
+            { "attackPower", IntegerValue(c.AttackPower) },
+            { "defensePower", IntegerValue(c.DefensePower) },
+            { "speed", IntegerValue(c.Speed) },
+            { "criticalChance", IntegerValue(c.CriticalChance) },
+            { "isInCombat", BooleanValue(c.IsInCombat) },
+            { "battlesFought", IntegerValue(c.BattlesFought) },
+            { "battlesWon", IntegerValue(c.BattlesWon) }
+        });
+
+        private static object ArmingObjectToMap(ArmingObject a) => MapValue(new Dictionary<string, object> {
+            { "weaponId", StringValue(a.WeaponId) },
+            { "weaponLevel", IntegerValue(a.WeaponLevel) },
+            { "armorId", StringValue(a.ArmorId) },
+            { "armorLevel", IntegerValue(a.ArmorLevel) },
+            { "specialEquipmentId", StringValue(a.SpecialEquipmentId) },
+            { "specialEquipmentLevel", IntegerValue(a.SpecialEquipmentLevel) },
+            { "bioChemicalId", StringValue(a.BioChemicalId) },
+            { "bioChemicalLevel", IntegerValue(a.BioChemicalLevel) }
+        });
+
+        private static object StockObjectToMap(StockObject s) => MapValue(new Dictionary<string, object> {
+            { "stockSpace", IntegerValue(s.StockSpace) },
+            { "stockFreeSpace", IntegerValue(s.StockFreeSpace) },
+            { "bagSpace", IntegerValue(s.BagSpace) },
+            { "bagFreeSpace", IntegerValue(s.BagFreeSpace) },
+            { "shopSpaces", IntegerValue(s.ShopSpaces) },
+            { "maxShopSpaces", IntegerValue(s.MaxShopSpaces) },
+            { "lockerSpace", IntegerValue(s.LockerSpace) },
+            { "stallSpace", IntegerValue(s.StallSpace) },
+            { "museumSpace", IntegerValue(s.MuseumSpace) },
+            { "itemsInStock", StockItemsToMap(s.ItemsInStock) },
+            { "lockedItemIds", ArrayValue(s.LockedItemIds?.Select(id => StringValue(id)).ToArray() ?? Array.Empty<object>()) }
+        });
+
+        private static object StockItemsToMap(Dictionary<string, StockItem> items)
+        {
+            var fields = new Dictionary<string, object>();
+            if (items != null)
+            {
+                foreach (var kvp in items)
+                {
+                    fields[kvp.Key] = StockItemToMap(kvp.Value);
+                }
+            }
+            return MapValue(fields);
+        }
+
+        private static object StockItemToMap(StockItem item) => MapValue(new Dictionary<string, object> {
+            { "itemId", StringValue(item.ItemId) },
+            { "name", StringValue(item.Name) },
+            { "description", StringValue(item.Description) },
+            { "imageResource", StringValue(item.ImageResource) },
+            { "categoryId", IntegerValue(item.CategoryId) },
+            { "count", IntegerValue(item.Count) },
+            { "originalPrice", IntegerValue(item.OriginalPrice) },
+            { "usedInArming", BooleanValue(item.UsedInArming) },
+            { "isLocked", BooleanValue(item.IsLocked) },
+            { "countInBag", IntegerValue(item.CountInBag) },
+            { "damage", IntegerValue(item.Damage) },
+            { "accuracy", IntegerValue(item.Accuracy) },
+            { "defense", IntegerValue(item.Defense) },
+            { "evasion", IntegerValue(item.Evasion) },
+            { "isWeapon", BooleanValue(item.IsWeapon) },
+            { "isGun", BooleanValue(item.IsGun) },
+            { "gunType", IntegerValue(item.GunType) }
+        });
+
+        private static object MuseumObjectToMap(MuseumObject m) => MapValue(new Dictionary<string, object> {
+            { "museumSpaces", IntegerValue(m.MuseumSpaces) },
+            { "maxMuseumSpaces", IntegerValue(m.MaxMuseumSpaces) },
+            { "backgroundId", IntegerValue(m.BackgroundId) },
+            { "unlockedBackgrounds", ArrayValue(m.UnlockedBackgrounds?.Select(b => IntegerValue(b)).ToArray() ?? Array.Empty<object>()) },
+            { "items", ArrayValue(m.Items?.Select(MuseumItemToMap).ToArray() ?? Array.Empty<object>()) }
+        });
+
+        private static object MuseumItemToMap(MuseumItem i) => MapValue(new Dictionary<string, object> {
+            { "itemId", StringValue(i.ItemId) },
+            { "itemName", StringValue(i.ItemName) },
+            { "imageResource", StringValue(i.ImageResource) },
+            { "quantity", IntegerValue(i.Quantity) },
+            { "originalPrice", IntegerValue(i.OriginalPrice) },
+            { "damage", IntegerValue(i.Damage) },
+            { "accuracy", IntegerValue(i.Accuracy) },
+            { "defense", IntegerValue(i.Defense) },
+            { "evasion", IntegerValue(i.Evasion) },
+            { "isWeapon", BooleanValue(i.IsWeapon) },
+            { "isGun", BooleanValue(i.IsGun) },
+            { "gunType", IntegerValue(i.GunType) }
+        });
+
+        private static object EstateObjectToMap(EstateObject e) => MapValue(new Dictionary<string, object> {
+            { "id", IntegerValue(e.Id) },
+            { "instanceId", StringValue(e.InstanceId) },
+            { "estateOwnerId", StringValue(e.EstateOwnerId) },
+            { "isUsed", BooleanValue(e.IsUsed) },
+            { "isSpouseUsed", BooleanValue(e.IsSpouseUsed) },
+            { "isForSale", BooleanValue(e.IsForSale) },
+            { "isForRent", BooleanValue(e.IsForRent) },
+            { "isRentedEstate", BooleanValue(e.IsRentedEstate) },
+            { "isRentedOut", BooleanValue(e.IsRentedOut) },
+            { "rentEndTime", IntegerValue(e.RentEndTime) },
+            { "rentedToPlayerId", StringValue(e.RentedToPlayerId) },
+            { "rentedToPlayerName", StringValue(e.RentedToPlayerName) },
+            { "estateImageUrl", StringValue(e.EstateImageUrl) },
+            { "lastTaxPaidTime", IntegerValue(e.LastTaxPaidTime) },
+            { "purchasedUpgrades", ArrayValue(e.PurchasedUpgrades?.Select(u => StringValue(u)).ToArray() ?? Array.Empty<object>()) },
+            { "activeContracts", ArrayValue(e.ActiveContracts?.Select(c => StringValue(c)).ToArray() ?? Array.Empty<object>()) },
+            { "contractStartTimes", FromStringLongDict(e.ContractStartTimes) },
+            { "fixedModifications", ArrayValue(e.FixedModifications?.Select(b => BooleanValue(b)).ToArray() ?? Array.Empty<object>()) },
+            { "servantContractStartTimes", ArrayValue(e.ServantContractStartTimes?.Select(t => IntegerValue(t)).ToArray() ?? Array.Empty<object>()) }
+        });
+
+        private static object WorkObjectToMap(WorkObject w) => MapValue(new Dictionary<string, object> {
+            { "workType", IntegerValue(w.WorkType) },
+            { "jobLevel", IntegerValue(w.JobLevel) },
+            { "jobStartTimeMilli", IntegerValue(w.JobStartTimeMilli) },
+            { "jobGotSalaryTimeMilli", IntegerValue(w.JobGotSalaryTimeMilli) }
+        });
+
+        private static object SchoolObjectToMap(SchoolObject s) => MapValue(new Dictionary<string, object> {
+            { "lawLessons", ArrayValue(s.LawLessons?.Select(i => IntegerValue(i)).ToArray() ?? Array.Empty<object>()) },
+            { "militaryLessons", ArrayValue(s.MilitaryLessons?.Select(i => IntegerValue(i)).ToArray() ?? Array.Empty<object>()) },
+            { "historyLessons", ArrayValue(s.HistoryLessons?.Select(i => IntegerValue(i)).ToArray() ?? Array.Empty<object>()) },
+            { "scienceLessons", ArrayValue(s.ScienceLessons?.Select(i => IntegerValue(i)).ToArray() ?? Array.Empty<object>()) },
+            { "gymLessons", ArrayValue(s.GymLessons?.Select(i => IntegerValue(i)).ToArray() ?? Array.Empty<object>()) },
+            { "isStudying", BooleanValue(s.IsStudying) },
+            { "startStudyingTimeInMilli", IntegerValue(s.StartStudyingTimeInMilli) },
+            { "currentCategory", IntegerValue(s.CurrentCategory) },
+            { "currentLesson", IntegerValue(s.CurrentLesson) }
+        });
+
+        private static object GymObjectToMap(GymObject g) => MapValue(new Dictionary<string, object> {
+            { "selectedLesson", IntegerValue(g.SelectedLesson) },
+            { "lessonProgress", ArrayValue(g.LessonProgress?.Select(p => IntegerValue(p)).ToArray() ?? Array.Empty<object>()) },
+            { "lessonUnlocked", ArrayValue(g.LessonUnlocked?.Select(u => BooleanValue(u)).ToArray() ?? Array.Empty<object>()) }
+        });
+
+        private static object FromIntDict(Dictionary<int, int> dict) =>
+            MapValue(dict?.ToDictionary(kvp => kvp.Key.ToString(), kvp => IntegerValue(kvp.Value))
+                        ?? new Dictionary<string, object>());
+
+        private static object FromStringLongDict(Dictionary<string, long> dict) =>
+            MapValue(dict?.ToDictionary(kvp => kvp.Key, kvp => IntegerValue(kvp.Value))
+                        ?? new Dictionary<string, object>());
+
+        // Firestore parsing helpers
+        private static string GetString(this JsonElement e, string property)
+        {
+            if (e.TryGetProperty(property, out var prop) &&
+                prop.TryGetProperty("stringValue", out var v))
+                return v.GetString();
+            return null;
+        }
+
+        private static int GetInt32(this JsonElement e, string property)
+        {
+            if (e.TryGetProperty(property, out var prop) &&
+                prop.TryGetProperty("integerValue", out var v))
+            {
+                if (v.ValueKind == JsonValueKind.String && int.TryParse(v.GetString(), out int result))
+                    return result;
+                if (v.ValueKind == JsonValueKind.Number)
+                    return v.GetInt32();
+            }
+            return 0;
+        }
+
+        private static long GetInt64(this JsonElement e, string property)
+        {
+            if (e.TryGetProperty(property, out var prop) &&
+                prop.TryGetProperty("integerValue", out var v))
+            {
+                if (v.ValueKind == JsonValueKind.String && long.TryParse(v.GetString(), out long result))
+                    return result;
+                if (v.ValueKind == JsonValueKind.Number)
+                    return v.GetInt64();
+            }
+            return 0;
+        }
+
+        private static double GetDouble(this JsonElement e, string property)
+        {
+            if (e.TryGetProperty(property, out var prop) &&
+                prop.TryGetProperty("doubleValue", out var v))
+            {
+                if (v.ValueKind == JsonValueKind.Number)
+                    return v.GetDouble();
+                if (v.ValueKind == JsonValueKind.String && double.TryParse(v.GetString(), out double result))
+                    return result;
+            }
+            return 0;
+        }
+
+        private static bool GetBoolean(this JsonElement e, string property)
+        {
+            if (e.TryGetProperty(property, out var prop) &&
+                prop.TryGetProperty("booleanValue", out var v))
+            {
+                if (v.ValueKind == JsonValueKind.True || v.ValueKind == JsonValueKind.False)
+                    return v.GetBoolean();
+                if (v.ValueKind == JsonValueKind.String && bool.TryParse(v.GetString(), out bool result))
+                    return result;
+            }
+            return false;
+        }
+
+        private static DateTime GetTimestamp(this JsonElement e, string property)
+        {
+            if (e.TryGetProperty(property, out var prop) &&
+                prop.TryGetProperty("timestampValue", out var v) &&
+                DateTime.TryParse(v.GetString(), out var dt))
+                return dt;
+            return DateTime.UtcNow;
+        }
+
         private static JsonElement? GetMapFieldsNullable(this JsonElement element)
         {
             if (element.TryGetProperty("mapValue", out var mapObj) &&
@@ -947,75 +1044,6 @@ namespace GameProject02.Services
                     action(v);
                 }
             }
-        }
-
-        private static string GetString(this JsonElement e, string property)
-        {
-            if (e.TryGetProperty(property, out var prop) &&
-                prop.TryGetProperty("stringValue", out var v))
-                return v.GetString();
-            return null;
-        }
-
-        private static int GetInt32(this JsonElement e, string property)
-        {
-            if (e.TryGetProperty(property, out var prop) &&
-                prop.TryGetProperty("integerValue", out var v))
-            {
-                if (v.ValueKind == JsonValueKind.String && int.TryParse(v.GetString(), out int result))
-                    return result;
-                if (v.ValueKind == JsonValueKind.Number)
-                    return v.GetInt32();
-            }
-            return 0;
-        }
-
-        private static long GetInt64(this JsonElement e, string property)
-        {
-            if (e.TryGetProperty(property, out var prop) &&
-                prop.TryGetProperty("integerValue", out var v))
-            {
-                if (v.ValueKind == JsonValueKind.String && long.TryParse(v.GetString(), out long result))
-                    return result;
-                if (v.ValueKind == JsonValueKind.Number)
-                    return v.GetInt64();
-            }
-            return 0;
-        }
-
-        private static double GetDouble(this JsonElement e, string property)
-        {
-            if (e.TryGetProperty(property, out var prop) &&
-                prop.TryGetProperty("doubleValue", out var v))
-            {
-                if (v.ValueKind == JsonValueKind.Number)
-                    return v.GetDouble();
-                if (v.ValueKind == JsonValueKind.String && double.TryParse(v.GetString(), out double result))
-                    return result;
-            }
-            return 0;
-        }
-
-        private static bool GetBoolean(this JsonElement e, string property)
-        {
-            if (e.TryGetProperty(property, out var prop) &&
-                prop.TryGetProperty("booleanValue", out var v))
-            {
-                if (v.ValueKind == JsonValueKind.True || v.ValueKind == JsonValueKind.False)
-                    return v.GetBoolean();
-                if (v.ValueKind == JsonValueKind.String && bool.TryParse(v.GetString(), out bool result))
-                    return result;
-            }
-            return false;
-        }
-
-        private static DateTime GetTimestamp(this JsonElement e, string property)
-        {
-            if (e.TryGetProperty(property, out var prop) &&
-                prop.TryGetProperty("timestampValue", out var v) &&
-                DateTime.TryParse(v.GetString(), out var dt))
-                return dt;
-            return DateTime.UtcNow;
         }
 
         private static string GetStringValue(this JsonElement e) =>

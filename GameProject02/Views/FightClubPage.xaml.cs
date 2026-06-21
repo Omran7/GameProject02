@@ -33,7 +33,7 @@ public partial class FightClubPage : ContentPage, INotifyPropertyChanged
         LoadPlayers();
     }
 
-    private void LoadPlayers()
+    private async void LoadPlayers()
     {
         _player = AccountService.GetCurrentPlayer();
         if (_player == null) return;
@@ -41,12 +41,12 @@ public partial class FightClubPage : ContentPage, INotifyPropertyChanged
         _player.CrimeObject.CheckConfinementStatus();
         if (_player.CrimeObject.IsInPrison || _player.CrimeObject.IsInHospital)
         {
-            DisplayAlert("غير مسموح", "لا يمكنك الوصول إلى نادي القتال أثناء وجودك في السجن أو المستشفى!", "موافق")
-                .ContinueWith(_ => Navigation.PopAsync());
+            await DisplayAlert("غير مسموح", "لا يمكنك الوصول إلى نادي القتال أثناء وجودك في السجن أو المستشفى!", "موافق");
+            await Navigation.PopAsync();
             return;
         }
 
-        var opponents = FightClubService.GetEligibleOpponents(_player);
+        var opponents = await FightClubService.GetEligibleOpponentsAsync(_player);
         Players = new ObservableCollection<FightClubPlayer>(opponents);
     }
 

@@ -7,7 +7,7 @@ public enum NewsType
     Information,
     PlayerAd,
     Bounty,
-    SystemAlert
+    SystemAlert=3
 }
 
 public class NewsItem

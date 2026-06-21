@@ -104,6 +104,12 @@ public partial class TopHeaderView : ContentView
     // ═══════════════════════════════════════════════════
     private async Task PickAndSaveAvatar()
     {
+        var player = AccountService.GetCurrentPlayer();
+
+        // ✅ Check if banned from changing profile picture
+        if (player != null && await BanHelper.CheckAndShowBanAlert(player, "profile"))
+            return;
+
         try
         {
             var photo = await MediaPicker.Default.PickPhotoAsync(new MediaPickerOptions
@@ -116,7 +122,6 @@ public partial class TopHeaderView : ContentView
             string localPath = await SaveAvatarLocallyAsync(photo);
             AvatarImage.Source = ImageSource.FromFile(localPath);
 
-            var player = AccountService.GetCurrentPlayer();
             if (player != null)
                 player.AvatarPath = localPath;
             else
@@ -135,7 +140,6 @@ public partial class TopHeaderView : ContentView
                 .DisplayAlert("خطأ", "تعذّر تغيير الصورة، حاول مرة أخرى.", "موافق");
         }
     }
-
     // ═══════════════════════════════════════════════════
     //  حذف الصورة والعودة للافتراضية
     // ═══════════════════════════════════════════════════

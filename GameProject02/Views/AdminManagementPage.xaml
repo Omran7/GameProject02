@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="GameProject02.Views.AdminManagementPage"
+             Title="👥 إدارة المسؤولين"
+             BackgroundColor="#1a1a1a"
+             FlowDirection="RightToLeft">
+
+	<Grid RowDefinitions="Auto, Auto, *">
+		<!-- Header -->
+		<Label Grid.Row="0" Text="إدارة المسؤولين والمديرين" TextColor="White" FontAttributes="Bold" Padding="15,10" FontSize="18" BackgroundColor="#0a0a0a"/>
+
+		<!-- Search -->
+		<Grid Grid.Row="1" ColumnDefinitions="*,Auto" Padding="10,5">
+			<Entry x:Name="SearchEntry" Placeholder="ابحث عن لاعب..." TextColor="White" PlaceholderColor="#888888" BackgroundColor="#252525" TextChanged="OnSearchTextChanged"/>
+			<Button Grid.Column="1" Text="🔍" BackgroundColor="#3498db" TextColor="White" CornerRadius="8" WidthRequest="50" Clicked="OnSearchClicked"/>
+		</Grid>
+
+		<!-- Players List -->
+		<CollectionView Grid.Row="2" x:Name="UsersList" Margin="10" SelectionMode="None">
+			<CollectionView.ItemTemplate>
+				<DataTemplate>
+					<Border BackgroundColor="#252525" StrokeShape="RoundRectangle 10" Padding="12" Margin="0,5">
+						<Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="10">
+							<VerticalStackLayout>
+								<Label Text="{Binding Username}" TextColor="White" FontAttributes="Bold"/>
+								<Label Text="{Binding DisplayRole}" TextColor="{Binding RoleColor}" FontSize="12"/>
+								<Label Text="{Binding Level, StringFormat='المستوى {0}'}" TextColor="#bdc3c7" FontSize="10"/>
+							</VerticalStackLayout>
+							<Button Grid.Column="1" Text="ترقية" BackgroundColor="#3498db" TextColor="White" CornerRadius="5" WidthRequest="80"
+                                    Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.PromoteCommand}"
+                                    CommandParameter="{Binding .}"
+                                    IsVisible="{Binding CanPromote}"/>
+							<Button Grid.Column="2" Text="تنزيل" BackgroundColor="#e67e22" TextColor="White" CornerRadius="5" WidthRequest="80"
+                                    Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.DemoteCommand}"
+                                    CommandParameter="{Binding .}"
+                                    IsVisible="{Binding CanDemote}"/>
+						</Grid>
+					</Border>
+				</DataTemplate>
+			</CollectionView.ItemTemplate>
+			<CollectionView.EmptyView>
+				<Label Text="لا يوجد لاعبين" TextColor="#888888" HorizontalOptions="Center" VerticalOptions="Center"/>
+			</CollectionView.EmptyView>
+		</CollectionView>
+	</Grid>
+</ContentPage>

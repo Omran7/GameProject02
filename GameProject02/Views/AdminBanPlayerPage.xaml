@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="GameProject02.Views.AdminBanPlayerPage"
+             Title="🚫 حظر اللاعبين"
+             BackgroundColor="#1a1a1a"
+             FlowDirection="RightToLeft">
+
+	<VerticalStackLayout Padding="20" Spacing="15">
+		<Label Text="أدخل اسم المستخدم:" TextColor="White" FontAttributes="Bold"/>
+		<Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
+			<Entry x:Name="UsernameEntry" Placeholder="اسم المستخدم..." TextColor="White" PlaceholderColor="#888888"/>
+			<Button Grid.Column="1" Text="🔍 بحث" BackgroundColor="#3498db" TextColor="White"
+                    CornerRadius="8" WidthRequest="80" Clicked="OnSearchClicked"/>
+		</Grid>
+
+		<Label x:Name="PlayerInfoLabel" Text="" TextColor="#2ecc71" IsVisible="False"/>
+
+		<BoxView HeightRequest="1" BackgroundColor="#444" Margin="0,10"/>
+
+		<Label Text="الإجراءات (اختر ما تريد تطبيقه):" TextColor="White" FontAttributes="Bold"/>
+
+		<Grid ColumnDefinitions="*,Auto">
+			<Label Text="حظر من الدردشة" TextColor="White" VerticalOptions="Center"/>
+			<Switch x:Name="BanChat" Grid.Column="1"/>
+		</Grid>
+		<Grid ColumnDefinitions="*,Auto">
+			<Label Text="حظر من تغيير الصورة" TextColor="White" VerticalOptions="Center"/>
+			<Switch x:Name="BanProfile" Grid.Column="1"/>
+		</Grid>
+		<Grid ColumnDefinitions="*,Auto">
+			<Label Text="حظر من نشر الأخبار" TextColor="White" VerticalOptions="Center"/>
+			<Switch x:Name="BanNews" Grid.Column="1"/>
+		</Grid>
+		<Grid ColumnDefinitions="*,Auto">
+			<Label Text="حظر من الرسائل الخاصة" TextColor="White" VerticalOptions="Center"/>
+			<Switch x:Name="BanMessages" Grid.Column="1"/>
+		</Grid>
+
+		<!-- Apply & Reset Buttons -->
+		<Grid ColumnDefinitions="*,*" ColumnSpacing="10">
+			<Button Text="🔄 إعادة تعيين" BackgroundColor="#95a5a6" TextColor="White" CornerRadius="10" HeightRequest="48"
+                    Clicked="OnResetClicked"/>
+			<Button Grid.Column="1" Text="💾 تطبيق التغييرات" BackgroundColor="#2ecc71" TextColor="White" CornerRadius="10" HeightRequest="48"
+                    Clicked="OnApplyChangesClicked"/>
+		</Grid>
+
+		<ActivityIndicator x:Name="LoadingIndicator" IsRunning="False" IsVisible="False" Color="#3498db" HorizontalOptions="Center"/>
+	</VerticalStackLayout>
+</ContentPage>

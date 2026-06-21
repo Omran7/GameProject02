@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:models="clr-namespace:GameProject02.Models"
+             x:Class="GameProject02.Views.AdminPanelPage"
+             Title="🛡️ لوحة الإدارة"
+             BackgroundColor="#1a1a1a"
+             FlowDirection="RightToLeft">
+
+	<Grid RowDefinitions="Auto, *, Auto">
+		<!-- Header -->
+		<Border Grid.Row="0" BackgroundColor="#0a0a0a" Padding="15,10">
+			<Grid ColumnDefinitions="*,Auto">
+				<Label Text="🛡️ لوحة الإدارة" TextColor="White" FontSize="18" FontAttributes="Bold"/>
+				<Label Grid.Column="1" Text="{Binding RoleDisplay}" TextColor="#f39c12" FontAttributes="Bold" FontSize="14"/>
+			</Grid>
+		</Border>
+
+		<!-- Menu -->
+		<CollectionView Grid.Row="1" x:Name="AdminMenuList" ItemsSource="{Binding MenuItems}" SelectionMode="None" Margin="10,0">
+			<CollectionView.ItemsLayout>
+				<LinearItemsLayout Orientation="Vertical" ItemSpacing="8"/>
+			</CollectionView.ItemsLayout>
+			<CollectionView.ItemTemplate>
+				<DataTemplate x:DataType="models:AdminMenuItem">
+					<Border BackgroundColor="#252525" StrokeShape="RoundRectangle 12" Padding="15,12">
+						<Grid ColumnDefinitions="Auto,*,Auto">
+							<Label Text="{Binding Icon}" FontSize="24" VerticalOptions="Center" Margin="0,0,12,0"/>
+							<Label Grid.Column="1" Text="{Binding Title}" TextColor="White" FontSize="15" VerticalOptions="Center"/>
+							<Label Grid.Column="2" Text="→" TextColor="#3498db" FontSize="18" VerticalOptions="Center"/>
+						</Grid>
+						<Border.GestureRecognizers>
+							<TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.MenuItemTappedCommand}" CommandParameter="{Binding .}"/>
+						</Border.GestureRecognizers>
+					</Border>
+				</DataTemplate>
+			</CollectionView.ItemTemplate>
+		</CollectionView>
+
+		<!-- Footer -->
+		<Border Grid.Row="2" BackgroundColor="#0a0a0a" Padding="10" Margin="10,0,10,10">
+			<Button Text="🏠 العودة للرئيسية" BackgroundColor="#e74c3c" TextColor="White" CornerRadius="10" HeightRequest="48"
+                    Command="{Binding GoHomeCommand}"/>
+		</Border>
+	</Grid>
+</ContentPage>

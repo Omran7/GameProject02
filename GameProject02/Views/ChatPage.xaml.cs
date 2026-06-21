@@ -1,4 +1,5 @@
-﻿using GameProject02.Models;
+﻿using GameProject02.Helpers;
+using GameProject02.Models;
 using GameProject02.Services;
 using Microsoft.Maui.Controls;
 using System;
@@ -55,6 +56,16 @@ namespace GameProject02.Views
         {
             string content = MessageEntry.Text?.Trim();
             if (string.IsNullOrWhiteSpace(content)) return;
+
+            var player = AccountService.GetCurrentPlayer();
+            if (player == null) return;
+
+            // ✅ Check if banned from chat
+            if (await BanHelper.CheckAndShowBanAlert(player, "chat"))
+            {
+                MessageEntry.Text = "";
+                return;
+            }
 
             MessageEntry.Text = "";
             bool sent = await ChatService.SendMessageAsync(_currentChannel, content);

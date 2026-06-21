@@ -58,6 +58,22 @@ public class PlayerAccount : INotifyPropertyChanged
 
     public MainStatesObject MainStatesObject { get; set; } = new MainStatesObject();
 
+    // 🔐 ADMIN PROPERTIES
+    public bool IsAdmin { get; set; } = false;
+    public bool IsTemporaryAdmin { get; set; } = false;
+    public bool IsBannedFromChat { get; set; } = false;
+    public bool IsBannedFromChatFromSystem { get; set; } = false;
+    public bool IsBannedFromChangeProfilePic { get; set; } = false;
+    public bool IsBannedFromChangeProfilePicFromSystem { get; set; } = false;
+    public bool IsBannedFromNews { get; set; } = false;
+    public bool IsBannedFromNewsFromSystem { get; set; } = false;
+    public bool IsBannedFromPrivateMessages { get; set; } = false;
+    public bool HasAdminRequestNotReviewed { get; set; } = false;
+    public string AdminRequestReason { get; set; } = string.Empty;
+    public DateTime? AdminRequestTimestamp { get; set; }
+    public DateTime? AdminExpiryDate { get; set; } // For temporary admins
+    public bool IsManager { get; set; } = false;
+
     // ══════════════════════════════════════════════════════════════════
     //  العملات
     // ══════════════════════════════════════════════════════════════════

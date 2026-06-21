@@ -184,6 +184,7 @@ public partial class MainPage : ContentPage, INotifyPropertyChanged
     private async void OnLuckyWheelClicked(object sender, EventArgs e) => await Navigation.PushAsync(new LuckyWheelPage());
     private async void OnPrivateChatClicked(object sender, EventArgs e) => await Navigation.PushAsync(new PrivateChatListPage());
     private async void OnMedalsClicked(object sender, EventArgs e) => await Navigation.PushAsync(new MedalsPage());
+    private async void OnAdminPanelClicked(object sender, EventArgs e) => await Navigation.PushAsync(new AdminPanelPage());
 
     private async void OnGangClicked(object sender, EventArgs e)
     {

@@ -1,4 +1,5 @@
-﻿using GameProject02.Models;
+﻿using GameProject02.Helpers;
+using GameProject02.Models;
 using GameProject02.Services;
 using Microsoft.Maui.Controls;
 using System;
@@ -110,10 +111,18 @@ namespace GameProject02.Views
         {
             string content = MessageEntry.Text?.Trim();
             if (string.IsNullOrEmpty(content)) return;
-            MessageEntry.Text = "";
 
             var player = AccountService.GetCurrentPlayer();
             if (player == null) return;
+
+            // ✅ Check if banned from private messages
+            if (await BanHelper.CheckAndShowBanAlert(player, "messages"))
+            {
+                MessageEntry.Text = "";
+                return;
+            }
+
+            MessageEntry.Text = "";
 
             long optimisticTimestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
             var optimisticMsg = new PrivateChatMessage
@@ -139,7 +148,6 @@ namespace GameProject02.Views
                 await DisplayAlert("خطأ", "فشل إرسال الرسالة.", "موافق");
             }
         }
-
         protected override void OnDisappearing()
         {
             base.OnDisappearing();
