@@ -1,4 +1,5 @@
-﻿using GameProject02.Services;
+﻿using GameProject02.Helpers;
+using GameProject02.Services;
 using GameProject02.Views;
 using Microsoft.Maui.Controls;
 using System;
@@ -37,12 +38,12 @@ namespace GameProject02.Views
                     player.CrimeObject.CheckConfinementStatus();
                     MedalService.CheckAndAwardAll(player);
 
-                    // ✅ if in plane → present PlanePage modally (cannot go back)
+                    // Set the main page based on confinement
                     if (player.CrimeObject.IsInPlane &&
                         player.CrimeObject.FlightReleaseTime > DateTimeOffset.UtcNow.ToUnixTimeMilliseconds())
                     {
                         var planePage = new PlanePage(player, player.City, player.CrimeObject.FlightReleaseTime);
-                        Application.Current.MainPage = new NavigationPage(new MainPage()); // temporary root
+                        Application.Current.MainPage = new NavigationPage(new MainPage());
                         await Application.Current.MainPage.Navigation.PushModalAsync(new NavigationPage(planePage)
                         {
                             BarBackgroundColor = Color.FromArgb("#2c3e50"),
@@ -69,6 +70,10 @@ namespace GameProject02.Views
                     {
                         Application.Current.MainPage = new NavigationPage(new MainPage());
                     }
+
+                    // ✅ Show ban alert AFTER page change
+                    await Task.Delay(300);
+                    await BanHelper.ShowBansOnLogin(player);
                 }
                 else
                 {

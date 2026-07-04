@@ -1,17 +1,20 @@
 ﻿using GameProject02.Models;
 using GameProject02.Services;
 using GameProject02.Views;
+using GameProject02.Helpers;
 using Microsoft.Maui.Controls;
 using System;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Timers;
+using System.Threading.Tasks;
 using Microsoft.Maui.ApplicationModel;
 
 namespace GameProject02;
 
 public partial class MainPage : ContentPage, INotifyPropertyChanged
 {
+    private bool _banAlertShown = false; // ✅ Track if ban alert was shown
     public event PropertyChangedEventHandler PropertyChanged;
     protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
     {
@@ -45,7 +48,7 @@ public partial class MainPage : ContentPage, INotifyPropertyChanged
         ApplyLanguage();
     }
 
-    protected override void OnAppearing()
+    protected override async void OnAppearing()
     {
         base.OnAppearing();
         _refreshTimer?.Stop();
@@ -60,15 +63,20 @@ public partial class MainPage : ContentPage, INotifyPropertyChanged
 
         CheckPrisonStateAndNavigate();
 
+        // ✅ Show ban alert ONLY ONCE after page loads
+        if (!_banAlertShown && _player != null)
+        {
+            _banAlertShown = true; // Mark as shown
+            await Task.Delay(500); // Wait for page to fully render
+            //await BanHelper.ShowBansOnLogin(_player);
+        }
+
         // ✅ Subscribe to gang status changes
         MessagingCenter.Subscribe<object, string>(this, "GangStatusChanged", (_, gangId) =>
         {
-            // Refresh player data when gang status changes
             LoadPlayerData();
-            // Optional: you can update the gang button text here if you add a method
         });
     }
-
     protected override void OnDisappearing()
     {
         base.OnDisappearing();

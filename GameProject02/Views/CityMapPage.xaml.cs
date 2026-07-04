@@ -1,4 +1,5 @@
-﻿using GameProject02.Services;
+﻿using GameProject02.Helpers;
+using GameProject02.Services;
 using Microsoft.Maui.Controls;
 using System;
 using System.Diagnostics;
@@ -11,7 +12,7 @@ public partial class CityMapPage : ContentPage
     public CityMapPage()
     {
         InitializeComponent();
-        
+
         // Hook into the building tapped event we added to MapView
         CityMapView.BuildingTapped += OnBuildingTapped;
     }

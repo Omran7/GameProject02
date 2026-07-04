@@ -17,6 +17,7 @@ namespace GameProject02.Services
         private static readonly Dictionary<string, PlayerAccount> _localAccounts = new();
         private static PlayerAccount _currentUser;
         private static readonly List<PlayerAccount> _allPlayers = new();
+        private static bool _isLoggedIn = false;
 
         public static PlayerAccount CurrentPlayer
         {
@@ -24,14 +25,13 @@ namespace GameProject02.Services
             set
             {
                 if (value == null)
-                {
                     Debug.WriteLine("[AccountService] Warning: Setting CurrentPlayer to null");
-                }
                 _currentUser = value;
             }
         }
 
         public static void SetCurrentPlayer(PlayerAccount player) => CurrentPlayer = player;
+        public static bool IsLoggedIn() => _isLoggedIn;
 
         private const string FirestoreBaseUrl = "https://firestore.googleapis.com/v1/projects/gameproject02-4207f/databases/(default)/documents";
         private const string WebApiKey = "AIzaSyCM61YoJzqt9X7lOndV2oBJGeoBtU9U_Uo";
@@ -71,6 +71,7 @@ namespace GameProject02.Services
 
             _localAccounts[account.PlayerId] = account;
             _currentUser = account;
+            _isLoggedIn = true;
             RegisterPlayer(account);
 
             bool saved = await FirebaseService.SavePlayerAsync(account);
@@ -78,6 +79,7 @@ namespace GameProject02.Services
             {
                 _localAccounts.Remove(account.PlayerId);
                 _currentUser = null;
+                _isLoggedIn = false;
                 await ShowAlert("Registration Failed", "Could not save player data to the cloud.");
                 return false;
             }
@@ -98,7 +100,6 @@ namespace GameProject02.Services
             return true;
         }
 
-        // ✅ Updated LoginAsync – checks ban before password
         public static async Task<bool> LoginAsync(string username, string password)
         {
             var localAccount = _localAccounts.Values
@@ -117,14 +118,16 @@ namespace GameProject02.Services
                 return false;
             }
 
-            // ✅ Check password first
+            // Log ban flags for debugging
+            Debug.WriteLine($"[LOGIN] Bans loaded for {cloudAccount.Username}: Chat={cloudAccount.IsBannedFromChat}, Profile={cloudAccount.IsBannedFromChangeProfilePic}, News={cloudAccount.IsBannedFromNews}, Messages={cloudAccount.IsBannedFromPrivateMessages}");
+
             if (cloudAccount.PasswordHash != HashPassword(password))
             {
                 await ShowAlert("Login Failed", "Incorrect password.");
                 return false;
             }
 
-            // ✅ Load gang
+            // Load gang
             if (!string.IsNullOrEmpty(cloudAccount.GangId))
             {
                 try
@@ -138,7 +141,7 @@ namespace GameProject02.Services
                 }
                 catch (Exception ex)
                 {
-                    System.Diagnostics.Debug.WriteLine($"[LOGIN] Failed to load gang: {ex.Message}");
+                    Debug.WriteLine($"[LOGIN] Failed to load gang: {ex.Message}");
                     cloudAccount.GangObject = null;
                 }
             }
@@ -148,16 +151,15 @@ namespace GameProject02.Services
                 _localAccounts.Remove(localAccount.PlayerId);
 
             _currentUser = cloudAccount;
+            _isLoggedIn = true;
             RegisterPlayer(cloudAccount);
             EnsurePlayerRegistered(cloudAccount);
 
             RegenerationService.Start(_currentUser);
 
-            // ✅ Show ban notification AFTER login (non-blocking)
-            await BanHelper.ShowBansOnLogin(_currentUser);
-
             return true;
         }
+
         private static async Task ShowAlert(string title, string message)
         {
             await MainThread.InvokeOnMainThreadAsync(async () =>
@@ -176,10 +178,10 @@ namespace GameProject02.Services
 
             NotificationService.ClearAll();
             _currentUser = null;
+            _isLoggedIn = false;
         }
 
         public static PlayerAccount GetCurrentPlayer() => _currentUser;
-        public static bool IsLoggedIn() => _currentUser != null;
 
         public static int GetPlayerAgeInDays()
         {
@@ -189,7 +191,7 @@ namespace GameProject02.Services
 
         public static void SavePlayer(PlayerAccount player)
         {
-            System.Diagnostics.Debug.WriteLine($"[SAVE] Player {player?.Username} state preserved");
+            Debug.WriteLine($"[SAVE] Player {player?.Username} state preserved");
         }
 
         public static void TrainAtGym()
@@ -263,11 +265,10 @@ namespace GameProject02.Services
             if (!_allPlayers.Contains(player))
             {
                 _allPlayers.Add(player);
-                System.Diagnostics.Debug.WriteLine($"[ACCOUNT] Registered player: {player.Username} (ID: {player.PlayerId})");
+                Debug.WriteLine($"[ACCOUNT] Registered player: {player.Username} (ID: {player.PlayerId})");
             }
         }
 
-        // ✅ Get player by username from Firestore
         public static async Task<PlayerAccount> GetPlayerByUsernameAsync(string username)
         {
             string playerId = await GetPlayerIdByUsernameAsync(username);

@@ -79,10 +79,10 @@ public partial class EstatePage : ContentPage
         var grid = new Grid
         {
             ColumnDefinitions =
-        {
-            new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) },
-            new ColumnDefinition { Width = GridLength.Auto }
-        },
+            {
+                new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) },
+                new ColumnDefinition { Width = GridLength.Auto }
+            },
             Padding = new Thickness(25, 0)
         };
 
@@ -97,6 +97,7 @@ public partial class EstatePage : ContentPage
 
         PageFooter.SetContent(grid);
     }
+
     private async void OnNewEstatesClicked(object sender, EventArgs e)
     {
         await AnimateBorder(sender as Border);

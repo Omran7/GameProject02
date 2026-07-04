@@ -1,5 +1,8 @@
 ﻿using GameProject02.Models;
+using GameProject02.Services;
 using Microsoft.Maui.Controls;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.Threading.Tasks;
 
 namespace GameProject02.Helpers;
@@ -29,15 +32,20 @@ public static class BanHelper
                 "messages" => "⛔ تم حظرك من الرسائل الخاصة من قبل الإدارة.",
                 _ => "⛔ تم حظرك من هذه الميزة من قبل الإدارة."
             };
-            await Application.Current.MainPage.DisplayAlert("🚫 ممنوع", message, "موافق");
-            return true; // Banned
+            await ShowAlert(message, "🚫 ممنوع");
+            return true;
         }
-        return false; // Not banned
+        return false;
     }
 
     public static async Task ShowBansOnLogin(PlayerAccount player)
     {
-        if (player == null) return;
+        // ✅ Only show if logged in and player matches
+        if (!AccountService.IsLoggedIn() || AccountService.CurrentPlayer?.PlayerId != player?.PlayerId)
+            return;
+
+        // ✅ Allow UI to settle (page transition completes)
+        await Task.Delay(300);
 
         var activeBans = new List<string>();
         if (player.IsBannedFromChat) activeBans.Add("• الدردشة العامة");
@@ -50,7 +58,25 @@ public static class BanHelper
             string message = "⚠️ تم حظر حسابك من الميزات التالية:\n\n" +
                              string.Join("\n", activeBans) +
                              "\n\nيمكنك استخدام باقي ميزات اللعبة بشكل طبيعي.";
-            await Application.Current.MainPage.DisplayAlert("🚫 تنبيه حظر", message, "موافق");
+            await ShowAlert(message, "🚫 تنبيه حظر");
+        }
+    }
+
+    // Helper to show alert on the main thread
+    private static async Task ShowAlert(string message, string title)
+    {
+        try
+        {
+            await MainThread.InvokeOnMainThreadAsync(async () =>
+            {
+                var page = Application.Current?.MainPage;
+                if (page == null) return;
+                await page.DisplayAlert(title, message, "موافق");
+            });
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"[BAN] ShowAlert error: {ex.Message}");
         }
     }
 }
