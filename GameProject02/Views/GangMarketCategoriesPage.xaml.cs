@@ -187,7 +187,7 @@ public partial class GangMarketCategoriesPage : ContentPage
         else
         {
             // Navigate to item types page (distinct items) for this category
-            await Navigation.PushAsync(new GangMarketItemTypesPage(category.Id, -1, category.Name));
+            await Navigation.PushAsync(new GangMarketItemTypesPage(category.Id, -1, category.Name), false);
         }
     }
 
@@ -253,7 +253,7 @@ public partial class GangMarketCategoriesPage : ContentPage
             await card.ScaleTo(1.0, 50);
             await HidePopup();
             // Navigate to item types page for this weapon subcategory
-            await Navigation.PushAsync(new GangMarketItemTypesPage(0, subCategoryId, subCategoryName));
+            await Navigation.PushAsync(new GangMarketItemTypesPage(0, subCategoryId, subCategoryName), false);
         };
         card.GestureRecognizers.Add(tapGesture);
 
@@ -273,7 +273,7 @@ public partial class GangMarketCategoriesPage : ContentPage
 
     private async void OnClosePopupClicked(object sender, EventArgs e) => await HidePopup();
     private async void OnOverlayClicked(object sender, EventArgs e) => await HidePopup();
-    private async void OnBackClicked(object sender, EventArgs e) => await Navigation.PopAsync();
+    private async void OnBackClicked(object sender, EventArgs e) => await Navigation.PopAsync(false);
     private async void OnRefreshClicked(object sender, EventArgs e)
     {
         LoadCategories();

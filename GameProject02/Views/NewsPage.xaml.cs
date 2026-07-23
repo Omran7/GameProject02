@@ -213,7 +213,7 @@ public partial class NewsPage : ContentPage
     }
     // ── Navigation ───────────────────────────────────────────
     private async void OnBackClicked(object sender, EventArgs e) =>
-        await Navigation.PopAsync();
+        await Navigation.PopAsync(false);
 
     private async void OnRefreshClicked(object sender, EventArgs e)
     {

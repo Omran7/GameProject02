@@ -122,7 +122,7 @@ public partial class ProfilePage : ContentPage
 
     private async void OnBackClicked(object sender, EventArgs e)
     {
-        await Navigation.PopAsync();
+        await Navigation.PopAsync(false);
     }
 
     private void OnSwitchLanguageClicked(object sender, EventArgs e)
@@ -145,7 +145,7 @@ public partial class ProfilePage : ContentPage
 
     private async void OnArmingClicked(object sender, EventArgs e)
     {
-        await Navigation.PushAsync(new ArmingPage());
+        await Navigation.PushAsync(new ArmingPage(), false);
     }
 
     private async void OnSignOutClicked(object sender, EventArgs e)

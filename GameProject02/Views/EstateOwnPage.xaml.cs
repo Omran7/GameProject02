@@ -576,7 +576,7 @@ public partial class EstateOwnPage : ContentPage
             await PopupService.ShowAlertAsync("تنبيه", "يمكنك ترقية مقر إقامتك الرئيسي فقط!");
             return;
         }
-        await Navigation.PushAsync(new EstateUpgradePage(estate));
+        await Navigation.PushAsync(new EstateUpgradePage(estate), false);
     }
 
     private async void OnRemoveFromSaleClicked(EstateObject estate)
@@ -687,6 +687,6 @@ public partial class EstateOwnPage : ContentPage
     private async void OnBackClicked(object sender, EventArgs e)
     {
         if (sender is Border border) await AnimateBorder(border);
-        await Navigation.PopAsync();
+        await Navigation.PopAsync(false);
     }
 }

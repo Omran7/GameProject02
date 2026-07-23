@@ -45,12 +45,12 @@ public partial class NotificationCenterPage : ContentPage
     {
         switch (target)
         {
-            case "CrimePage": await Navigation.PushAsync(new CrimePage()); break;
-            case "ProfilePage": await Navigation.PushAsync(new ProfilePage()); break;
-            case "GymPage": await Navigation.PushAsync(new GymPage()); break;
-            case "HospitalPage": await Navigation.PushAsync(new HospitalPage()); break;
-            case "PrisonPage": await Navigation.PushAsync(new PrisonPage()); break;
-            case "MainPage": await Navigation.PushAsync(new MainPage()); break;
+            case "CrimePage": await Navigation.PushAsync(new CrimePage(), false); break;
+            case "ProfilePage": await Navigation.PushAsync(new ProfilePage(), false); break;
+            case "GymPage": await Navigation.PushAsync(new GymPage(), false); break;
+            case "HospitalPage": await Navigation.PushAsync(new HospitalPage(), false); break;
+            case "PrisonPage": await Navigation.PushAsync(new PrisonPage(), false); break;
+            case "MainPage": await Navigation.PushAsync(new MainPage(), false); break;
             default: await DisplayAlert("Info", "Feature coming soon!", "OK"); break;
         }
     }

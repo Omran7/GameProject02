@@ -577,7 +577,7 @@ public partial class EstateUpgradePage : ContentPage
     private async void OnBackClicked(object sender, EventArgs e)
     {
         if (sender is Border border) await AnimateBorder(border);
-        await Navigation.PopAsync();
+        await Navigation.PopAsync(false);
     }
 
     private async Task<string> SaveImageToLocalStorage(FileResult imageFile)

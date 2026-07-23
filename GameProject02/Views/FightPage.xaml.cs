@@ -76,7 +76,7 @@ public partial class FightPage : ContentPage, INotifyPropertyChanged
         if (_player == null || _opponentDTO == null)
         {
             await DisplayAlert("خطأ", "بيانات غير صالحة", "موافق");
-            await Navigation.PopAsync();
+            await Navigation.PopAsync(false);
             return;
         }
 
@@ -85,7 +85,7 @@ public partial class FightPage : ContentPage, INotifyPropertyChanged
         if (_opponentPlayer == null)
         {
             await DisplayAlert("خطأ", "الخصم غير موجود", "موافق");
-            await Navigation.PopAsync();
+            await Navigation.PopAsync(false);
             return;
         }
 
@@ -94,7 +94,7 @@ public partial class FightPage : ContentPage, INotifyPropertyChanged
         if (_player.CrimeObject.IsInPrison || _player.CrimeObject.IsInHospital)
         {
             await DisplayAlert("غير مسموح", "لا يمكنك القتال أثناء وجودك في السجن أو المستشفى!", "موافق");
-            await Navigation.PopAsync();
+            await Navigation.PopAsync(false);
             return;
         }
 
@@ -103,7 +103,7 @@ public partial class FightPage : ContentPage, INotifyPropertyChanged
         if (_opponentPlayer.CrimeObject.IsInPrison || _opponentPlayer.CrimeObject.IsInHospital)
         {
             await DisplayAlert("غير متاح", "هذا اللاعب غير متاح للقتال حالياً", "موافق");
-            await Navigation.PopAsync();
+            await Navigation.PopAsync(false);
             return;
         }
 
@@ -262,7 +262,7 @@ public partial class FightPage : ContentPage, INotifyPropertyChanged
     // ✅ AUTO-REDIRECT TO HOSPITAL AFTER FIGHT (LOSERS ONLY)
     private async Task RedirectToHospitalAfterFight()
     {
-        await Navigation.PopAsync(); // Close fight page
+        await Navigation.PopAsync(false); // Close fight page
 
         _player.CrimeObject.CheckConfinementStatus();
 
@@ -272,7 +272,7 @@ public partial class FightPage : ContentPage, INotifyPropertyChanged
         }
         else
         {
-            await Application.Current.MainPage.Navigation.PopToRootAsync();
+            await Application.Current.MainPage.Navigation.PopToRootAsync(false);
         }
     }
     // ✅ START 30-SECOND POLICE TIMER (AUTHENTIC ARREST MECHANIC) - NON-DESTRUCTIVE ADDITION
@@ -303,7 +303,7 @@ public partial class FightPage : ContentPage, INotifyPropertyChanged
 
                     // Redirect to prison after 1 second
                     await Task.Delay(1000);
-                    await Navigation.PopAsync();
+                    await Navigation.PopAsync(false);
                     await Task.Delay(300);
                     _player.CrimeObject.CheckConfinementStatus();
                     if (_player.CrimeObject.IsInPrison)
@@ -314,7 +314,7 @@ public partial class FightPage : ContentPage, INotifyPropertyChanged
     }    // ✅ REDIRECT TO PRISON AFTER ARREST - NON-DESTRUCTIVE ADDITION
     private async Task RedirectToPrison()
     {
-        await Navigation.PopAsync(); // Close fight page
+        await Navigation.PopAsync(false); // Close fight page
 
         // Check confinement status
         _player.CrimeObject.CheckConfinementStatus();
@@ -325,7 +325,7 @@ public partial class FightPage : ContentPage, INotifyPropertyChanged
         }
         else
         {
-            await Application.Current.MainPage.Navigation.PopToRootAsync();
+            await Application.Current.MainPage.Navigation.PopToRootAsync(false);
         }
     }
 
@@ -347,13 +347,13 @@ public partial class FightPage : ContentPage, INotifyPropertyChanged
 
     private async Task RedirectToMainPage()
     {
-        await Navigation.PopAsync(); // Close fight page
-        await Application.Current.MainPage.Navigation.PopToRootAsync();
+        await Navigation.PopAsync(false); // Close fight page
+        await Application.Current.MainPage.Navigation.PopToRootAsync(false);
     }
 
     private async Task RedirectToHospital()
     {
-        await Navigation.PopAsync(); // Close fight page
+        await Navigation.PopAsync(false); // Close fight page
         // Check again in case player already freed
         _player.CrimeObject.CheckConfinementStatus();
         if (_player.CrimeObject.IsInHospital)
@@ -389,7 +389,7 @@ public partial class FightPage : ContentPage, INotifyPropertyChanged
         await DisplayAlert("سرقة", $"سرقت {stealAmount:N0} ذهب!\n❌ فقدت {nobilityLoss} نقاط شهامة", "موافق");
 
         await Task.Delay(1000);
-        await Navigation.PopToRootAsync();
+        await Navigation.PopToRootAsync(false);
     }
 
     // ✅ DISABILITY BUTTON: 30-MIN HOSPITAL + 25 NOBILITY LOSS
@@ -418,7 +418,7 @@ public partial class FightPage : ContentPage, INotifyPropertyChanged
         await DisplayAlert("عاهة", $"تم إرسال {_opponentPlayer.Username} للمستشفى لمدة 30 دقيقة\n❌ فقدت {nobilityLoss} نقاط شهامة", "موافق");
 
         await Task.Delay(1000);
-        await Navigation.PopToRootAsync();
+        await Navigation.PopToRootAsync(false);
     }
 
     // ✅ LEAVE BUTTON: ESCAPE POLICE + 10 NOBILITY LOSS
@@ -459,7 +459,7 @@ public partial class FightPage : ContentPage, INotifyPropertyChanged
             await DisplayAlert("هروب ناجح", $"هربت قبل وصول الشرطة!\n❌ فقدت {nobilityLoss} نقاط شهامة\n حصلت على {xpReward} خبرة!", "موافق");
         }
 
-        await Navigation.PopToRootAsync();
+        await Navigation.PopToRootAsync(false);
     }
     private void AddLog(string message)
     {
@@ -587,11 +587,11 @@ public partial class FightPage : ContentPage, INotifyPropertyChanged
         }
         else
         {
-            await Navigation.PopAsync();
+            await Navigation.PopAsync(false);
         }
     }
 
-    private async void OnHomeClicked(object sender, EventArgs e) => await Navigation.PopToRootAsync();
+    private async void OnHomeClicked(object sender, EventArgs e) => await Navigation.PopToRootAsync(false);
     private async void OnRefreshClicked(object sender, EventArgs e) { /* Not allowed during fight */ }
 
     public event PropertyChangedEventHandler PropertyChanged;

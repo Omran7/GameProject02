@@ -4,7 +4,12 @@ using System;
 
 namespace GameProject02.Controls;
 
-public partial class FooterView : ContentView
+// ═══════════════════════════════════════════════════════════════════
+//  الفوتر الحقيقي — نسخة واحدة مشتركة في كل التطبيق (Singleton)
+//  الصفحات تستخدم FooterView (الحاوية) التي تستعير هذه النسخة
+//  وتضع أزرارها الخاصة داخل ContentContainer
+// ═══════════════════════════════════════════════════════════════════
+public partial class FooterCore : ContentView
 {
     // ==================== إعدادات خاصة بالفوتر ====================
     public double FooterHeightRatio { get; set; } = 0.08;
@@ -17,11 +22,14 @@ public partial class FooterView : ContentView
 
     private double _buttonSize = 60;
 
-    public FooterView()
+    public FooterCore()
     {
         InitializeComponent();
         this.SizeChanged += OnFooterViewSizeChanged;
     }
+
+    /// <summary>حجم الزر الحالي (يُستخدم من FooterView لإنشاء أزرار بالحجم الصحيح)</summary>
+    public double CurrentButtonSize => _buttonSize;
 
     private void OnFooterViewSizeChanged(object sender, EventArgs e)
     {

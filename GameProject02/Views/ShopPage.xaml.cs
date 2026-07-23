@@ -386,12 +386,12 @@ public partial class ShopPage : ContentPage
             if (tabName == "المخزن")
             {
                 SetActiveTab(border, StockTabLabel);
-                await Navigation.PushAsync(new StockPage());
+                await Navigation.PushAsync(new StockPage(), false);
             }
             else if (tabName == "الحقيبة")
             {
                 SetActiveTab(border, BagTabLabel);
-                await Navigation.PushAsync(new BagPage());
+                await Navigation.PushAsync(new BagPage(), false);
             }
             else if (tabName == "المتجر")
             {
@@ -401,7 +401,7 @@ public partial class ShopPage : ContentPage
             else if (tabName == "المتحف")
             {
                 SetActiveTab(border, MuseumTabLabel);
-                await Navigation.PushAsync(new MuseumPage());
+                await Navigation.PushAsync(new MuseumPage(), false);
             }
         }
     }
@@ -448,7 +448,7 @@ public partial class ShopPage : ContentPage
             await Task.Delay(50);
             await border.ScaleTo(1.0, 50, Easing.CubicIn);
         }
-        await Navigation.PopToRootAsync();
+        await Navigation.PopToRootAsync(false);
     }
     #endregion
 
@@ -659,7 +659,7 @@ public class ShopSpaceItemViewModel
     private async void OnAddClicked(object parameter)
     {
         await Application.Current.MainPage.Navigation.PushAsync(
-            new StockPage(isAddMode: true, isForShop: true, shopSpaceIndex: _spaceIndex));
+            new StockPage(isAddMode: true, isForShop: true, shopSpaceIndex: _spaceIndex), false);
     }
 
     private async void OnRemoveClicked(object parameter)

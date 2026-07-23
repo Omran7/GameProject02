@@ -33,20 +33,20 @@ public partial class GangManagementPage : ContentPage
             if (_player == null)
             {
                 await DisplayAlert("خطأ", "الرجاء تسجيل الدخول أولاً", "موافق");
-                await Navigation.PopToRootAsync();
+                await Navigation.PopToRootAsync(false);
                 return;
             }
             if (string.IsNullOrEmpty(_player.GangId))
             {
                 await DisplayAlert("خطأ", "أنت لست عضواً في أي عصابة", "موافق");
-                await Navigation.PopToRootAsync();
+                await Navigation.PopToRootAsync(false);
                 return;
             }
             _gang = await GangDatabaseService.GetGangAsync(_player.GangId);
             if (_gang == null)
             {
                 await DisplayAlert("خطأ", "لم يتم العثور على بيانات العصابة", "موافق");
-                await Navigation.PopToRootAsync();
+                await Navigation.PopToRootAsync(false);
                 return;
             }
             await RefreshContent();
@@ -330,7 +330,7 @@ public partial class GangManagementPage : ContentPage
                 {
                     await SaveGangAndRefresh();
                     await DisplayAlert("نجاح", "تم نقل الزعامة", "موافق");
-                    await Navigation.PopToRootAsync();
+                    await Navigation.PopToRootAsync(false);
                 }
                 else await DisplayAlert("فشل", "", "موافق");
             }
@@ -405,7 +405,7 @@ public partial class GangManagementPage : ContentPage
                 bool confirm = await DisplayAlert("حل العصابة", "هل أنت متأكد؟ لا يمكن التراجع", "نعم", "لا");
                 if (confirm && GangService.DisbandGang(_gang, _player))
                 {
-                    await Navigation.PopToRootAsync();
+                    await Navigation.PopToRootAsync(false);
                 }
             }
         }
@@ -421,8 +421,8 @@ public partial class GangManagementPage : ContentPage
         try { MessagingCenter.Send(this, "RefreshGangProfile"); } catch { }
     }
 
-    private async void OnBackClicked(object sender, EventArgs e) => await Navigation.PopAsync();
-    private async void OnHomeClicked(object sender, EventArgs e) => await Navigation.PopToRootAsync();
+    private async void OnBackClicked(object sender, EventArgs e) => await Navigation.PopAsync(false);
+    private async void OnHomeClicked(object sender, EventArgs e) => await Navigation.PopToRootAsync(false);
 }
 
 public class GangManagementItem

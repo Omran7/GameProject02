@@ -59,7 +59,7 @@ public partial class AdminManagementPage : ContentPage
         if (currentAdmin == null || !AdminService.IsPlayerAdmin(currentAdmin))
         {
             await DisplayAlert("خطأ", "ليس لديك صلاحية", "موافق");
-            await Navigation.PopAsync();
+            await Navigation.PopAsync(false);
             return;
         }
 

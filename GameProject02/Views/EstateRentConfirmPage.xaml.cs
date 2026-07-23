@@ -127,14 +127,14 @@ public partial class EstateRentConfirmPage : ContentPage
         var totalPrice = _listing.CalculatePriceForDays(days);
         if (_player.Gold < totalPrice) { await ToastService.Show("ليس لديك ذهب كافي!", ToastType.Error); return; }
         var (success, message) = RentalService.RentEstate(_player, _listing.ListingId, days);
-        if (success) { await Navigation.PopAsync(); ToastService.Show("تم استئجار العقار بنجاح!", ToastType.Success); }
+        if (success) { await Navigation.PopAsync(false); ToastService.Show("تم استئجار العقار بنجاح!", ToastType.Success); }
         else { await ToastService.Show($"❌ {message}", ToastType.Error); }
     }
 
     private async void OnBackClicked(object sender, EventArgs e)
     {
         if (sender is Border backBorder) await AnimateBorder(backBorder);
-        await Navigation.PopAsync();
+        await Navigation.PopAsync(false);
     }
 
     private async Task AnimateBorder(Border border)

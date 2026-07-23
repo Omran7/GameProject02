@@ -210,12 +210,12 @@ public partial class SchoolPage : ContentPage
     private async Task NavigateToCategory(int category, object sender)
     {
         if (sender is Border border) await AnimateBorder(border);
-        await Navigation.PushAsync(new LessonPage(category, _player));
+        await Navigation.PushAsync(new LessonPage(category, _player), false);
     }
 
     private async void OnHomeClicked(object sender, EventArgs e)
     {
         if (sender is Border border) await AnimateBorder(border);
-        await Navigation.PopToRootAsync();
+        await Navigation.PopToRootAsync(false);
     }
 }

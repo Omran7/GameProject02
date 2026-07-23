@@ -47,7 +47,7 @@ public partial class GangMarketSubCategoriesPage : ContentPage
                 await card.ScaleTo(0.92, 100);
                 await Task.Delay(100);
                 await card.ScaleTo(1.0, 100);
-                await Navigation.PushAsync(new GangMarketItemsPage(_categoryId, sub.Id, sub.Name));
+                await Navigation.PushAsync(new GangMarketItemsPage(_categoryId, sub.Id, sub.Name), false);
             };
             card.GestureRecognizers.Add(tapGesture);
 
@@ -110,5 +110,5 @@ public partial class GangMarketSubCategoriesPage : ContentPage
         return card;
     }
 
-    private async void OnBackClicked(object sender, EventArgs e) => await Navigation.PopAsync();
+    private async void OnBackClicked(object sender, EventArgs e) => await Navigation.PopAsync(false);
 }

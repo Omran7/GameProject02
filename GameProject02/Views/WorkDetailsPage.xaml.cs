@@ -857,7 +857,7 @@ public partial class WorkDetailsPage : ContentPage
         _isCheckingWork = false;
         _isTimerRunning = false;
         if (sender is Border border) await AnimateBorder(border);
-        await Navigation.PopAsync();
+        await Navigation.PopAsync(false);
     }
 
     private string GetPropertyValue(object obj, string propName)

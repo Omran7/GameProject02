@@ -341,6 +341,6 @@ public partial class LessonPage : ContentPage
     {
         _isCheckingStudy = false;
         if (sender is Border border) await AnimateBorder(border);
-        await Navigation.PopAsync();
+        await Navigation.PopAsync(false);
     }
 }

@@ -48,5 +48,5 @@ public partial class TheShopPage : ContentPage
         else await DisplayAlert("❌ فشل الشراء", msg, "موافق");
     }
 
-    private async void OnOpenWheel() => await Navigation.PushAsync(new LuckyWheelPage());
+    private async void OnOpenWheel() => await Navigation.PushAsync(new LuckyWheelPage(), false);
 }

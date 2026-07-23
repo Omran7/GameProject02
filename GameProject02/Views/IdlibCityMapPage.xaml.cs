@@ -25,34 +25,34 @@ public partial class IdlibCityMapPage : ContentPage
             switch (buildingId)
             {
                 case "Gym":
-                    await Navigation.PushAsync(new GymPage());
+                    await Navigation.PushAsync(new GymPage(), false);
                     break;
                 case "School":
-                    await Navigation.PushAsync(new SchoolPage());
+                    await Navigation.PushAsync(new SchoolPage(), false);
                     break;
                 case "Hospital":
-                    await Navigation.PushAsync(new HospitalPage());
+                    await Navigation.PushAsync(new HospitalPage(), false);
                     break;
                 case "Prison":
-                    await Navigation.PushAsync(new PrisonPage());
+                    await Navigation.PushAsync(new PrisonPage(), false);
                     break;
                 case "FightClub":
-                    await Navigation.PushAsync(new FightClubPage());
+                    await Navigation.PushAsync(new FightClubPage(), false);
                     break;
                 case "WorkOffice":
-                    await Navigation.PushAsync(new WorkOfficePage());
+                    await Navigation.PushAsync(new WorkOfficePage(), false);
                     break;
                 case "CityMarket":
-                    await Navigation.PushAsync(new MarketCategoriesPage());
+                    await Navigation.PushAsync(new MarketCategoriesPage(), false);
                     break;
                 case "GangMarket":
-                    await Navigation.PushAsync(new GangMarketCategoriesPage());
+                    await Navigation.PushAsync(new GangMarketCategoriesPage(), false);
                     break;
                 case "BlackMarket":
-                    await Navigation.PushAsync(new BlackMarketMenuPage());
+                    await Navigation.PushAsync(new BlackMarketMenuPage(), false);
                     break;
                 case "Estate":
-                    await Navigation.PushAsync(new EstatePage());
+                    await Navigation.PushAsync(new EstatePage(), false);
                     break;
                 case "GangBase":
                     await HandleGangNavigation();
@@ -118,13 +118,13 @@ public partial class IdlibCityMapPage : ContentPage
                 "بحث");
 
             if (createNew)
-                await Navigation.PushAsync(new Views.GangCreatePage());
+                await Navigation.PushAsync(new Views.GangCreatePage(), false);
             else
-                await Navigation.PushAsync(new Views.GangSearchPage());
+                await Navigation.PushAsync(new Views.GangSearchPage(), false);
         }
         else
         {
-            await Navigation.PushAsync(new Views.GangProfilePage());
+            await Navigation.PushAsync(new Views.GangProfilePage(), false);
         }
     }
 }

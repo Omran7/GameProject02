@@ -170,29 +170,29 @@ public partial class MainPage : ContentPage, INotifyPropertyChanged
         }
     }
 
-    private async void OnProfileClicked(object sender, EventArgs e) => await Navigation.PushAsync(new ProfilePage());
-    private async void OnGymClicked(object sender, EventArgs e) => await Navigation.PushAsync(new GymPage());
-    private async void OnSchoolClicked(object sender, EventArgs e) => await Navigation.PushAsync(new SchoolPage());
-    private async void OnStockClicked(object sender, EventArgs e) => await Navigation.PushAsync(new StockPage());
-    private async void OnMarketClicked(object sender, EventArgs e) => await Navigation.PushAsync(new MarketCategoriesPage());
-    private async void OnGangMarketClicked(object sender, EventArgs e) => await Navigation.PushAsync(new GangMarketCategoriesPage());
-    private async void OnBlackMarketClicked(object sender, EventArgs e) => await Navigation.PushAsync(new BlackMarketMenuPage());
-    private async void OnEstateClicked(object sender, EventArgs e) => await Navigation.PushAsync(new EstatePage());
-    private async void OnWorkOfficeClicked(object sender, EventArgs e) => await Navigation.PushAsync(new WorkOfficePage());
-    private async void OnCrimeClicked(object sender, EventArgs e) => await Navigation.PushAsync(new CrimePage());
-    private async void OnHospitalClicked(object sender, EventArgs e) => await Navigation.PushAsync(new HospitalPage());
-    private async void OnPrisonClicked(object sender, EventArgs e) => await Navigation.PushAsync(new PrisonPage());
-    private async void OnFightClubClicked(object sender, EventArgs e) => await Navigation.PushAsync(new FightClubPage());
-    private async void OnNotificationCenterClicked(object sender, EventArgs e) => await Navigation.PushAsync(new NotificationCenterPage());
-    private async void OnNewsClicked(object sender, EventArgs e) => await Navigation.PushAsync(new NewsPage());
-    private async void OnAirportClicked(object sender, EventArgs e) => await Navigation.PushAsync(new AirportPage());
-    private async void OnChatClicked(object sender, EventArgs e) => await Navigation.PushAsync(new ChatPage());
-    private async void OnSkillsClicked(object sender, EventArgs e) => await Navigation.PushAsync(new SkillsPage());
-    private async void OnTheShopClicked(object sender, EventArgs e) => await Navigation.PushAsync(new TheShopPage());
-    private async void OnLuckyWheelClicked(object sender, EventArgs e) => await Navigation.PushAsync(new LuckyWheelPage());
-    private async void OnPrivateChatClicked(object sender, EventArgs e) => await Navigation.PushAsync(new PrivateChatListPage());
-    private async void OnMedalsClicked(object sender, EventArgs e) => await Navigation.PushAsync(new MedalsPage());
-    private async void OnAdminPanelClicked(object sender, EventArgs e) => await Navigation.PushAsync(new AdminPanelPage());
+    private async void OnProfileClicked(object sender, EventArgs e) => await Navigation.PushAsync(new ProfilePage(), false);
+    private async void OnGymClicked(object sender, EventArgs e) => await Navigation.PushAsync(new GymPage(), false);
+    private async void OnSchoolClicked(object sender, EventArgs e) => await Navigation.PushAsync(new SchoolPage(), false);
+    private async void OnStockClicked(object sender, EventArgs e) => await Navigation.PushAsync(new StockPage(), false);
+    private async void OnMarketClicked(object sender, EventArgs e) => await Navigation.PushAsync(new MarketCategoriesPage(), false);
+    private async void OnGangMarketClicked(object sender, EventArgs e) => await Navigation.PushAsync(new GangMarketCategoriesPage(), false);
+    private async void OnBlackMarketClicked(object sender, EventArgs e) => await Navigation.PushAsync(new BlackMarketMenuPage(), false);
+    private async void OnEstateClicked(object sender, EventArgs e) => await Navigation.PushAsync(new EstatePage(), false);
+    private async void OnWorkOfficeClicked(object sender, EventArgs e) => await Navigation.PushAsync(new WorkOfficePage(), false);
+    private async void OnCrimeClicked(object sender, EventArgs e) => await Navigation.PushAsync(new CrimePage(), false);
+    private async void OnHospitalClicked(object sender, EventArgs e) => await Navigation.PushAsync(new HospitalPage(), false);
+    private async void OnPrisonClicked(object sender, EventArgs e) => await Navigation.PushAsync(new PrisonPage(), false);
+    private async void OnFightClubClicked(object sender, EventArgs e) => await Navigation.PushAsync(new FightClubPage(), false);
+    private async void OnNotificationCenterClicked(object sender, EventArgs e) => await Navigation.PushAsync(new NotificationCenterPage(), false);
+    private async void OnNewsClicked(object sender, EventArgs e) => await Navigation.PushAsync(new NewsPage(), false);
+    private async void OnAirportClicked(object sender, EventArgs e) => await Navigation.PushAsync(new AirportPage(), false);
+    private async void OnChatClicked(object sender, EventArgs e) => await Navigation.PushAsync(new ChatPage(), false);
+    private async void OnSkillsClicked(object sender, EventArgs e) => await Navigation.PushAsync(new SkillsPage(), false);
+    private async void OnTheShopClicked(object sender, EventArgs e) => await Navigation.PushAsync(new TheShopPage(), false);
+    private async void OnLuckyWheelClicked(object sender, EventArgs e) => await Navigation.PushAsync(new LuckyWheelPage(), false);
+    private async void OnPrivateChatClicked(object sender, EventArgs e) => await Navigation.PushAsync(new PrivateChatListPage(), false);
+    private async void OnMedalsClicked(object sender, EventArgs e) => await Navigation.PushAsync(new MedalsPage(), false);
+    private async void OnAdminPanelClicked(object sender, EventArgs e) => await Navigation.PushAsync(new AdminPanelPage(), false);
 
     private async void OnGangClicked(object sender, EventArgs e)
     {
@@ -222,13 +222,13 @@ public partial class MainPage : ContentPage, INotifyPropertyChanged
                 "بحث");
 
             if (createNew)
-                await Navigation.PushAsync(new Views.GangCreatePage());
+                await Navigation.PushAsync(new Views.GangCreatePage(), false);
             else
-                await Navigation.PushAsync(new Views.GangSearchPage());
+                await Navigation.PushAsync(new Views.GangSearchPage(), false);
         }
         else
         {
-            await Navigation.PushAsync(new Views.GangProfilePage());
+            await Navigation.PushAsync(new Views.GangProfilePage(), false);
         }
     }
 
@@ -251,6 +251,6 @@ public partial class MainPage : ContentPage, INotifyPropertyChanged
         }
     }
 
-    private async void OnCityMapClicked(object sender, EventArgs e) => await Navigation.PushAsync(new CityMapPage());
-    private async void OnIdlibCityMapClicked(object sender, EventArgs e) => await Navigation.PushAsync(new CityMapPage());
+    private async void OnCityMapClicked(object sender, EventArgs e) => await Navigation.PushAsync(new CityMapPage(), false);
+    private async void OnIdlibCityMapClicked(object sender, EventArgs e) => await Navigation.PushAsync(new CityMapPage(), false);
 }

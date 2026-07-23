@@ -62,7 +62,7 @@ public partial class GangProfilePage : ContentPage, INotifyPropertyChanged
             var currentPlayer = AccountService.CurrentPlayer;
             if (currentPlayer == null)
             {
-                await Navigation.PopToRootAsync();
+                await Navigation.PopToRootAsync(false);
                 return;
             }
 
@@ -70,7 +70,7 @@ public partial class GangProfilePage : ContentPage, INotifyPropertyChanged
             var freshPlayer = await FirebaseService.LoadPlayerAsync(currentPlayer.PlayerId);
             if (freshPlayer == null)
             {
-                await Navigation.PopToRootAsync();
+                await Navigation.PopToRootAsync(false);
                 return;
             }
 
@@ -84,7 +84,7 @@ public partial class GangProfilePage : ContentPage, INotifyPropertyChanged
             if (freshGang == null)
             {
                 // No gang – go back
-                await Navigation.PopToRootAsync();
+                await Navigation.PopToRootAsync(false);
                 return;
             }
 
@@ -109,7 +109,7 @@ public partial class GangProfilePage : ContentPage, INotifyPropertyChanged
         MembersList.ItemsSource = new ObservableCollection<GangMemberInfo>(members);
     }
 
-    private async void OnGangMarketClicked(object sender, EventArgs e) => await Navigation.PushAsync(new GangMarketCategoriesPage());
+    private async void OnGangMarketClicked(object sender, EventArgs e) => await Navigation.PushAsync(new GangMarketCategoriesPage(), false);
     private async void OnDonateClicked(object sender, EventArgs e)
     {
         if (_gang == null || _player == null) return;
@@ -123,16 +123,16 @@ public partial class GangProfilePage : ContentPage, INotifyPropertyChanged
             await RefreshData(); // Reload the gang profile page to show updated loyalty
         }
     }
-    private async void OnBackClicked(object sender, EventArgs e) => await Navigation.PopAsync();
-    private async void OnHomeClicked(object sender, EventArgs e) => await Navigation.PopToRootAsync();
-    private async void OnLevelUpgradeClicked(object sender, EventArgs e) => await Navigation.PushAsync(new GangLevelUpgradePage());
-    private async void OnSettingsClicked(object sender, EventArgs e) => await Navigation.PushAsync(new GangManagementPage());
+    private async void OnBackClicked(object sender, EventArgs e) => await Navigation.PopAsync(false);
+    private async void OnHomeClicked(object sender, EventArgs e) => await Navigation.PopToRootAsync(false);
+    private async void OnLevelUpgradeClicked(object sender, EventArgs e) => await Navigation.PushAsync(new GangLevelUpgradePage(), false);
+    private async void OnSettingsClicked(object sender, EventArgs e) => await Navigation.PushAsync(new GangManagementPage(), false);
     private async void OnOpenMilitiaPageClicked(object sender, EventArgs e)
     {
-        if (_gang != null) await Navigation.PushAsync(new GangMilitiaPage(_gang));
+        if (_gang != null) await Navigation.PushAsync(new GangMilitiaPage(_gang), false);
         else await DisplayAlert("خطأ", "بيانات العصابة غير متوفرة", "موافق");
     }
-    private async void OnSkillsClicked(object sender, EventArgs e) => await Navigation.PushAsync(new GangSkillsPage());
+    private async void OnSkillsClicked(object sender, EventArgs e) => await Navigation.PushAsync(new GangSkillsPage(), false);
 
     public new event PropertyChangedEventHandler PropertyChanged;
     protected void OnPropertyChanged([CallerMemberName] string name = "") => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));

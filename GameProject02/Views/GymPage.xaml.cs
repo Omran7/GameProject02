@@ -360,8 +360,8 @@ public partial class GymPage : ContentPage
     }
 
     private async void OnProfileClicked(object sender, EventArgs e)
-        => await Navigation.PushAsync(new ProfilePage());
+        => await Navigation.PushAsync(new ProfilePage(), false);
 
     private async void OnHomeClicked(object sender, EventArgs e)
-        => await Navigation.PopToRootAsync();
+        => await Navigation.PopToRootAsync(false);
 }

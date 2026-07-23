@@ -55,7 +55,7 @@ namespace GameProject02.Views
                 {
                     var player = AccountService.GetCurrentPlayer();
                     await DisplayAlert("Success!", $"Account created successfully!\n\nYour Player ID: {player.PlayerId}\nYour Username: {player.Username}", "OK");
-                    await Navigation.PopAsync();
+                    await Navigation.PopAsync(false);
                 }
                 else
                 {
@@ -75,7 +75,7 @@ namespace GameProject02.Views
 
         private async void OnLoginClicked(object sender, EventArgs e)
         {
-            await Navigation.PopAsync();
+            await Navigation.PopAsync(false);
         }
 
         private void ShowError(string message)

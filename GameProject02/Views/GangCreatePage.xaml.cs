@@ -40,7 +40,7 @@ namespace GameProject02.Views
                 _ = FirebaseService.SavePlayerAsync(player);
 
                 await DisplayAlert("تم", $"تم إنشاء العصابة {gang.Name} بنجاح!", "موافق");
-                await Navigation.PopAsync();
+                await Navigation.PopAsync(false);
             }
             catch (Exception ex)
             {

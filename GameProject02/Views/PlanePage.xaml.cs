@@ -84,8 +84,8 @@ namespace GameProject02.Views
         private async void OnChatClicked(object sender, EventArgs e)
             => await DisplayAlert("قريباً", "المحادثة ستتوفر قريباً", "موافق");
         private async void OnNewsClicked(object sender, EventArgs e)
-            => await Navigation.PushAsync(new NewsPage());
+            => await Navigation.PushAsync(new NewsPage(), false);
         private async void OnShopClicked(object sender, EventArgs e)
-            => await Navigation.PushAsync(new MarketCategoriesPage());
+            => await Navigation.PushAsync(new MarketCategoriesPage(), false);
     }
 }

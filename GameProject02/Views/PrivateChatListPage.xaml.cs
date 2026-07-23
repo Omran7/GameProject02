@@ -72,13 +72,13 @@ namespace GameProject02.Views
             if (e.CurrentSelection.FirstOrDefault() is ConversationModel conv)
             {
                 ((CollectionView)sender).SelectedItem = null;
-                await Navigation.PushAsync(new PrivateChatPage(conv.ConversationId, conv.OtherUserId, conv.OtherUserName));
+                await Navigation.PushAsync(new PrivateChatPage(conv.ConversationId, conv.OtherUserId, conv.OtherUserName), false);
             }
         }
 
         private async void OnNewChatClicked(object sender, EventArgs e)
         {
-            await Navigation.PushAsync(new PlayerSelectionPage());
+            await Navigation.PushAsync(new PlayerSelectionPage(), false);
         }
     }
 }

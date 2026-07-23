@@ -376,7 +376,7 @@ public partial class EstateRentPage : ContentPage
                 ToastService.Show("لا يمكنك استئجار عقارك الخاص!", ToastType.Error);
                 return;
             }
-            await Navigation.PushAsync(new EstateRentConfirmPage(selectedListing));
+            await Navigation.PushAsync(new EstateRentConfirmPage(selectedListing), false);
         }
     }
 
@@ -394,12 +394,12 @@ public partial class EstateRentPage : ContentPage
     private async void OnRentOutClicked(object sender, EventArgs e)
     {
         if (sender is Border border) await AnimateBorder(border);
-        await Navigation.PushAsync(new EstateRentOutPage());
+        await Navigation.PushAsync(new EstateRentOutPage(), false);
     }
 
     private async void OnBackClicked(object sender, EventArgs e)
     {
         if (sender is Border border) await AnimateBorder(border);
-        await Navigation.PopAsync();
+        await Navigation.PopAsync(false);
     }
 }

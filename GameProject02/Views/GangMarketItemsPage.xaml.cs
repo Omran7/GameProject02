@@ -283,7 +283,7 @@ public partial class GangMarketItemsPage : ContentPage
         _notificationBorder.IsVisible = false;
     }
 
-    private async void OnBackClicked(object sender, EventArgs e) => await Navigation.PopAsync();
+    private async void OnBackClicked(object sender, EventArgs e) => await Navigation.PopAsync(false);
     private async void OnRefreshClicked(object sender, EventArgs e)
     {
         LoadItems();

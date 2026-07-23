@@ -9,7 +9,11 @@ using static GameProject02.Helpers.PopupService;
 
 namespace GameProject02.Views;
 
-public partial class TopHeaderView : ContentView
+// ═══════════════════════════════════════════════════════════════════
+//  الهيدر الحقيقي — نسخة واحدة مشتركة في كل التطبيق (Singleton)
+//  الصفحات تستخدم TopHeaderView (الحاوية) التي تستعير هذه النسخة
+// ═══════════════════════════════════════════════════════════════════
+public partial class TopHeaderCore : ContentView
 {
     private System.Timers.Timer _refreshTimer;
     private bool _sizesApplied = false;
@@ -48,7 +52,7 @@ public partial class TopHeaderView : ContentView
     private double _levelDigitSize;
     private double _maxDigitSize;
 
-    public TopHeaderView()
+    public TopHeaderCore()
     {
         InitializeComponent();
 
@@ -415,10 +419,6 @@ public partial class TopHeaderView : ContentView
         fillImage.WidthRequest = maxWidth * ratio;
     }
 
-    ~TopHeaderView()
-    {
-        PlayerAccount.AvatarChanged -= OnAvatarChanged;
-        _refreshTimer?.Stop();
-        _refreshTimer?.Dispose();
-    }
+    // ملاحظة: هذه النسخة مشتركة وتعيش طوال عمر التطبيق،
+    // لذلك لا نلغي الاشتراك في الأحداث ولا نوقف المؤقّت.
 }
