@@ -461,7 +461,7 @@ public partial class CrimeTypePage : ContentPage
     private async void OnBackClicked(object sender, EventArgs e)
     {
         if (sender is Border b) await AnimateBorder(b);
-        await Navigation.PopAsync();
+        await Navigation.PopAsync(false);
     }
 
     private async Task AnimateBorder(Border border)

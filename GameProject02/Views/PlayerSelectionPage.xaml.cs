@@ -84,7 +84,7 @@ namespace GameProject02.Views
 
                 // الانتقال لصفحة المحادثة (تأكد من مطابقة اسم الصفحة لديك)
                 // إذا كان اسم الصفحة PrivateChatRoomPage قم بتغييره هنا
-                await Navigation.PushAsync(new PrivateChatPage(conversationId, selected.PlayerId, selected.Username));
+                await Navigation.PushAsync(new PrivateChatPage(conversationId, selected.PlayerId, selected.Username), false);
             }
         }
     }

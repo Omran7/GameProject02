@@ -101,26 +101,26 @@ public partial class EstatePage : ContentPage
     private async void OnNewEstatesClicked(object sender, EventArgs e)
     {
         await AnimateBorder(sender as Border);
-        await Navigation.PushAsync(new EstateNewPage());
+        await Navigation.PushAsync(new EstateNewPage(), false);
     }
 
     private async void OnUsedEstatesClicked(object sender, EventArgs e)
     {
         await AnimateBorder(sender as Border);
-        await Navigation.PushAsync(new UsedEstatePage());
+        await Navigation.PushAsync(new UsedEstatePage(), false);
     }
 
     private async void OnRentEstatesClicked(object sender, EventArgs e)
     {
         await AnimateBorder(sender as Border);
-        await Navigation.PushAsync(new EstateRentPage());
+        await Navigation.PushAsync(new EstateRentPage(), false);
     }
 
     private async void OnMyEstatesClicked(object sender, EventArgs e)
     {
         await AnimateBorder(sender as Border);
         if (_player.Estates != null && _player.Estates.Count > 0)
-            await Navigation.PushAsync(new EstateOwnPage());
+            await Navigation.PushAsync(new EstateOwnPage(), false);
         else
             await ToastService.Show("لم تمتلك أي عقارات بعد!\nاشتري عقار جديد من قسم 'عقارات جديدة'", ToastType.Error);
     }
@@ -128,7 +128,7 @@ public partial class EstatePage : ContentPage
     private async void OnHomeClicked(object sender, EventArgs e)
     {
         await AnimateBorder(sender as Border);
-        await Navigation.PopToRootAsync();
+        await Navigation.PopToRootAsync(false);
     }
 
     private async void OnProfileClicked(object sender, EventArgs e)
@@ -136,7 +136,7 @@ public partial class EstatePage : ContentPage
         // هذه الدالة لن تُستخدم حالياً بعد حذف زر Profile
         // يمكن الاحتفاظ بها أو حذفها
         await AnimateBorder(sender as Border);
-        await Navigation.PushAsync(new ProfilePage());
+        await Navigation.PushAsync(new ProfilePage(), false);
     }
 
     private async Task AnimateBorder(Border border)

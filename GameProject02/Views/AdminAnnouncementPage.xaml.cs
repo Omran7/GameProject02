@@ -31,7 +31,7 @@ public partial class AdminAnnouncementPage : ContentPage
             MessageEntry.Text = "";
             await DisplayAlert("✅ نجاح", resultMessage, "موافق");
             MessagingCenter.Send(this, "RefreshNews");
-            await Navigation.PopAsync();
+            await Navigation.PopAsync(false);
         }
         else
         {

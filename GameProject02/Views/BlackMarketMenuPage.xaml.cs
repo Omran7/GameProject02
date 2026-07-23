@@ -12,17 +12,17 @@ public partial class BlackMarketMenuPage : ContentPage
     }
 
     private async void OnEnterDiamondsClicked(object sender, System.EventArgs e) =>
-        await Navigation.PushAsync(new BlackMarketConversionPage("Diamonds"));
+        await Navigation.PushAsync(new BlackMarketConversionPage("Diamonds"), false);
 
     private async void OnEnterChecksClicked(object sender, System.EventArgs e) =>
-        await Navigation.PushAsync(new BlackMarketConversionPage("Checks"));
+        await Navigation.PushAsync(new BlackMarketConversionPage("Checks"), false);
 
     private async void OnEnterToolsClicked(object sender, System.EventArgs e) =>
-        await Navigation.PushAsync(new BlackMarketConversionPage("Tools"));
+        await Navigation.PushAsync(new BlackMarketConversionPage("Tools"), false);
 
     private async void OnEnterFoodClicked(object sender, System.EventArgs e) =>
-        await Navigation.PushAsync(new BlackMarketConversionPage("Food"));
+        await Navigation.PushAsync(new BlackMarketConversionPage("Food"), false);
 
-    private async void OnBackClicked(object sender, System.EventArgs e) => await Navigation.PopAsync();
-    private async void OnHomeClicked(object sender, System.EventArgs e) => await Navigation.PopToRootAsync();
+    private async void OnBackClicked(object sender, System.EventArgs e) => await Navigation.PopAsync(false);
+    private async void OnHomeClicked(object sender, System.EventArgs e) => await Navigation.PopToRootAsync(false);
 }

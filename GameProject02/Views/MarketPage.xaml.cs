@@ -428,6 +428,6 @@ public partial class MarketPage : ContentPage
     private async void OnBackClicked(object sender, EventArgs e)
     {
         if (sender is Border border) await AnimateBorder(border);
-        await Navigation.PopAsync();
+        await Navigation.PopAsync(false);
     }
 }

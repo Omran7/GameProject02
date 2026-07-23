@@ -314,13 +314,13 @@ public partial class EstateRentOutPage : ContentPage
             return;
         }
         var (success, message) = RentalService.CreateListing(_player, _selectedEstate, totalPrice);
-        if (success) { await Navigation.PopAsync(); ToastService.Show("تم عرض العقار للإيجار بنجاح!", ToastType.Success); }
+        if (success) { await Navigation.PopAsync(false); ToastService.Show("تم عرض العقار للإيجار بنجاح!", ToastType.Success); }
         else { await ToastService.Show($"❌ {message}", ToastType.Error); }
     }
 
     private async void OnBackClicked(object sender, EventArgs e)
     {
         if (sender is Border b) await AnimateBorder(b);
-        await Navigation.PopAsync();
+        await Navigation.PopAsync(false);
     }
 }

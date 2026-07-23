@@ -420,17 +420,17 @@ public partial class MuseumPage : ContentPage, INotifyPropertyChanged
             if (tabName == "المخزن")
             {
                 SetActiveTab(border, StockTabLabel);
-                await Navigation.PushAsync(new StockPage());
+                await Navigation.PushAsync(new StockPage(), false);
             }
             else if (tabName == "الحقيبة")
             {
                 SetActiveTab(border, BagTabLabel);
-                await Navigation.PushAsync(new BagPage());
+                await Navigation.PushAsync(new BagPage(), false);
             }
             else if (tabName == "المتجر")
             {
                 SetActiveTab(border, ShopTabLabel);
-                await Navigation.PushAsync(new ShopPage());
+                await Navigation.PushAsync(new ShopPage(), false);
             }
             else if (tabName == "المتحف")
             {
@@ -521,7 +521,7 @@ public partial class MuseumPage : ContentPage, INotifyPropertyChanged
             await Task.Delay(50);
             await border.ScaleTo(1.0, 50, Easing.CubicIn);
         }
-        await Navigation.PopToRootAsync();
+        await Navigation.PopToRootAsync(false);
     }
     #endregion
 
@@ -610,7 +610,7 @@ public class MuseumSpaceItemViewModel
     private async void OnAddClicked(object parameter)
     {
         await Application.Current.MainPage.Navigation.PushAsync(
-            new StockPage(isAddMode: true, isForMuseum: true, museumSpaceIndex: _spaceIndex));
+            new StockPage(isAddMode: true, isForMuseum: true, museumSpaceIndex: _spaceIndex), false);
     }
 
     private async void OnRemoveClicked(object parameter)

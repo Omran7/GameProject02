@@ -455,17 +455,17 @@ namespace GameProject02.Views
                 else if (tabName == "الحقيبة")
                 {
                     SetActiveTab(border, BagTabLabel);
-                    await Navigation.PushAsync(new BagPage());
+                    await Navigation.PushAsync(new BagPage(), false);
                 }
                 else if (tabName == "المتجر")
                 {
                     SetActiveTab(border, ShopTabLabel);
-                    await Navigation.PushAsync(new ShopPage());
+                    await Navigation.PushAsync(new ShopPage(), false);
                 }
                 else if (tabName == "المتحف")
                 {
                     SetActiveTab(border, MuseumTabLabel);
-                    await Navigation.PushAsync(new MuseumPage());
+                    await Navigation.PushAsync(new MuseumPage(), false);
                 }
             }
         }
@@ -562,7 +562,7 @@ namespace GameProject02.Views
                             _player.StockObject.ShopListings.Add(listing);
                         item.Count -= quantity;
                         _player.StockObject.StockFreeSpace += quantity;
-                        await Navigation.PopAsync();
+                        await Navigation.PopAsync(false);
                         await ToastService.Show($"تمت إضافة {quantity} × {item.Name}", ToastType.Success);
                     }
                 }
@@ -594,7 +594,7 @@ namespace GameProject02.Views
                             _player.Museum.Items[_museumSpaceIndex] = museumItem;
                         else
                             _player.Museum.Items.Add(museumItem);
-                        await Navigation.PopAsync();
+                        await Navigation.PopAsync(false);
                         await ToastService.Show($"تم عرض {item.Name} في المتحف", ToastType.Success);
                     }
                 }
@@ -605,7 +605,7 @@ namespace GameProject02.Views
             {
                 if (_player.StockObject.AddToBag(item.ItemId, amount))
                 {
-                    await Navigation.PopAsync();
+                    await Navigation.PopAsync(false);
                     await ToastService.Show($"تمت إضافة {amount} × {item.Name}", ToastType.Success);
                     LoadStockData();
                 }
@@ -632,9 +632,9 @@ namespace GameProject02.Views
                 await border.ScaleTo(1.0, 50, Easing.CubicIn);
             }
             if (IsAddMode)
-                await Navigation.PopAsync();
+                await Navigation.PopAsync(false);
             else
-                await Navigation.PopToRootAsync();
+                await Navigation.PopToRootAsync(false);
         }
         #endregion
     }

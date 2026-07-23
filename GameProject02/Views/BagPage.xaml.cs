@@ -365,7 +365,7 @@ namespace GameProject02.Views
                 if (tabName == "المخزن")
                 {
                     SetActiveTab(border, StockTabLabel);
-                    await Navigation.PushAsync(new StockPage());
+                    await Navigation.PushAsync(new StockPage(), false);
                 }
                 else if (tabName == "الحقيبة")
                 {
@@ -375,12 +375,12 @@ namespace GameProject02.Views
                 else if (tabName == "المتجر")
                 {
                     SetActiveTab(border, ShopTabLabel);
-                    await Navigation.PushAsync(new ShopPage());
+                    await Navigation.PushAsync(new ShopPage(), false);
                 }
                 else if (tabName == "المتحف")
                 {
                     SetActiveTab(border, MuseumTabLabel);
-                    await Navigation.PushAsync(new MuseumPage());
+                    await Navigation.PushAsync(new MuseumPage(), false);
                 }
             }
         }
@@ -402,7 +402,7 @@ namespace GameProject02.Views
                 await ToastService.Show("الحقيبة ممتلئة!", ToastType.Error);
                 return;
             }
-            await Navigation.PushAsync(new StockPage(isAddMode: true));
+            await Navigation.PushAsync(new StockPage(isAddMode: true), false);
         }
 
         private async void OnRemoveClicked(StockItem item)
@@ -426,7 +426,7 @@ namespace GameProject02.Views
                 await Task.Delay(50);
                 await border.ScaleTo(1.0, 50, Easing.CubicIn);
             }
-            await Navigation.PopToRootAsync();
+            await Navigation.PopToRootAsync(false);
         }
         #endregion
     }

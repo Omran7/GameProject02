@@ -325,14 +325,14 @@ public partial class UsedEstateSellPage : ContentPage
             return;
         }
         var (success, message) = UsedEstateService.CreateListing(_player, _selectedEstate, (int)salePriceLong);
-        if (success) { await Navigation.PopAsync(); ToastService.Show("تم عرض العقار للبيع بنجاح!", ToastType.Success); }
+        if (success) { await Navigation.PopAsync(false); ToastService.Show("تم عرض العقار للبيع بنجاح!", ToastType.Success); }
         else { ToastService.Show($"❌ {message}", ToastType.Error); }
     }
 
     private async void OnBackClicked(object sender, EventArgs e)
     {
         if (sender is Border b) await AnimateBorder(b);
-        await Navigation.PopAsync();
+        await Navigation.PopAsync(false);
     }
 
     private async Task AnimateBorder(Border border)

@@ -68,7 +68,7 @@ public partial class GangMarketItemTypesPage : ContentPage
                 await card.ScaleTo(0.92, 100);
                 await Task.Delay(100);
                 await card.ScaleTo(1.0, 100);
-                await Navigation.PushAsync(new GangMarketSellersPage(_categoryId, _subCategoryId, item.ItemId, item.ItemName));
+                await Navigation.PushAsync(new GangMarketSellersPage(_categoryId, _subCategoryId, item.ItemId, item.ItemName), false);
             };
             card.GestureRecognizers.Add(tap);
             ItemsGrid.Add(card, col, row);
@@ -130,6 +130,6 @@ public partial class GangMarketItemTypesPage : ContentPage
         return card;
     }
 
-    private async void OnBackClicked(object sender, EventArgs e) => await Navigation.PopAsync();
+    private async void OnBackClicked(object sender, EventArgs e) => await Navigation.PopAsync(false);
     private async void OnRefreshClicked(object sender, EventArgs e) { LoadItemTypes(); await DisplayAlert("تحديث", "تم تحديث قائمة العناصر", "موافق"); }
 }

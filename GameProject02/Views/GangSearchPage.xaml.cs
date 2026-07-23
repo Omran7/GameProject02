@@ -75,7 +75,7 @@ namespace GameProject02.Views
             }
         }
 
-        private async void OnBackClicked(object sender, EventArgs e) => await Navigation.PopAsync();
-        private async void OnHomeClicked(object sender, EventArgs e) => await Navigation.PopToRootAsync();
+        private async void OnBackClicked(object sender, EventArgs e) => await Navigation.PopAsync(false);
+        private async void OnHomeClicked(object sender, EventArgs e) => await Navigation.PopToRootAsync(false);
     }
 }

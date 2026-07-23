@@ -167,7 +167,7 @@ public partial class AdminRequestsPage : ContentPage
             var image = ImageSource.FromStream(() => stream);
             var page = new ContentPage();
             page.Content = new Image { Source = image, Aspect = Aspect.AspectFit };
-            await Navigation.PushAsync(page);
+            await Navigation.PushAsync(page, false);
         }
         catch (Exception ex)
         {

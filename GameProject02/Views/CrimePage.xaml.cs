@@ -283,7 +283,7 @@ public partial class CrimePage : ContentPage
             tap.Tapped += async (s, e) =>
             {
                 await AnimateBorder(buttonBorder);
-                await Navigation.PushAsync(new CrimeTypePage(crimeTypeId));
+                await Navigation.PushAsync(new CrimeTypePage(crimeTypeId), false);
             };
         }
         else
@@ -312,7 +312,7 @@ public partial class CrimePage : ContentPage
     private async void OnHomeClicked(object sender, EventArgs e)
     {
         if (sender is Border border) await AnimateBorder(border);
-        await Navigation.PopToRootAsync();
+        await Navigation.PopToRootAsync(false);
     }
 
     private async Task AnimateBorder(Border border)

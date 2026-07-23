@@ -234,7 +234,7 @@ public partial class WorkOfficePage : ContentPage
         tap.Tapped += async (s, e) =>
         {
             await AnimateBorder(buttonBorder);
-            await Navigation.PushAsync(new WorkDetailsPage(category.Id, category.Name));
+            await Navigation.PushAsync(new WorkDetailsPage(category.Id, category.Name), false);
         };
         buttonBorder.GestureRecognizers.Add(tap);
 
@@ -305,6 +305,6 @@ public partial class WorkOfficePage : ContentPage
     private async void OnHomeClicked(object sender, EventArgs e)
     {
         if (sender is Border border) await AnimateBorder(border);
-        await Navigation.PopToRootAsync();
+        await Navigation.PopToRootAsync(false);
     }
 }

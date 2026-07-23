@@ -2,13 +2,14 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:views="clr-namespace:GameProject02.Views"
+             xmlns:controls="clr-namespace:GameProject02.Controls"
              x:Class="GameProject02.MainPage"
              BackgroundColor="Black"
              FlowDirection="RightToLeft"
              NavigationPage.HasNavigationBar="False">
 
-    <Grid RowDefinitions="Auto, *">
-        <!-- Sticky Top Bar -->
+    <Grid RowDefinitions="Auto, *, Auto">
+        <!-- Sticky Top Bar (نسخة مشتركة ثابتة لا تتغير بين الصفحات) -->
         <views:TopHeaderView Grid.Row="0" x:Name="StickyHeader" />
 
         <!-- Scrollable Content -->
@@ -107,5 +108,8 @@
 
             </VerticalStackLayout>
         </ScrollView>
+
+        <!-- Sticky Footer (نسخة مشتركة ثابتة — الأزرار الإضافية تحددها كل صفحة) -->
+        <controls:FooterView Grid.Row="2" x:Name="PageFooter" />
     </Grid>
 </ContentPage>

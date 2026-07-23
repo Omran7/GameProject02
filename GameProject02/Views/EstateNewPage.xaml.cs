@@ -309,7 +309,7 @@ public partial class EstateNewPage : ContentPage
     {
         if (sender is Border b)
             await b.ScaleTo(EstateUIConstants.AnimationPressScale, EstateUIConstants.AnimationPressDuration, Easing.CubicIn);
-        await Navigation.PopAsync();
+        await Navigation.PopAsync(false);
     }
 
     public class EstateItem

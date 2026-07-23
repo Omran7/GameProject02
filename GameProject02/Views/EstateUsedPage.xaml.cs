@@ -415,12 +415,12 @@ public partial class UsedEstatePage : ContentPage
     private async void OnSellUsedClicked(object sender, EventArgs e)
     {
         if (sender is Border border) await AnimateBorder(border);
-        await Navigation.PushAsync(new UsedEstateSellPage());
+        await Navigation.PushAsync(new UsedEstateSellPage(), false);
     }
 
     private async void OnBackClicked(object sender, EventArgs e)
     {
         if (sender is Border border) await AnimateBorder(border);
-        await Navigation.PopAsync();
+        await Navigation.PopAsync(false);
     }
 }

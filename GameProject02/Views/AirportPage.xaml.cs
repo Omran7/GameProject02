@@ -61,9 +61,9 @@ namespace GameProject02.Views
         }
 
         private async void OnBackClicked(object sender, EventArgs e)
-            => await Navigation.PopAsync();
+            => await Navigation.PopAsync(false);
 
         private async void OnMapClicked(object sender, EventArgs e)
-            => await Navigation.PushAsync(new MapPage());
+            => await Navigation.PushAsync(new MapPage(), false);
     }
 }

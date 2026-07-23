@@ -83,7 +83,7 @@ public partial class ManagerReportPage : ContentPage
                 _imageBase64 = string.Empty;
                 ImagePathLabel.Text = "لم يتم اختيار صورة";
                 ImagePathLabel.TextColor = Color.FromArgb("#bdc3c7");
-                await Navigation.PopAsync();
+                await Navigation.PopAsync(false);
             }
         }
         catch (Exception ex)

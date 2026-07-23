@@ -198,12 +198,12 @@ public partial class ArmingStockSelectionPage : ContentPage
 
             // Optional: Auto-close after 800ms
             await Task.Delay(800);
-            await Navigation.PopAsync();
+            await Navigation.PopAsync(false);
         }
     }
 
     private async void OnBackClicked(object sender, EventArgs e)
     {
-        await Navigation.PopAsync();
+        await Navigation.PopAsync(false);
     }
 }

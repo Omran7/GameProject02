@@ -42,7 +42,7 @@ public partial class FightClubPage : ContentPage, INotifyPropertyChanged
         if (_player.CrimeObject.IsInPrison || _player.CrimeObject.IsInHospital)
         {
             await DisplayAlert("غير مسموح", "لا يمكنك الوصول إلى نادي القتال أثناء وجودك في السجن أو المستشفى!", "موافق");
-            await Navigation.PopAsync();
+            await Navigation.PopAsync(false);
             return;
         }
 
@@ -67,12 +67,12 @@ public partial class FightClubPage : ContentPage, INotifyPropertyChanged
             }
 
             // Navigate to fight screen
-            await Navigation.PushAsync(new FightPage(_player, opponent));
+            await Navigation.PushAsync(new FightPage(_player, opponent), false);
         }
     }
 
-    private async void OnBackClicked(object sender, EventArgs e) => await Navigation.PopAsync();
-    private async void OnHomeClicked(object sender, EventArgs e) => await Navigation.PopToRootAsync();
+    private async void OnBackClicked(object sender, EventArgs e) => await Navigation.PopAsync(false);
+    private async void OnHomeClicked(object sender, EventArgs e) => await Navigation.PopToRootAsync(false);
     private async void OnRefreshClicked(object sender, EventArgs e)
     {
         LoadPlayers();

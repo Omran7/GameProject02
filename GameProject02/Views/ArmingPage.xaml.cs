@@ -118,16 +118,16 @@ public partial class ArmingPage : ContentPage
     }
     // ✅ CORRECTED: Navigate to STOCK SELECTION (not market)
     private async void OnSelectWeaponClicked(object sender, EventArgs e) =>
-        await Navigation.PushAsync(new ArmingStockSelectionPage("weapon", 0));
+        await Navigation.PushAsync(new ArmingStockSelectionPage("weapon", 0), false);
 
     private async void OnSelectArmorClicked(object sender, EventArgs e) =>
-        await Navigation.PushAsync(new ArmingStockSelectionPage("armor", 1));
+        await Navigation.PushAsync(new ArmingStockSelectionPage("armor", 1), false);
 
     private async void OnSelectSpecialClicked(object sender, EventArgs e) =>
-        await Navigation.PushAsync(new ArmingStockSelectionPage("special", 3));
+        await Navigation.PushAsync(new ArmingStockSelectionPage("special", 3), false);
 
     private async void OnSelectBiochemicalClicked(object sender, EventArgs e) =>
-        await Navigation.PushAsync(new ArmingStockSelectionPage("biochemical", 4));
+        await Navigation.PushAsync(new ArmingStockSelectionPage("biochemical", 4), false);
 
     private async void OnRemoveWeaponClicked(object sender, EventArgs e) => await RemoveItem(_player.ArmingObject.WeaponId, "السلاح");
     private async void OnRemoveArmorClicked(object sender, EventArgs e) => await RemoveItem(_player.ArmingObject.ArmorId, "الدرع");
@@ -146,7 +146,7 @@ public partial class ArmingPage : ContentPage
         if (result.success) LoadPlayerData();
     }
 
-    private async void OnBackClicked(object sender, EventArgs e) => await Navigation.PopAsync();
-    private async void OnHomeClicked(object sender, EventArgs e) => await Navigation.PopToRootAsync();
+    private async void OnBackClicked(object sender, EventArgs e) => await Navigation.PopAsync(false);
+    private async void OnHomeClicked(object sender, EventArgs e) => await Navigation.PopToRootAsync(false);
     private async void OnRefreshClicked(object sender, EventArgs e) => LoadPlayerData();
 }

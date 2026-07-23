@@ -29,7 +29,7 @@ public partial class AdminPanelPage : ContentPage
         if (player == null || !AdminService.IsPlayerAdmin(player) && !AdminService.IsPlayerManager(player))
         {
             DisplayAlert("خطأ", "ليس لديك صلاحية", "موافق");
-            Navigation.PopAsync();
+            Navigation.PopAsync(false);
             return;
         }
 
@@ -61,19 +61,19 @@ public partial class AdminPanelPage : ContentPage
         switch (item.Action)
         {
             case "requests":
-                await Navigation.PushAsync(new AdminRequestsPage());
+                await Navigation.PushAsync(new AdminRequestsPage(), false);
                 break;
             case "ban":
-                await Navigation.PushAsync(new AdminBanPlayerPage());
+                await Navigation.PushAsync(new AdminBanPlayerPage(), false);
                 break;
             case "announce":
-                await Navigation.PushAsync(new AdminAnnouncementPage());
+                await Navigation.PushAsync(new AdminAnnouncementPage(), false);
                 break;
             case "manage":
-                await Navigation.PushAsync(new AdminManagementPage());
+                await Navigation.PushAsync(new AdminManagementPage(), false);
                 break;
             case "report":
-                await Navigation.PushAsync(new ManagerReportPage());
+                await Navigation.PushAsync(new ManagerReportPage(), false);
                 break;
             default:
                 await DisplayAlert("قريباً", "هذه الميزة قيد التطوير", "موافق");
@@ -81,5 +81,5 @@ public partial class AdminPanelPage : ContentPage
         }
     }
 
-    private async void OnGoHome() => await Navigation.PopAsync();
+    private async void OnGoHome() => await Navigation.PopAsync(false);
 }

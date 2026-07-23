@@ -277,7 +277,7 @@ public partial class MarketCategoriesPage : ContentPage
     private async Task NavigateToItemsPage(int categoryId, int subCategoryId, string categoryName, string subCategoryName)
     {
         var itemsPage = new MarketPage(categoryId, subCategoryId, categoryName, subCategoryName);
-        await Navigation.PushAsync(itemsPage);
+        await Navigation.PushAsync(itemsPage, false);
     }
 
     private async Task AnimateBorder(Border border)
@@ -296,7 +296,7 @@ public partial class MarketCategoriesPage : ContentPage
         var player = AccountService.GetCurrentPlayer();
         if (player == null)
         {
-            await Navigation.PopToRootAsync();
+            await Navigation.PopToRootAsync(false);
             return;
         }
 
@@ -320,7 +320,7 @@ public partial class MarketCategoriesPage : ContentPage
             return;
         }
 
-        await Navigation.PopToRootAsync();
+        await Navigation.PopToRootAsync(false);
     }
 
     private async void OnHomeClicked(object sender, EventArgs e)

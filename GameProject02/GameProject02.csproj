@@ -168,8 +168,8 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<Compile Update="Controls\FooterView.xaml.cs">
-			<DependentUpon>FooterView.xaml</DependentUpon>
+		<Compile Update="Controls\FooterCore.xaml.cs">
+			<DependentUpon>FooterCore.xaml</DependentUpon>
 		</Compile>
 		<Compile Update="Controls\GameHeader.xaml.cs">
 			<DependentUpon>GameHeader.xaml</DependentUpon>
@@ -192,7 +192,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<MauiXaml Update="Controls\FooterView.xaml">
+		<MauiXaml Update="Controls\FooterCore.xaml">
 			<Generator>MSBuild:Compile</Generator>
 		</MauiXaml>
 		<MauiXaml Update="Resources\Styles\StockStyles.xaml">

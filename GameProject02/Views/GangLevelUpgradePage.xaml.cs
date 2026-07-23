@@ -14,7 +14,7 @@ public partial class GangLevelUpgradePage : ContentPage
         InitializeComponent();
         _player = AccountService.GetCurrentPlayer();
         _gang = _player?.GangObject;
-        if (_gang == null) Navigation.PopAsync();
+        if (_gang == null) Navigation.PopAsync(false);
         else LoadData();
     }
 
@@ -36,7 +36,7 @@ public partial class GangLevelUpgradePage : ContentPage
         if (result.success)
         {
             await DisplayAlert("✅ نجاح", result.message, "موافق");
-            await Navigation.PopAsync();
+            await Navigation.PopAsync(false);
         }
         else
         {
