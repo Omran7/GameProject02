@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:local="clr-namespace:GameProject02"
              xmlns:views="clr-namespace:GameProject02.Views"
+             xmlns:controls="clr-namespace:GameProject02.Controls"
              xmlns:converters="clr-namespace:GameProject02.Converters"
              x:Class="GameProject02.App">
 
@@ -25,6 +26,23 @@
 
                     <!-- The Page Content (MainPage, GamePage, etc.) loads in Row 1 -->
                     <ContentPresenter Grid.Row="1" />
+                </Grid>
+            </ControlTemplate>
+
+            <!-- Global Template: Sticky Header + Sticky Footer
+                 للصفحات التي لا تحتوي على FooterView خاص بها —
+                 الفوتر المشترك يظهر بنفس التصميم، وتضيف كل صفحة
+                 أزرارها عبر FooterView.SetContent إن احتاجت -->
+            <ControlTemplate x:Key="StickyHeaderFooterTemplate">
+                <Grid RowDefinitions="Auto, *, Auto">
+                    <!-- The Sticky Header stays at Row 0 -->
+                    <views:TopHeaderView Grid.Row="0" />
+
+                    <!-- The Page Content loads in Row 1 -->
+                    <ContentPresenter Grid.Row="1" />
+
+                    <!-- The Sticky Footer stays at Row 2 -->
+                    <controls:FooterView x:Name="TemplateFooter" Grid.Row="2" />
                 </Grid>
             </ControlTemplate>
 
